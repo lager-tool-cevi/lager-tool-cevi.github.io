@@ -1,6 +1,6 @@
 // Service Worker: macht das Lager-Tool installierbar und ohne Netz startbar.
 // Seiten kommen immer zuerst frisch aus dem Netz; ohne Netz aus dem Zwischenspeicher.
-const CACHE = "lager-tool-2026-11-17 21:27";
+const CACHE = "lager-tool-2026-11-17 21:35";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png"];
 
 self.addEventListener("install", (e) => {
@@ -13,7 +13,7 @@ self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET" || new URL(req.url).origin !== location.origin) return; // Daten (Google) nie zwischenspeichern
   e.respondWith(
-    fetch(req).then((res) => { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); return res; })
+    fetch(req, { cache: "no-cache" }).then((res) => { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); return res; })
       .catch(() => caches.match(req).then((r) => r || caches.match("./index.html")))
   );
 });
