@@ -1,0 +1,23 @@
+{
+    "background_color":  "#f4f5fa",
+    "short_name":  "Lager-Tool",
+    "icons":  [
+                  {
+                      "type":  "image/png",
+                      "sizes":  "192x192",
+                      "src":  "icons/icon-192.png"
+                  },
+                  {
+                      "purpose":  "any",
+                      "type":  "image/png",
+                      "sizes":  "512x512",
+                      "src":  "icons/icon-512.png"
+                  }
+              ],
+    "lang":  "de",
+    "theme_color":  "#141a3d",
+    "display":  "standalone",
+    "name":  "Lager-Tool",
+    "scope":  "./",
+    "start_url":  "./"
+}

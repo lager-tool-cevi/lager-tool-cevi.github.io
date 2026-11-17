@@ -1,0 +1,17 @@
+# Personendaten und Startdaten bleiben lokal (Namen, Aufgaben, Logo-Daten)
+quelle/seed*.json
+google-version/Seed.gs
+# alte Google-Dateien (werden nicht mehr gebraucht)
+google-version/Index.html
+google-version/Daten.html
+google-version/Programm*.html
+# lokale Vorschau, Sicherungen, Testausgaben
+vorschau/
+sicherung/
+lalei-*.html
+beispiel-*.png
+werkzeuge/upload-*
+*.docx
+*.xlsx
+*.pdf
+.claude/

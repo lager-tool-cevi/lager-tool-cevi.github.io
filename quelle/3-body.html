@@ -1,0 +1,83 @@
+<div id="boot-msg" style="font:15px system-ui,sans-serif;color:#444;padding:40px 16px;text-align:center">Lager-Tool wird geladen … <span style="opacity:.55;font-size:12px">(Stand 1.11.2026)</span></div>
+<script>
+(function () {
+  function show(m) {
+    var b = document.getElementById('boot-msg'); if (!b) { b = document.createElement('div'); b.id = 'boot-msg'; document.body.insertBefore(b, document.body.firstChild); }
+    b.innerHTML = '<div style="max-width:640px;margin:20px auto;padding:16px 20px;border:2px solid #c01030;border-radius:10px;background:#fff;color:#161a33;text-align:left;font:14px system-ui,sans-serif"><b style="font-size:16px">Das Lager-Tool konnte nicht starten.</b><p>Bitte einen Screenshot davon an Claude schicken.</p><pre style="white-space:pre-wrap;background:#f3f3f7;padding:10px;border-radius:6px;font-size:12px">' + String(m).replace(/</g, '&lt;').slice(0, 1500) + '</pre></div>';
+  }
+  window.__startFehler = show;
+  window.addEventListener('error', function (e) { if (document.getElementById('boot-msg')) show((e.message || 'Fehler') + ' (Zeile ' + (e.lineno || '?') + ')'); });
+  window.addEventListener('unhandledrejection', function (e) { if (document.getElementById('boot-msg')) show(e.reason && (e.reason.message || e.reason)); });
+  // Nach 8 Sekunden selbst prüfen, woran es hängt
+  setTimeout(function () {
+    var b = document.getElementById('boot-msg'); if (!b || b.querySelector('pre')) return;
+    if (!window.LaleiStore) return show('Prüfung 1: Der Programmteil (Datenanbindung) fehlt.\nDie Datei «Index» ist im Apps-Script-Editor nicht vollständig eingefügt. Bitte nochmals ganz einfügen: die letzte Zeile muss </html> sein.');
+    if (!window.__appGeladen) return show('Prüfung 2: Der Hauptteil des Programms fehlt.\nDie Datei «Index» ist im Apps-Script-Editor nicht vollständig eingefügt. Bitte nochmals ganz einfügen: die letzte Zeile muss </html> sein.');
+    if (!(window.google && google.script && google.script.run)) return show('Prüfung 3: Keine Verbindung zu Google Apps Script (google.script.run fehlt).');
+    b.innerHTML = 'Programm vollständig geladen. Prüfe die Verbindung zum Server …';
+    google.script.run.withSuccessHandler(function (r) {
+      var n = r && r.lagers ? Object.keys(r.lagers).length : 0;
+      show('Prüfung 4: Server antwortet, ' + n + ' Lager gefunden, aber die Startseite erscheint nicht.' + (n ? '' : '\nKeine Lager in der Tabelle: Wurde «einrichten» ausgeführt?'));
+    }).withFailureHandler(function (e) {
+      show('Prüfung 4: Der Server meldet einen Fehler:\n' + (e && (e.message || e)) + '\n\nMeist hilft: im Apps-Script-Editor «einrichten» ausführen, alle Berechtigungen erlauben und danach eine neue Version bereitstellen.');
+    }).api(null, 'lagers', null);
+  }, 8000);
+})();
+</script>
+<div class="preview-bar" id="preview-bar" hidden><span><b>Vorschau:</b> Alles funktioniert, aber Änderungen bleiben nur in diesem Browser. Test-Passwörter: Admin «Vorschau-Admin», Lager «Vorschau-Lager».</span><button class="link" id="preview-reset">Vorschau zurücksetzen</button></div>
+
+<div class="start" id="start" hidden>
+  <div class="start-in" id="start-in"></div>
+</div>
+
+<div class="app" id="app" hidden>
+  <aside class="side">
+    <div class="side-logo" id="side-logo" hidden></div>
+    <div class="brand"><div class="brand-mark" id="brand-mark">LL</div><div><b id="brand-title">Lager-Tool</b><span id="brand-sub">Cevi Stäfa-Hombi</span></div></div>
+    <div class="gsearch"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input type="search" id="gsearch" placeholder="Suchen …  (Strg+K)" aria-label="Im ganzen Lager suchen" autocomplete="off"></div>
+    <nav class="nav" role="tablist" id="tabs">
+      <button class="back" data-home>← Alle Lager</button>
+      <div class="nav-label" data-roles="team">Mein Lager</div>
+      <button role="tab" data-view="home" data-roles="team"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Mein Bereich</button>
+      <button role="tab" data-view="org" data-roles="team"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="5" rx="1"/><rect x="3" y="16" width="6" height="5" rx="1"/><rect x="15" y="16" width="6" height="5" rx="1"/><path d="M12 8v4M6 16v-4h12v4"/></svg>Organigramm</button>
+      <button role="tab" data-view="myatt" data-roles="team"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16M15 4v16"/></svg>Meine Anwesenheit</button>
+      <div class="nav-label" data-roles="lalei">Planung</div>
+      <button role="tab" data-view="overview" data-roles="lalei"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Übersicht</button>
+      <button role="tab" data-view="tasks" data-roles="lalei"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>Aufgaben<span class="count" id="late-count" hidden></span></button>
+      <button role="tab" data-view="mine" data-roles="lalei"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Meine Aufgaben</button>
+      <button role="tab" data-view="ress" data-roles="lalei"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>Ressorts</button>
+      <button role="tab" data-view="timeline" data-roles="lalei"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M7 14h4M13 17h4"/></svg>Zeitplan</button>
+      <button role="tab" data-view="journal" data-roles="lalei"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></svg>Protokoll</button>
+      <button role="tab" data-view="board" data-roles="lalei"><svg viewBox="0 0 24 24"><path d="M4 4h16v12H8l-4 4z"/><path d="M8 9h8M8 12h5"/></svg>Pinnwand</button>
+      <button role="tab" data-view="inbox" data-roles="lalei"><svg viewBox="0 0 24 24"><path d="M3 13l3-8h12l3 8v6H3z"/><path d="M3 13h5l1 3h6l1-3h5"/></svg>Eingang<span class="count" id="inbox-count" hidden></span></button>
+      <div class="nav-label">Lager</div>
+      <button role="tab" data-view="days" data-roles="lalei"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Tagesseiten</button>
+      <button role="tab" data-view="attendance" data-roles="lalei"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16M15 4v16"/></svg>Anwesenheit</button>
+      <button role="tab" data-view="plan"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/><circle cx="8" cy="5" r="1.5"/><circle cx="14" cy="12" r="1.5"/><circle cx="10" cy="19" r="1.5"/></svg>Schichtplan</button>
+      <button role="tab" data-view="rooms"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V10l7-6 7 6v10"/><path d="M10 20v-5h4v5"/></svg>Einteilung</button>
+      <button role="tab" data-view="pack" data-roles="lalei"><svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>Packliste</button>
+      <button role="tab" data-view="count"><svg viewBox="0 0 24 24"><path d="M4 6l2 2 3-3M4 13l2 2 3-3M4 20l2 2 3-3"/><path d="M12 7h8M12 14h8M12 21h8"/></svg>Abzählen</button>
+      <button role="tab" data-view="shop" data-roles="lalei"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.5 11h11L21 7H7"/><circle cx="9" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/></svg>Einkaufsliste</button>
+      <button role="tab" data-view="eval" data-roles="lalei"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>Auswertung</button>
+      <div class="nav-label">Allgemein</div>
+      <button role="tab" data-view="infos"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>Infos &amp; Links</button>
+      <button role="tab" data-view="settings" data-roles="lalei"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M3 20h18M5 20V10l7-6 7 6v10"/><path d="M9 14h6"/></svg>Lager einrichten</button>
+      <div class="nav-sep" aria-hidden="true"></div>
+      <button role="tab" data-view="prefs"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Einstellungen</button>
+      <button role="tab" data-view="help"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.5"/></svg>So funktioniert's</button>
+      <button role="tab" data-view="trash" data-roles="lalei"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Papierkorb<span class="count" id="trash-count" style="background:var(--side-active)" hidden></span></button>
+    </nav>
+    <div class="side-foot">
+      <button class="sos" id="sos" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Notfall</button>
+      <div class="cd" id="countdown"><b>–</b><span>Tage bis zur Leitervorbereitung</span></div>
+      <div class="me-box"><span class="me-l">Angemeldet als</span><div class="me-row"><b id="me-name">–</b><span class="me-role" id="me-role"></span></div></div>
+      <button class="sos back-btn" id="asteam-back" type="button" hidden>← Zurück zur Lagerleitung</button>
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="sync-dot" id="sync-state"></span><button class="side-link" id="logout">Abmelden</button></div>
+    </div>
+  </aside>
+  <div class="content">
+    <main class="page" id="view"><div class="card empty">Daten werden geladen …</div></main>
+  </div>
+  <nav class="bnav" id="bnav" aria-label="Schnellnavigation"></nav>
+  <button class="fab" id="qnote" type="button" aria-label="Schnell-Notiz" title="Schnell-Notiz" hidden>+</button>
+</div>
