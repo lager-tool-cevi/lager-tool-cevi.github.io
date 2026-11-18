@@ -107,7 +107,7 @@
     return `<article class="card board-item ${b.important ? "important" : ""}"><div class="card-body stack" style="gap:8px">
       <div class="entry-top"><h3>${esc(b.title || "Mitteilung")}</h3>${tags}</div>
       ${b.text ? `<div class="rich">${rich(b.text)}</div>` : ""}${fileList(b.files)}
-      ${reactBar(b)}
+      ${umfrageHtml(b)}${reactBar(b)}
       <div class="board-foot"><span class="muted">${esc(b.by || "")} · ${fmtFull((b.from || b.createdAt || "").slice(0, 10))}</span>
         ${lalei ? `<span class="btn-group"><button class="btn small" data-board-copy="${esc(b._id)}">Für WhatsApp kopieren</button><button class="btn small" data-board-edit="${esc(b._id)}">Bearbeiten</button></span>` : `<button class="btn small" data-board-ask="${esc(b._id)}">Frage dazu stellen</button>`}</div>
       ${qs.length ? `<div class="board-qs">${qs.map((q) => `<div class="board-q"><b>${esc(lalei ? q.name : "Deine Frage")}:</b> ${esc(q.text)}${q.reply ? `<div class="reply"><b>Antwort:</b> ${rich(q.reply)}</div>` : lalei ? ' <button class="link" data-goto="inbox">im Eingang beantworten</button>' : ' <span class="muted">(noch keine Antwort)</span>'}</div>`).join("")}</div>` : ""}
@@ -132,6 +132,7 @@
       o.querySelector(".modal").innerHTML = `<div class="lg-head"><span class="eyebrow">Pinnwand</span><h2>${src ? "Mitteilung bearbeiten" : "Neue Mitteilung"}</h2></div>
         <label class="field"><span>Titel</span><input data-bf="title" value="${esc(d.title)}" placeholder="z.B. Anwesenheit bis 1. März eintragen"></label>
         <label class="field"><span>Text</span><textarea data-bf="text" rows="6" data-mention>${esc(d.text)}</textarea></label>
+        <div class="field"><span>Umfrage (freiwillig)</span>${(d.umfrage || []).map((x, i) => `<div class="log-add"><input data-uf="${i}" value="${esc(x)}" placeholder="Antwort ${i + 1}" aria-label="Antwort ${i + 1}"><button type="button" class="btn small ghost" data-uf-rm="${i}" aria-label="Antwort entfernen">✕</button></div>`).join("")}<button type="button" class="btn small" data-uf-add style="align-self:flex-start">${(d.umfrage || []).length ? "+ Antwort" : "+ Umfrage hinzufügen"}</button>${(d.umfrage || []).length ? `<label class="toggle"><input type="checkbox" data-bf-c="umfrageMehr" ${d.umfrageMehr ? "checked" : ""}> Mehrere Antworten erlaubt</label>` : ""}</div>
         <div class="field"><span>An</span><div class="seg" role="radiogroup" aria-label="Empfänger"><button type="button" data-bf-all="1" aria-pressed="${!d.to.length && !d._sel}">Ganzes Team</button><button type="button" data-bf-all="0" aria-pressed="${!!d.to.length || !!d._sel}">Ausgewählte Personen</button></div>
           ${d.to.length || d._sel ? `<div class="present">${peopleSorted().map((p) => `<button type="button" data-bf-to="${esc(p._id)}" aria-pressed="${d.to.includes(p._id)}">${av(displayName(p))}${esc(displayName(p))}</button>`).join("")}</div><span class="hint">Nur diese Personen sehen die Mitteilung (dazu immer die Lagerleitung).</span>` : ""}</div>
         <div class="form-grid"><label class="toggle"><input type="checkbox" data-bf-c="important" ${d.important ? "checked" : ""}> Wichtig (wird hervorgehoben)</label><label class="toggle"><input type="checkbox" data-bf-c="pinned" ${d.pinned ? "checked" : ""}> Oben anheften</label></div>
@@ -139,7 +140,7 @@
         <div class="field"><span>Bilder und Dateien</span>${(d.files || []).map((f, i) => `<div class="link-row">${f.image ? "🖼" : "📄"} <span>${esc(f.name)}</span><button type="button" class="x" data-bf-rm="${i}" aria-label="Entfernen">✕</button></div>`).join("")}<label class="btn small" style="align-self:flex-start;cursor:pointer">Bild oder PDF hinzufügen<input type="file" accept="image/*,application/pdf" data-bf-file hidden></label></div>
         <div class="lg-foot">${src ? `<button class="btn small ${sure ? "red" : "ghost danger"}" data-bf-del>${sure ? "Wirklich löschen?" : "Löschen"}</button>` : "<span></span>"}<span class="btn-group"><button class="btn" data-bf-close>Abbrechen</button><button class="btn primary" data-bf-save>Speichern</button></span></div>`;
     };
-    o.oninput = (e) => { const t = e.target; if (t.dataset.bf) d[t.dataset.bf] = t.value; if (t.dataset.bfC) d[t.dataset.bfC] = t.checked; };
+    o.oninput = (e) => { const t = e.target; if (t.dataset.bf) d[t.dataset.bf] = t.value; if (t.dataset.bfC) d[t.dataset.bfC] = t.checked; if (t.dataset.uf !== undefined) d.umfrage[+t.dataset.uf] = t.value; };
     o.onchange = async (e) => {
       o.oninput(e);
       if (e.target.matches("[data-bf-file]")) { const f = e.target.files[0]; e.target.value = ""; try { toast("Wird hochgeladen …"); const r = await uploadAny(f); d.files = [...(d.files || []), r]; draw(); } catch (err) { toast(errMsg(err)); } }
@@ -147,12 +148,15 @@
     o.onclick = async (e) => {
       if (e.target === o || e.target.closest("[data-bf-close]")) return closeDrawer();
       const rm = e.target.closest("[data-bf-rm]"); if (rm) { d.files.splice(+rm.dataset.bfRm, 1); return draw(); }
+      if (e.target.closest("[data-uf-add]")) { d.umfrage = [...(d.umfrage || []), ""]; if (d.umfrage.length === 1) d.umfrage.push(""); draw(); const ins = o.querySelectorAll("[data-uf]"); if (ins.length) ins[ins.length - (d.umfrage.length === 2 ? 2 : 1)].focus(); return; }
+      const ufr = e.target.closest("[data-uf-rm]"); if (ufr) { d.umfrage.splice(+ufr.dataset.ufRm, 1); return draw(); }
       const al = e.target.closest("[data-bf-all]"); if (al) { if (al.dataset.bfAll === "1") { d.to = []; d._sel = false; } else d._sel = true; return draw(); }
       const bt = e.target.closest("[data-bf-to]"); if (bt) { const pid = bt.dataset.bfTo; d.to = d.to.includes(pid) ? d.to.filter((x) => x !== pid) : [...d.to, pid]; return draw(); }
       if (e.target.closest("[data-bf-del]")) { if (!sure) { sure = true; return draw(); } try { await state.db.doc("board/" + id).delete(); closeDrawer(); toast("Mitteilung gelöscht"); } catch (err) { handleWriteError(err); } return; }
       if (!e.target.closest("[data-bf-save]")) return;
       if (!d.title.trim()) return toast("Bitte einen Titel eingeben.");
       if (d._sel && !d.to.length) return toast("Bitte mindestens eine Person wählen oder «Ganzes Team».");
+      d.umfrage = (d.umfrage || []).map((x) => String(x).trim()).filter(Boolean); if (d.umfrage.length === 1) return toast("Eine Umfrage braucht mindestens zwei Antworten.");
       const data = { ...d, title: d.title.trim(), by: src ? src.by : me(), createdAt: src ? src.createdAt : nowStamp(), updatedAt: nowStamp(), updatedBy: me() }; delete data._id; delete data._sel;
       try { await state.db.doc("board/" + (id || state.db.newId())).set(data); closeDrawer(); toast("Gespeichert"); } catch (err) { handleWriteError(err); }
     };

@@ -106,7 +106,7 @@
     if (!isLaLei() || isReadOnly() || isClosed() || state.asTeam) return person(t.owner);
     return `<div class="owner-pick">${t.owner ? av(t.owner) : '<span class="av av-empty" aria-hidden="true">?</span>'}<select class="owner" data-owner="${esc(t._id)}" aria-label="Verantwortlich für ${esc(t.title)}">${personOptions(t.owner, "Nicht zugeteilt")}</select></div>${!t.owner && me() && t.status !== "Erledigt" ? `<button class="link take" data-take="${esc(t._id)}">Ich übernehme</button>` : ""}`;
   }
-  function depInfo(t) {
+  function depInfo(t) { return ""; // «Wartet auf» auf Wunsch entfernt
     const offen = (t.dependsOn || []).map((id) => state.tasks.get(id)).filter((x) => x && x.status !== "Erledigt");
     return offen.length ? `<span class="tag plain dep" title="${esc(offen.map((x) => x.title).join("\n"))}">⛓ wartet auf ${offen.length === 1 ? "«" + esc(offen[0].title.slice(0, 30)) + "»" : offen.length + " Aufgaben"}</span>` : "";
   }
@@ -134,7 +134,7 @@
       const t = state.tasks.get(openTaskId); const deps = (t.dependsOn || []).map((id) => state.tasks.get(id)).filter(Boolean);
       const andere = allTasks().filter((x) => x._id !== t._id && !(t.dependsOn || []).includes(x._id));
       const ck = $("#d-ck-wrap", o).closest(".field");
-      ck.insertAdjacentHTML("beforebegin", `<div class="field"><span>Wartet auf</span><div class="dep-list">${deps.map((x) => `<span class="pchip-s ${x.status === "Erledigt" ? "kid" : ""}">${x.status === "Erledigt" ? "✓ " : ""}<button class="link" data-open="${esc(x._id)}">${esc(x.title)}</button><button type="button" class="x" data-dep-rm="${esc(x._id)}" aria-label="Entfernen">✕</button></span>`).join("") || '<span class="muted" style="font-size:13px">Nichts. Diese Aufgabe kann sofort angegangen werden.</span>'}</div>
+      if (false) ck.insertAdjacentHTML("beforebegin", `<div class="field"><span>Wartet auf</span><div class="dep-list">${deps.map((x) => `<span class="pchip-s ${x.status === "Erledigt" ? "kid" : ""}">${x.status === "Erledigt" ? "✓ " : ""}<button class="link" data-open="${esc(x._id)}">${esc(x.title)}</button><button type="button" class="x" data-dep-rm="${esc(x._id)}" aria-label="Entfernen">✕</button></span>`).join("") || '<span class="muted" style="font-size:13px">Nichts. Diese Aufgabe kann sofort angegangen werden.</span>'}</div>
         <div class="log-add"><input list="dep-opts" id="d-dep" placeholder="Aufgabe suchen, auf die diese wartet" aria-label="Abhängigkeit"><datalist id="dep-opts">${andere.slice(0, 400).map((x) => `<option value="${esc(x.title)} · ${esc(x.ressort)}">`).join("")}</datalist><button type="button" class="btn small" data-dep-add>+</button></div></div>`);
       const dup = $("#d-dup", o); if (dup && isLaLei()) dup.insertAdjacentHTML("afterend", `<button class="btn small ghost" data-versions-task title="Frühere Fassungen dieser Aufgabe">Fassungen</button>`);
       if (!t.owner && me() && !isReadOnly()) own.closest(".field").insertAdjacentHTML("beforeend", `<button type="button" class="link take-d" data-take-d>Ich übernehme</button>`);

@@ -10,7 +10,7 @@
       const camp = isCampNow(); const r = campRange(); const d = cfg().dates || {}; const ziel = d.prep || d.start;
       const bis = ziel && ziel > t0 ? daysBetween(today(), parse(ziel)) : null;
       const zeit = camp ? `<b>Tag ${daysBetween(parse(r.from), today()) + 1} von ${daysBetween(parse(r.from), parse(r.to)) + 1}</b><span>im Lager</span>` : bis != null ? `<b>${bis} ${bis === 1 ? "Tag" : "Tage"}</b><span>bis zur Leitervorbereitung</span>` : `<b>${esc(lagerDoc().title || "")}</b><span>${r.to && r.to < t0 ? "Lager vorbei" : ""}</span>`;
-      const meine = allTasks().filter((t) => t.status !== "Erledigt" && (t.owner === n || t.support === n));
+      const meine = allTasks().filter((t) => t.status !== "Erledigt" && (t.owner === n || t.support === n) && !(t.snooze && t.snooze > t0));
       const ueber = meine.filter(isLate); const woche = meine.filter((t) => !isLate(t) && t.deadline && t.deadline <= addDays(t0, 7));
       const fokus = [...ueber, ...woche].slice(0, 6);
       const hk = state.hoecks.filter((h) => h.date >= t0).sort((a, b) => (a.date + (a.time || "")).localeCompare(b.date + (b.time || "")))[0];

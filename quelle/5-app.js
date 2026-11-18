@@ -343,7 +343,7 @@
   const taskRow = (t, opts = {}) => {
     const late = isLate(t); const done = t.status === "Erledigt";
     const meta = [];
-    if (!opts.hideRessort) meta.push(esc(t.ressort) + (t.teil ? " › " + esc(t.teil) : ""));
+    if (!opts.hideRessort) meta.push(ressDot(t.ressort) + esc(t.ressort) + (t.teil ? " › " + esc(t.teil) : ""));
     if (t.ongoing) meta.push('<span class="tag plain ongoing">laufend</span>');
     if (t.repeat) meta.push('<span class="tag plain ongoing">↻ wiederkehrend</span>');
     for (const tg of tagsOf(t)) meta.push(`<button class="tagchip" data-tag="${esc(tg)}">${esc(tg)}</button>`);
@@ -1741,9 +1741,11 @@
     const nextMs = milestones().find((m) => m.date >= t0);
     const msOpen = nextMs ? allTasks().filter((t) => t.status !== "Erledigt" && t.deadline && t.deadline <= nextMs.date) : [];
     const byRess = {}; for (const t of msOpen) byRess[t.ressort] = (byRess[t.ressort] || 0) + 1;
-    let items = [{ key: "hello", kind: "std", title: "Begrüssung", lines: [], on: true }, ...(cfg().agendaDefaults || []).map((x, i) => ({ key: "def" + i, kind: "std", title: x, lines: [], on: true }))];
-    if (lastMeeting) items.push({ key: "proto", kind: "std", title: "Protokoll vom letzten Höck", lines: [`${lastMeeting.title} vom ${fmtFull(lastMeeting.date)}`], on: true });
+    // Offene Pendenzen kommen gleich nach der Begrüssung
+    let items = [{ key: "hello", kind: "std", title: "Begrüssung", lines: [], on: true }];
     if (pend.length) items.push({ key: "pend", kind: "pend", title: "Offene Pendenzen", lines: pend.map((t) => `${noAt(t.title)} (${t.owner || "niemand"}, ${t.status}${t.deadline ? ", bis " + fmtFull(t.deadline) : ""})`), on: true });
+    items.push(...(cfg().agendaDefaults || []).map((x, i) => ({ key: "def" + i, kind: "std", title: x, lines: [], on: true })));
+    if (lastMeeting) items.push({ key: "proto", kind: "std", title: "Protokoll vom letzten Höck", lines: [`${lastMeeting.title} vom ${fmtFull(lastMeeting.date)}`], on: true });
     for (const i of openIdeas()) items.push({ key: "idea:" + i._id, kind: "idea", title: i.title, lines: i.text ? [noAt(i.text)] : [], ideaId: i._id, by: i.by, on: true });
     if (late.length) items.push({ key: "late", kind: "late", title: "Überfällige Aufgaben", lines: late.slice(0, 15).map((t) => `${noAt(t.title)} (${t.ressort}, ${t.owner || "niemand"}, seit ${fmtFull(t.deadline)})`).concat(late.length > 15 ? [`… und ${late.length - 15} weitere`] : []), on: true });
     if (nextMs) items.push({ key: "ms", kind: "ms", title: `Stand bis «${nextMs.name}»`, lines: [`Meilenstein am ${fmtFull(nextMs.date)}`, ...(Object.keys(byRess).length ? Object.entries(byRess).map(([r, n]) => `${r}: ${n} offen`) : ["Alles erledigt"])], on: true });

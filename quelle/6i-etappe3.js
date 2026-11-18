@@ -43,7 +43,7 @@
     if (isLaLei()) {
       const t0 = iso(today()), lim = addDays(t0, 3);
       for (const t of state.tasks.values()) {
-        if (t.status === "Erledigt") continue;
+        if (t.status === "Erledigt" || (t.snooze && t.snooze > t0)) continue;
         if (t.owner === n && neu(t)) { const last = (t.log || []).slice(-1)[0] || {}; out.push({ key: "t" + t._id + t.updatedAt, at: t.updatedAt, ico: "☑", text: /Verantwortlich|übernimmt|erfasst/.test(last.text || "") ? `${esc(t.updatedBy)} hat dir <b>${esc(t.title)}</b> zugeteilt` : `${esc(t.updatedBy)} hat deine Aufgabe <b>${esc(t.title)}</b> geändert`, attr: `data-open="${esc(t._id)}"` }); }
         else if (neu(t) && [t.note, ...(t.log || []).filter((l) => ts(l.at) > since).map((l) => l.text)].some((x) => String(x || "").split("\n").some(mentionsMe))) out.push({ key: "tm" + t._id + t.updatedAt, at: t.updatedAt, ico: "@", text: `${esc(t.updatedBy)} hat dich bei <b>${esc(t.title)}</b> erwähnt`, attr: `data-open="${esc(t._id)}"` });
         if ((t.owner === n || t.support === n) && t.deadline && !t.ongoing && t.deadline <= lim) out.push({ key: "d" + t._id + t.deadline, at: t.deadline, ico: t.deadline < t0 ? "⚠️" : "⏰", text: `${t.deadline < t0 ? "Überfällig" : t.deadline === t0 ? "Heute fällig" : "Fällig am " + fmt(t.deadline)}: <b>${esc(t.title)}</b>`, attr: `data-open="${esc(t._id)}"`, due: true });

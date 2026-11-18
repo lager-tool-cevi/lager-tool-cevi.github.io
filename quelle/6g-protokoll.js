@@ -72,7 +72,7 @@
   view.addEventListener("click", (e) => {
     if (e.target.closest("[data-ment-alle]")) { state.mentAlle = !state.mentAlle; return views.mine.update(); }
     const d = e.target.closest("[data-ment-done]"); if (d) { e.stopPropagation(); e.stopImmediatePropagation(); const h = mentHits[+d.dataset.mentDone]; if (!h) return; const war = mentFertig().includes(h.key); mentSetze(h.key, !war); if (!war) toastAction("Als erledigt markiert", "Rückgängig", () => mentSetze(h.key, false)); return; }
-    const b = e.target.closest("[data-ment-task]"); if (!b) return; e.stopPropagation(); e.stopImmediatePropagation();
+    const b = null; if (!b) return; // «Als Aufgabe» übernimmt jetzt 6p (mit Name und Datum)
     const h = mentHits[+b.dataset.mentTask]; if (!h) return;
     openTask("_new", { title: h.text.slice(0, 140), owner: me(), note: `Aus «${h.title}» (${fmtFull(h.date)}):\n${h.text}`, ...(h.entry ? { source: { entry: h.entry, label: `${h.title} (${fmtFull(h.date)})` } } : {}) });
   }, true);
