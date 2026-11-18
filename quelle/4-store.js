@@ -2,9 +2,9 @@
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:
 // Anmeldung als Team (nur Name) oder Lagerleitung (Name + Passwort), Admin mit Admin-Passwort.
 window.LaleiStore = (() => {
-  const SHORT = ["tasks", "config", "journal", "hoecks", "people", "kids", "att", "plan", "info", "eval", "assets", "trash", "rooms", "todos", "feedback", "attreq", "daypage", "presence", "media", "board", "swap", "trips", "groups", "count", "shop", "log"];
+  const SHORT = ["tasks", "config", "journal", "hoecks", "people", "kids", "att", "plan", "info", "eval", "assets", "trash", "rooms", "todos", "feedback", "attreq", "daypage", "presence", "media", "board", "swap", "trips", "groups", "count", "shop", "log", "versions"];
   const TEAM_READ = ["config", "people", "kids", "plan", "rooms", "info", "att", "attreq", "todos", "feedback", "hoecks", "board", "swap", "trips", "groups", "count", "media"];
-  const NO_LOG = ["presence", "count", "todos", "feedback", "attreq", "swap", "log", "media"];
+  const NO_LOG = ["presence", "count", "todos", "feedback", "attreq", "swap", "log", "media", "versions"];
   const TOKEN_DAYS = 60;
   const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
   const isGas = typeof google !== "undefined" && google.script && google.script.run;
@@ -83,6 +83,7 @@ window.LaleiStore = (() => {
     if (!sec) sec = { admin: s0.adminHash || null, lagerPw: {}, personPw: {}, tokens: {} };
     if (!sec.admins) { sec.admins = sec.admin ? [{ id: "a1", name: "Admin", h: sec.admin }] : []; delete sec.admin; }
     if (!sec.global) sec.global = { wartung: null, fehler: [], nutzung: {} };
+    if (!sec.global.toolfb) sec.global.toolfb = []; if (!sec.global.notify) sec.global.notify = []; if (!sec.global.vorlagen) sec.global.vorlagen = { tasks: [], pack: [] };
     for (const [k, v] of Object.entries(s0.lagerPw || {})) if (!(k in sec.lagerPw)) sec.lagerPw[k] = v;
     const save = () => { ls.set(KEY, JSON.stringify(db)); ls.set(SKEY, JSON.stringify(sec)); };
     const hash = async (s) => Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("lalei|" + s))), (b) => b.toString(16).padStart(2, "0")).join("");
@@ -138,6 +139,11 @@ window.LaleiStore = (() => {
         if (a === "removeAdmin") { if (sec.admins.length < 2) throw new Error("LETZTER_ADMIN"); sec.admins = sec.admins.filter((x) => x.id !== payload.id); save(); return {}; }
         if (a === "setWartung") { sec.global.wartung = { text: String(payload.text || "").slice(0, 300), on: !!payload.on }; db.rev++; save(); return {}; }
         if (a === "clearFehler") { sec.global.fehler = []; save(); return {}; }
+        if (a === "toolFeedback") return { items: sec.global.toolfb, notify: sec.global.notify };
+        if (a === "toolFeedbackRead") { sec.global.toolfb.forEach((x) => { if (!payload.id || x.id === payload.id) x.read = true; }); if (payload.remove) sec.global.toolfb = sec.global.toolfb.filter((x) => x.id !== payload.remove); db.rev++; save(); return {}; }
+        if (a === "setNotify") { sec.global.notify = (payload.personen || []).map((x) => ({ lager: x.lager, person: x.person })); db.rev++; save(); return {}; }
+        if (a === "getVorlagen") return clone(sec.global.vorlagen);
+        if (a === "setVorlagen") { sec.global.vorlagen = { tasks: (payload.vorlagen.tasks || []).slice(0, 30), pack: (payload.vorlagen.pack || []).slice(0, 30) }; save(); return {}; }
         if (a === "setLagerPw") { if ((payload.pw || "").length < 6) throw new Error("PASSWORT_ZU_KURZ"); sec.lagerPw[payload.lager] = payload.pw; save(); return {}; }
         if (a === "resetPerson") { delete sec.personPw[payload.lager + "|" + payload.person]; for (const [t, s] of Object.entries(sec.tokens)) if (s.lager === payload.lager && s.person === payload.person) delete sec.tokens[t]; save(); return {}; }
         if (a === "logoutAll") { sec.tokens = {}; save(); return {}; }
@@ -158,6 +164,8 @@ window.LaleiStore = (() => {
         throw new Error("UNBEKANNTE_AKTION");
       }
       const sess = session(tok);
+      if (op === "vorlagen") { if (sess.role !== "lalei" && sess.role !== "lesen") throw new Error("KEINE_BERECHTIGUNG"); return clone(sec.global.vorlagen); }
+      if (op === "toolFeedback") { const txt = String(payload.text || "").trim(); if (!txt) throw new Error("TEXT_FEHLT"); sec.global.toolfb = [{ id: rnd(8), at: new Date().toISOString(), lager: sess.lager, name: payload.anon ? "Anonym" : nameOf(sess.lager, sess.person), role: sess.role, art: payload.art || "Idee", text: txt.slice(0, 2000), read: false }, ...sec.global.toolfb].slice(0, 200); db.rev++; save(); return {}; }
       if (op === "changePw") { if (sess.role !== "lalei" && sess.role !== "lesen") throw new Error("KEINE_BERECHTIGUNG"); const key = sess.lager + "|" + sess.person; if (sec.personPw[key] !== (await hash(payload.oldPw || ""))) throw new Error("FALSCHES_PASSWORT"); if ((payload.newPw || "").length < 6) throw new Error("PASSWORT_ZU_KURZ"); sec.personPw[key] = await hash(payload.newPw); save(); return {}; }
       if (op === "sync" && sess.role !== "admin") { const k = sess.lager + "|" + sess.person; const prevN = sec.global.nutzung[k]; if (!prevN || Date.now() - new Date(prevN.at).getTime() > 600000) { sec.global.nutzung[k] = { lager: sess.lager, name: nameOf(sess.lager, sess.person), role: sess.role, at: new Date().toISOString() }; save(); } }
       if (op === "sync") {
@@ -165,6 +173,7 @@ window.LaleiStore = (() => {
         if (payload.rev === db.rev && !payload.full) return { rev: db.rev };
         const data = { lager: lagerList() };
         if (lager) Object.assign(data, filterFor({ ...sess, lager }, lagerColls(lager)));
+        if (sec.global.notify.some((x) => x.lager === sess.lager && x.person === sess.person)) { const nfb = sec.global.toolfb.filter((x) => !x.read).length; if (nfb) data.toolFb = nfb; }
         return { rev: db.rev, data };
       }
       if (op === "write") {
@@ -232,14 +241,14 @@ window.LaleiStore = (() => {
   const collSnap = (coll) => { const docs = [...data[coll].keys()].sort().map((id) => docSnap(coll, id)); return { docs, size: docs.length, empty: !docs.length, docChanges: () => [], metadata: {} }; };
   function emit(colls) { for (const l of listeners) if (colls.has(l.coll)) { try { l.cb(l.id ? docSnap(l.coll, l.id) : collSnap(l.coll)); } catch (e) { console.error(e); } } }
   // letzter Stand pro Lager im Browser, damit man ohne Netz lesen und weiterarbeiten kann
-  let offline = false;
+  let offline = false, toolFb = 0;
   const cacheKey = () => "lalei-cache-" + lagerId + "-" + (sess ? sess.person : "");
   function saveCache(res) { if (!lagerId || !sess) return; try { const d = { ...res.data, media: {} }; ls.set(cacheKey(), JSON.stringify({ at: new Date().toISOString(), data: d })); } catch {} }
   function applyServer(res) {
     if (!res) return;
     if (res.data) {
       if (!res.cached) { saveCache(res); offline = false; }
-      data.lager = new Map(Object.entries(res.data.lager || {}));
+      data.lager = new Map(Object.entries(res.data.lager || {})); toolFb = res.data.toolFb || 0;
       for (const c of SHORT) data[c] = new Map(Object.entries(res.data[c] || {}));
       rev = res.rev; emit(new Set(["lager", ...SHORT]));
     } else rev = res.rev;
@@ -372,6 +381,8 @@ window.LaleiStore = (() => {
   const admin = (adminPw, action, extra = {}) => raw("admin", { adminPw, action, ...extra });
   const forgotAdmin = (name) => raw("forgotAdmin", { name });
   const changePw = (oldPw, newPw) => call("changePw", { oldPw, newPw });
+  const vorlagen = () => call("vorlagen", {});
+  const toolFeedback = (d) => call("toolFeedback", d);
   // Admin-Zugang für Vorlagen und neue Lager
   async function adminCall(adminPw, fn) { const { token } = await admin(adminPw, "token"); return fn((op, p) => raw(op, p, token)); }
   async function readLager(adminPw, id) { return adminCall(adminPw, (c) => c("sync", { rev: -1, lager: id, full: true }).then((r) => r.data)); }
@@ -399,7 +410,7 @@ window.LaleiStore = (() => {
   }
   const peek = (coll, id) => { const v = data[coll] && data[coll].get(id); return v ? clone(v) : null; };
   return {
-    ready, setLager, login, logout, roster, admin, forgotAdmin, changePw, readLager, writeRaw, upload, peek, report,
+    ready, setLager, login, logout, roster, admin, forgotAdmin, changePw, vorlagen, toolFeedback, toolFb: () => toolFb, readLager, writeRaw, upload, peek, report,
     isGas: echt, isApi, isTest: !!CONF.test, version: CONF.version || "", isOffline: () => offline, appUrl: () => appUrl, wartung: () => wartung, lastSyncMs: () => lastSyncMs, wartend: () => outbox.length,
     onRejected: (fn) => (onRejected = fn),
     session: () => sess, lager: () => lagerId, onLoggedOut: (fn) => (onLoggedOut = fn),

@@ -65,6 +65,7 @@
     const ps = people().slice().sort((a, b) => b.length - a.length);
     let out = esc(text || "");
     out = out.replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)])/g, (u) => `<a href="${u}" target="_blank" rel="noopener">${u.length > 60 ? u.slice(0, 57) + "…" : u}</a>`);
+    out = richGroups(out);
     if (!ps.length) return out;
     const re = new RegExp(`(^|[^\\p{L}\\p{N}_/])@(${ps.map((p) => escRe(esc(p))).join("|")})(?!${NAME_CH})`, "giu");
     return out.replace(re, (m, pre, name) => {
@@ -73,7 +74,7 @@
     });
   };
   const mentions = (text, name) => !!name && new RegExp(`(^|[^\\p{L}\\p{N}_])@${escRe(name)}(?!${NAME_CH})`, "iu").test(text || "");
-  const mentionHint = () => `<span class="hint">Mit @ markierst du eine Person, z.B. «@${esc(people()[0] || "Name")} organisiert das».</span>`;
+  const mentionHint = () => `<span class="hint">Mit @ markierst du eine Person, z.B. «@${esc(people()[0] || "Name")} organisiert das». Auch @alle, @LaLei oder @Ressort.</span>`;
   const mbox = { el: null, box: null, items: [], idx: 0, start: 0 };
   function hideMention() { if (mbox.box) mbox.box.remove(); mbox.box = null; mbox.el = null; }
   function checkMention(el) {
@@ -81,11 +82,12 @@
     const m = before.match(new RegExp(`(^|[^\\p{L}\\p{N}_])@(${NAME_CH}*)$`, "u"));
     if (!m) return hideMention();
     const q = m[2].toLowerCase();
-    const list = people().filter((p) => p.toLowerCase().startsWith(q));
+    const groups = mentionGroups().filter((g) => g.token.toLowerCase().startsWith(q));
+    const list = [...people().filter((p) => p.toLowerCase().startsWith(q)), ...groups.map((g) => g.token)];
     if (!list.length) return hideMention();
     mbox.el = el; mbox.items = list; mbox.idx = Math.min(mbox.idx, list.length - 1); mbox.start = pos - m[2].length - 1;
     if (!mbox.box) { mbox.box = document.createElement("div"); mbox.box.className = "mention-box"; mbox.box.setAttribute("role", "listbox"); document.body.appendChild(mbox.box); }
-    mbox.box.innerHTML = list.map((p, i) => `<button type="button" role="option" aria-selected="${i === mbox.idx}" data-pick="${esc(p)}">${av(p)}${esc(p)}</button>`).join("");
+    mbox.box.innerHTML = list.map((p, i) => { const g = groups.find((x) => x.token === p); return `<button type="button" role="option" aria-selected="${i === mbox.idx}" data-pick="${esc(p)}">${g ? `<span class="av av-group" aria-hidden="true">👥</span>${esc(p)} <span class="muted" style="font-size:12px">${esc(g.label)}</span>` : av(p) + esc(p)}</button>`; }).join("");
     const r = el.getBoundingClientRect();
     const below = r.bottom + 4 + mbox.box.offsetHeight < window.innerHeight;
     mbox.box.style.left = Math.max(8, Math.min(r.left, window.innerWidth - mbox.box.offsetWidth - 8)) + "px";
@@ -347,10 +349,11 @@
     if ((t.links || []).length) meta.push(`${t.links.length} ${t.links.length === 1 ? "Link" : "Links"}`);
     if (t.note) meta.push("Bemerkung");
     if (t.source) meta.push("aus " + esc(t.source.label || "Höck"));
+    if ((t.dependsOn || []).length && !done) { const di = depInfo(t); if (di) meta.push(di); }
     return `<tr class="task ${late ? "late" : ""} ${done ? "done" : ""}">
       <td class="c-date">${fmt(t.deadline)}${late ? `<div><span class="tag late">überfällig</span></div>` : ""}</td>
       <td class="c-main"><div class="t-row"><button class="qdone ${done ? "on" : ""}" data-qdone="${esc(t._id)}" aria-label="${done ? "Wieder öffnen" : "Als erledigt abhaken"}" title="${done ? "Wieder öffnen" : "Abhaken"}">${done ? "✓" : ""}</button><div style="min-width:0"><button class="star ${t.star ? "on" : ""}" data-star="${esc(t._id)}" aria-label="${t.star ? "Nicht mehr wichtig" : "Als wichtig markieren"}" title="Wichtig">★</button><button class="t-title" data-open="${esc(t._id)}">${isNew(t) ? '<span class="new-dot" title="Neu oder geändert seit deinem letzten Besuch"></span>' : ""}${esc(t.title)}</button><div class="t-meta">${meta.map((m) => `<span>${m}</span>`).join("")}</div></div></div></td>
-      <td class="c-who">${person(t.owner)}${t.support ? `<div class="plus">mit ${esc(t.support)}</div>` : ""}</td>
+      <td class="c-who">${ownerCell(t)}${t.support ? `<div class="plus">mit ${esc(t.support)}</div>` : ""}</td>
       <td class="c-stat">${statusSelect(t)}</td></tr>`;
   };
   const taskTable = (list, opts = {}) => {
@@ -584,21 +587,22 @@
       const cls = (k) => [k.m ? "msw" : "", k.now ? "now" : "", k.pause ? "pause" : "", k.camp ? "camp" : ""].join(" ");
       const head = `<tr><th class="rowh" rowspan="2"></th>${months.map((m) => `<th class="mo" colspan="${m.n}">${m.n > 1 ? m.label : ""}</th>`).join("")}</tr><tr>${wk.map((k) => `<th class="wk ${k.m ? "msw" : ""} ${k.now ? "now" : ""}" title="Woche ab ${fmtFull(k.wi)}">${k.w.getDate()}</th>`).join("")}</tr>`;
       const sep = (label) => `<tr class="sep"><td class="rowh">${label}</td>${wk.map((k) => `<td class="${cls(k)}"></td>`).join("")}</tr>`;
-      const markerRow = (label, pick, render) => `<tr><td class="rowh">${label}</td>${wk.map((k) => { const items = pick(k); return `<td class="c ${cls(k)}">${items.length ? render(items, k) : ""}</td>`; }).join("")}</tr>`;
+      const canDrag = isLaLei() && !isReadOnly() && !isClosed() && !state.asTeam;
+      const markerRow = (label, pick, render) => `<tr><td class="rowh">${label}</td>${wk.map((k) => { const items = pick(k); return `<td class="c ${cls(k)}" data-wi="${k.wi}">${items.length ? render(items, k) : ""}</td>`; }).join("")}</tr>`;
       const hkTip = (h) => `${HK[h.kind || "LaLei"].label}: ${h.title || ""} · ${fmt(h.date)}${h.time ? " " + h.time : ""}${h.place ? " · " + h.place : ""}`;
       const rowFor = (label, list, cl, key) => `<tr class="${cl}"><td class="rowh">${esc(label)}</td>${wk.map((k) => { const items = list.filter((t) => t.deadline >= k.wi && t.deadline <= k.we);
-        if (!items.length) return `<td class="c ${cls(k)}"></td>`;
+        if (!items.length) return `<td class="c ${cls(k)}" data-wi="${k.wi}"></td>`;
         const s = statsFor(items); const sel = state.gSel && state.gSel.key === key && state.gSel.wi === k.wi; const c = s.late ? "late" : s.done === s.total ? "ok" : s.done ? "part" : "";
-        return `<td class="c ${cls(k)}"><button class="cell ${c} ${sel ? "sel" : ""}" style="--p:${pct(s.done, s.total)}%" data-gkey="${esc(key)}" data-wi="${k.wi}" title="${esc(label)}, Woche ab ${fmtFull(k.wi)}: ${s.total} Aufgaben, ${s.done} erledigt">${s.total}</button></td>`; }).join("")}</tr>`;
+        return `<td class="c ${cls(k)}" data-wi="${k.wi}"><button class="cell ${c} ${sel ? "sel" : ""}" style="--p:${pct(s.done, s.total)}%" data-gkey="${esc(key)}" data-wi="${k.wi}" title="${esc(label)}, Woche ab ${fmtFull(k.wi)}: ${s.total} Aufgaben, ${s.done} erledigt">${s.total}</button></td>`; }).join("")}</tr>`;
       const rows = [];
       if (tl.ms || tl.lalei || tl.team) rows.push(sep("Termine"));
-      if (tl.ms) rows.push(markerRow("Meilensteine", (k) => ms.filter((m) => m.date >= k.wi && m.date <= k.we), (items) => items.map((m) => msMark(m, ms.indexOf(m) + 1)).join("")));
+      if (tl.ms) rows.push(markerRow("Meilensteine", (k) => ms.filter((m) => m.date >= k.wi && m.date <= k.we), (items) => items.map((m) => canDrag ? msMark(m, ms.indexOf(m) + 1).replace("<button", `<button draggable="true" data-drag-ms="${esc(m.id)}"`) : msMark(m, ms.indexOf(m) + 1)).join("")));
       for (const kind of ["LaLei", "Team"]) { if (!(kind === "LaLei" ? tl.lalei : tl.team)) continue;
         rows.push(markerRow(HK[kind].label + "s", (k) => hk.filter((h) => (h.kind || "LaLei") === kind && h.date >= k.wi && h.date <= k.we), (items) => `<button class="mk ${HK[kind].cls}" data-open-hoeck="${esc(items[0]._id)}" title="${esc(items.map(hkTip).join("\n"))}">${items.length > 1 ? items.length : kind[0]}</button>`)); }
       if (tl.tasks) {
         if (tl.ress) {
           rows.push(sep(`Aufgaben ${tl.ress === "_mine" ? (me() ? "von " + esc(me()) : "(Name wählen)") : esc(tl.ress.replace("|", " › "))}`));
-          for (const t of all) rows.push(`<tr class="taskrow"><td class="rowh"><button class="t-title" data-open="${esc(t._id)}" title="${esc(t.title)}">${esc(t.title)}</button></td>${wk.map((k) => `<td class="c ${cls(k)}">${t.deadline >= k.wi && t.deadline <= k.we ? `<button class="mk task ${isLate(t) ? "late" : ""}" data-s="${esc(t.status)}" data-open="${esc(t._id)}" title="${esc(t.title)} · ${fmt(t.deadline)} · ${esc(t.status)}"></button>` : ""}</td>`).join("")}</tr>`);
+          for (const t of all) rows.push(`<tr class="taskrow"><td class="rowh"><button class="t-title" data-open="${esc(t._id)}" title="${esc(t.title)}">${esc(t.title)}</button></td>${wk.map((k) => `<td class="c ${cls(k)}" data-wi="${k.wi}">${t.deadline >= k.wi && t.deadline <= k.we ? `<button class="mk task ${isLate(t) ? "late" : ""}" data-s="${esc(t.status)}" data-open="${esc(t._id)}"${canDrag ? ` draggable="true" data-drag-task="${esc(t._id)}"` : ""} title="${esc(t.title)} · ${fmt(t.deadline)} · ${esc(t.status)}"></button>` : ""}</td>`).join("")}</tr>`);
           if (!all.length) rows.push(`<tr><td class="rowh muted">Keine Aufgaben</td>${wk.map((k) => `<td class="${cls(k)}"></td>`).join("")}</tr>`);
         } else {
           rows.push(sep("Aufgaben pro Ressort"));
@@ -2525,7 +2529,7 @@
     on("attreq", (snap) => { state.attreq = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
     on("daypage", (snap) => { state.daypages = new Map(snap.docs.map((d) => [d.id, d.data()])); });
     on("presence", (snap) => { state.presence = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
-    for (const c of ["board", "swap", "trips", "groups"]) on(c, (snap) => { state[c] = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
+    for (const c of ["board", "swap", "trips", "groups", "versions"]) on(c, (snap) => { state[c] = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
     for (const c of ["count", "shop", "log", "media"]) on(c, () => {});
     STORE.onLoggedOut((id) => { if (state.lagerId === id) { toast("Bitte melde dich neu an."); showStart(); showLogin(id); } });
     const last = store.get("lalei-lager");

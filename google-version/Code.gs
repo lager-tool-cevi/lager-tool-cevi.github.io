@@ -21,9 +21,9 @@ const WEBSITE = 'https://jajakingge.github.io/lager-tool/';
 const DATEN_BLATT = '_daten';
 const MAX_ZELLE = 49000; // Google Sheets erlaubt höchstens 50'000 Zeichen pro Zelle
 const TOKEN_TAGE = 60;
-const SHORT = ['tasks', 'config', 'journal', 'hoecks', 'people', 'kids', 'att', 'plan', 'info', 'eval', 'assets', 'trash', 'rooms', 'todos', 'feedback', 'attreq', 'daypage', 'presence', 'media', 'board', 'swap', 'trips', 'groups', 'count', 'shop', 'log'];
+const SHORT = ['tasks', 'config', 'journal', 'hoecks', 'people', 'kids', 'att', 'plan', 'info', 'eval', 'assets', 'trash', 'rooms', 'todos', 'feedback', 'attreq', 'daypage', 'presence', 'media', 'board', 'swap', 'trips', 'groups', 'count', 'shop', 'log', 'versions'];
 const TEAM_READ = ['config', 'people', 'kids', 'plan', 'rooms', 'info', 'att', 'attreq', 'todos', 'feedback', 'hoecks', 'board', 'swap', 'trips', 'groups', 'count', 'media'];
-const NO_LOG = ['presence', 'count', 'todos', 'feedback', 'attreq', 'swap', 'log', 'media'];
+const NO_LOG = ['presence', 'count', 'todos', 'feedback', 'attreq', 'swap', 'log', 'media', 'versions'];
 
 // ---------------------------------------------------------------------------
 // Web-App
@@ -69,11 +69,14 @@ function api(token, op, payload) {
     if (payload.rev === rev && !payload.full) return { rev: rev };
     const data = { lager: lagerListe_() };
     if (lager) { const f = filterFuer_(Object.assign({}, sess, { lager: lager }), lagerDaten_(lager)); Object.keys(f).forEach(function (k) { data[k] = f[k]; }); }
+    const fb = toolFbNeu_(sess); if (fb) data.toolFb = fb;
     return { rev: rev, data: data };
   }
   if (op === 'write') return schreiben_(sess, payload.ops);
   if (op === 'upload') return hochladen_(sess, payload);
   if (op === 'changePw') return passwortAendern_(sess, payload);
+  if (op === 'vorlagen') { if (sess.role !== 'lalei' && sess.role !== 'lesen') throw new Error('KEINE_BERECHTIGUNG'); return global_('vorlagen') || { tasks: [], pack: [] }; }
+  if (op === 'toolFeedback') return toolFeedback_(sess, payload);
   throw new Error('UNBEKANNTE_AKTION');
 }
 // ---------------------------------------------------------------------------
@@ -249,11 +252,35 @@ function vergessen_(d) {
 // Gemeinsame Einstellungen (Wartungshinweis, Fehlerberichte, Nutzung)
 // ---------------------------------------------------------------------------
 
-function global_(id) { const r = zeilen_(datenBlatt_()).find(function (x) { return x[0] === '_global' && String(x[1]) === id; }); return r ? parse_(r[2]) : null; }
+// Gemeinsame Werte; grosse Werte (z.B. Vorlagen) werden auf mehrere Zeilen «id#1», «id#2» … verteilt
+function global_(id) {
+  const w = zeilen_(datenBlatt_()); const r = w.find(function (x) { return x[0] === '_global' && String(x[1]) === id; }); if (!r) return null;
+  const v = parse_(r[2]); if (!v || !v.__teile) return v;
+  let s = ''; for (let k = 1; k <= v.__teile; k++) { const t = w.find(function (x) { return x[0] === '_global' && String(x[1]) === id + '#' + k; }); s += t ? String(t[2]) : ''; }
+  return parse_(s);
+}
 function globalSetzen_(id, wert) {
-  const sh = datenBlatt_(); const w = zeilen_(sh); const i = w.findIndex(function (x) { return x[0] === '_global' && String(x[1]) === id; });
-  let json = JSON.stringify(wert); if (json.length > MAX_ZELLE) throw new Error('EINTRAG_ZU_GROSS');
-  if (i >= 0) sh.getRange(i + 2, 3, 1, 2).setValues([[json, new Date()]]); else sh.getRange(sh.getLastRow() + 1, 1, 1, 4).setValues([['_global', id, json, new Date()]]);
+  const sh = datenBlatt_(); const json = JSON.stringify(wert); const teile = [];
+  if (json.length > MAX_ZELLE) { for (let k = 0; k < json.length; k += MAX_ZELLE) teile.push(json.slice(k, k + MAX_ZELLE)); if (teile.length > 40) throw new Error('EINTRAG_ZU_GROSS'); }
+  // alte Teile entfernen
+  const w = zeilen_(sh); for (let i = w.length - 1; i >= 0; i--) if (w[i][0] === '_global' && String(w[i][1]).indexOf(id + '#') === 0) sh.deleteRow(i + 2);
+  const setze = function (rid, val) { const w2 = zeilen_(sh); const i = w2.findIndex(function (x) { return x[0] === '_global' && String(x[1]) === rid; }); if (i >= 0) sh.getRange(i + 2, 3, 1, 2).setValues([[val, new Date()]]); else sh.getRange(sh.getLastRow() + 1, 1, 1, 4).setValues([['_global', rid, val, new Date()]]); };
+  if (!teile.length) { setze(id, json); return; }
+  teile.forEach(function (tt, k) { setze(id + '#' + (k + 1), tt); });
+  setze(id, JSON.stringify({ __teile: teile.length }));
+}
+// Feedback zum Tool (von allen Angemeldeten), Benachrichtigung für ausgewählte Personen
+function toolFeedback_(sess, d) {
+  const text = String(d.text || '').trim().slice(0, 2000); if (!text) throw new Error('TEXT_FEHLT');
+  const pers = lagerDaten_(sess.lager).people[sess.person];
+  const lock = LockService.getScriptLock(); lock.waitLock(10000);
+  try { const alt = (global_('toolfeedback') || {}).items || []; globalSetzen_('toolfeedback', { items: [{ id: Utilities.getUuid().slice(0, 8), at: new Date().toISOString(), lager: sess.lager, name: d.anon ? 'Anonym' : (pers ? anzeigeName_(pers) : '?'), role: sess.role, art: String(d.art || 'Idee').slice(0, 20), text: text, read: false }].concat(alt).slice(0, 200) }); erhoeheRev_(); } finally { lock.releaseLock(); }
+  return {};
+}
+function toolFbNeu_(sess) {
+  const wer = (global_('notify') || {}).personen || [];
+  if (!wer.some(function (x) { return x.lager === sess.lager && x.person === sess.person; })) return 0;
+  return ((global_('toolfeedback') || {}).items || []).filter(function (x) { return !x.read; }).length;
 }
 function fehlerMelden_(d) {
   const c = CacheService.getScriptCache(); const n = Number(c.get('FEHLER') || 0); if (n > 30) return {}; c.put('FEHLER', String(n + 1), 3600);
@@ -293,6 +320,11 @@ function admin_(d) {
   if (a === 'removeAdmin') { if (list.length < 2) throw new Error('LETZTER_ADMIN'); const i = list.findIndex(function (x) { return x.id === d.id; }); if (i >= 0) list.splice(i, 1); speichern(); return {}; }
   if (a === 'setWartung') { globalSetzen_('wartung', { text: String(d.text || '').slice(0, 300), on: !!d.on }); erhoeheRev_(); return {}; }
   if (a === 'clearFehler') { globalSetzen_('fehler', { items: [] }); return {}; }
+  if (a === 'toolFeedback') return { items: (global_('toolfeedback') || {}).items || [], notify: (global_('notify') || {}).personen || [] };
+  if (a === 'toolFeedbackRead') { const g = global_('toolfeedback') || { items: [] }; g.items.forEach(function (x) { if (!d.id || x.id === d.id) x.read = true; }); if (d.remove) g.items = g.items.filter(function (x) { return x.id !== d.remove; }); globalSetzen_('toolfeedback', g); erhoeheRev_(); return {}; }
+  if (a === 'setNotify') { globalSetzen_('notify', { personen: (d.personen || []).slice(0, 20).map(function (x) { return { lager: String(x.lager), person: String(x.person) }; }) }); erhoeheRev_(); return {}; }
+  if (a === 'getVorlagen') return global_('vorlagen') || { tasks: [], pack: [] };
+  if (a === 'setVorlagen') { const v = d.vorlagen || {}; globalSetzen_('vorlagen', { tasks: (v.tasks || []).slice(0, 30), pack: (v.pack || []).slice(0, 30) }); return {}; }
   if (a === 'token') { const t = Utilities.getUuid().replace(/-/g, ''); p.setProperty('TOK_' + t, JSON.stringify({ lager: '*', role: 'admin', person: '', created: Date.now(), ttl: 1 })); return { token: t }; }
   if (a === 'deleteLager') {
     const lock = LockService.getScriptLock(); lock.waitLock(20000);

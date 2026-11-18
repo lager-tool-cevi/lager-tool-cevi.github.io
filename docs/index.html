@@ -1040,6 +1040,120 @@ body.nav-open .fab { display: none; }
 .nav-sep { border-top: 1px solid var(--side-active); margin: 10px 8px 6px; }
 @media (max-width: 760px) { .nav-sep { display: none; } body.nav-open .side .nav .nav-sep { display: block; } }
 
+/* ===== Etappe 2: Aufgaben und Protokoll ===== */
+
+/* Status «Nächster Höck» */
+.status[data-s="Nächster Höck"] { background-color: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+.seg button[aria-pressed="true"][data-s="Nächster Höck"] { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font-weight: 600; }
+.mk.task[data-s="Nächster Höck"] { background: var(--accent); }
+#d-status { flex-wrap: wrap; }
+
+/* Aufgaben-Seite ruhiger: Nebensachen erst beim Darüberfahren */
+.ttable tr.task .star:not(.on) { opacity: 0; transition: opacity var(--t); }
+.ttable tr.task:hover .star, .ttable tr.task:focus-within .star { opacity: 0.6; }
+.ttable .t-meta { opacity: 0.85; }
+.ttable tr.task:hover .t-meta { opacity: 1; }
+.task-tools { gap: var(--sp-2); flex-wrap: wrap; }
+.task-tools #f-reset { order: 9; }
+.view-seg { margin-left: auto; }
+.view-seg button { padding: 4px 12px; font-size: var(--fs-sm, 13px); }
+@media (hover: none) { .ttable tr.task .star:not(.on) { opacity: 0.45; } }
+
+/* Verantwortlich direkt in der Liste */
+.owner-pick { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
+select.owner { border: 1px solid transparent; background: transparent; border-radius: var(--r-sm, 6px); padding: 3px 4px; font: inherit; font-size: 13.5px; color: var(--ink); max-width: 150px; cursor: pointer; transition: border-color var(--t), background var(--t); }
+select.owner:hover, select.owner:focus-visible { border-color: var(--line-strong); background: var(--surface); }
+.av-empty { background: var(--line); color: var(--muted); }
+.take { display: block; font-size: 12px; margin-top: 2px; opacity: 0; transition: opacity var(--t); }
+tr.task:hover .take, tr.task:focus-within .take { opacity: 1; }
+@media (hover: none) { .take { opacity: 1; } }
+.take-d { align-self: flex-start; font-size: 12.5px; }
+.tag.dep { color: var(--wait); }
+
+/* Mehrfachauswahl */
+.sel-cb { margin: 0 8px 0 0; width: 18px; height: 18px; vertical-align: middle; accent-color: var(--accent); }
+tr.task.selected td { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.bulk-bar { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 18; display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); max-width: calc(100vw - 32px); background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); border-radius: var(--r-lg, 14px); box-shadow: var(--shadow-3, 0 12px 30px rgb(10 14 40 / 0.2)); padding: var(--sp-2) var(--sp-3); animation: lt-pop var(--t); }
+.bulk-bar select { font: inherit; font-size: 13px; padding: 5px 8px; border: 1px solid var(--line-strong); border-radius: var(--r-sm, 6px); background: var(--surface); color: var(--ink); }
+.bulk-sep { width: 1px; align-self: stretch; background: var(--line); }
+@media (max-width: 900px) { .bulk-bar { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); } }
+
+/* Kanban */
+.kanban { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(230px, 1fr); gap: var(--sp-3); padding: var(--sp-3); overflow-x: auto; }
+.kb-col { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r, 10px); display: flex; flex-direction: column; min-height: 180px; transition: border-color var(--t), background var(--t); }
+.kb-col.over { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, var(--bg)); }
+.kb-head { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid var(--line); font-size: 13.5px; }
+.kb-head .muted { margin-left: auto; }
+.kb-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line-strong); }
+.kb-dot[data-s="Läuft"] { background: var(--run); } .kb-dot[data-s="Wartet"] { background: var(--wait); } .kb-dot[data-s="Erledigt"] { background: var(--ok); } .kb-dot[data-s="Nächster Höck"] { background: var(--accent); }
+.kb-list { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-2); max-height: 70vh; overflow-y: auto; }
+.kb-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm, 8px); padding: var(--sp-2) 10px; cursor: grab; box-shadow: var(--shadow-1, none); transition: box-shadow var(--t), transform var(--t); display: flex; flex-direction: column; gap: 4px; }
+.kb-card:hover { box-shadow: var(--shadow-2, 0 4px 12px rgb(0 0 0 / 0.1)); }
+.kb-card.dragging { opacity: 0.5; }
+.kb-card.late { border-left: 3px solid var(--late); }
+.kb-title { font-size: 13.5px; font-weight: 500; line-height: 1.35; }
+.kb-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+.kb-meta .av { margin-left: auto; width: 22px; height: 22px; font-size: 10px; }
+.kb-empty { font-size: 12.5px; color: var(--muted); text-align: center; padding: var(--sp-3) 0; }
+
+/* Aufgabe neben der Liste (breite Bildschirme) */
+@media (min-width: 1280px) {
+  body.task-side .overlay:not(.center) { background: transparent; pointer-events: none; }
+  body.task-side .overlay:not(.center) .drawer { pointer-events: auto; box-shadow: var(--shadow-3, -8px 0 30px rgb(0 0 0 / 0.15)); border-left: 1px solid var(--line); }
+  body.task-side #view { padding-right: min(560px, 42vw); transition: padding var(--t); }
+}
+
+/* Zeitplan ziehen */
+.gantt [draggable="true"] { cursor: grab; }
+.gantt td.drop { background: color-mix(in srgb, var(--accent) 16%, transparent) !important; }
+
+/* Abhängigkeiten, Fassungen */
+.dep-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.dep-list .pchip-s { display: inline-flex; align-items: center; gap: 4px; }
+.ver-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-2) 0; border-bottom: 1px solid var(--line); }
+.ver-row:last-child { border-bottom: 0; }
+
+/* Übersicht: ruhige Ressorts */
+.quiet-card .hint-row.plain { font-size: 13.5px; }
+
+/* Erwähnungen */
+.mention.group { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.av-group { background: var(--line); font-size: 12px; }
+.ment-line { display: flex; align-items: flex-start; gap: var(--sp-3); margin-top: 4px; }
+.ment-line .rich { flex: 1; min-width: 0; }
+.ment-line .btn { flex: none; opacity: 0.75; }
+.ment-row:hover .ment-line .btn { opacity: 1; }
+
+/* Protokoll-Fenster */
+.drawer-foot { flex-wrap: wrap; gap: var(--sp-2); }
+.drawer-foot > span { flex-wrap: wrap; }
+.drawer-head > span { flex-wrap: wrap; justify-content: flex-end; align-items: center; }
+
+/* Diktieren */
+.has-dictate { position: relative; }
+.dictate { position: absolute; right: 6px; bottom: 6px; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: 14px; line-height: 1; opacity: 0.55; transition: opacity var(--t), background var(--t); }
+.dictate:hover, .dictate:focus-visible { opacity: 1; }
+.dictate.on { opacity: 1; background: var(--late-soft, #fde3e6); border-color: var(--late); animation: lt-pulse 1.2s ease-in-out infinite; }
+.has-dictate textarea { padding-right: 40px; }
+@keyframes lt-pulse { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--late) 20%, transparent); } }
+
+/* Höck-Modus */
+.hoeck-mode { position: fixed; inset: 0; z-index: 25; background: var(--bg); color: var(--ink); display: grid; grid-template-rows: auto auto 1fr auto; animation: lt-fade var(--t); }
+.hm-top { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--line); background: var(--surface); }
+.hm-top > div { display: flex; flex-direction: column; min-width: 0; }
+.hm-top b { font-size: 17px; }
+.hm-clock { margin-left: auto; font-variant-numeric: tabular-nums; }
+.hm-nav { display: flex; gap: var(--sp-2); overflow-x: auto; padding: var(--sp-2) var(--sp-4); border-bottom: 1px solid var(--line); background: var(--surface); }
+.hm-nav button { flex: none; border: 1px solid var(--line); background: var(--bg); color: var(--ink-2, var(--ink)); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.hm-nav button.done { border-color: var(--ok); }
+.hm-nav button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.hm-main { overflow-y: auto; padding: var(--sp-5, 32px) var(--sp-4); width: min(860px, 100%); margin: 0 auto; display: flex; flex-direction: column; gap: var(--sp-3); }
+.hm-title { font-size: 26px; font-weight: 600; border: 0; border-bottom: 2px solid var(--line); background: transparent; color: var(--ink); padding: 6px 0; font-family: inherit; }
+.hm-title:focus { outline: none; border-bottom-color: var(--accent); }
+.hm-main textarea { font-size: 17px; line-height: 1.5; }
+.hm-foot { display: flex; justify-content: center; gap: var(--sp-2); padding: var(--sp-3) var(--sp-4) calc(var(--sp-3) + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); background: var(--surface); }
+@media (max-width: 600px) { .hm-title { font-size: 20px; } .hm-main { padding: var(--sp-3); } .hm-main textarea { font-size: 16px; } }
+
 
 /* =====================================================================
    Gestaltungsregeln (Grundgerüst): Abstände 4/8/16/24/32, wenige Schriftgrössen,
@@ -1177,15 +1291,15 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px var(--accent-s
   <nav class="bnav" id="bnav" aria-label="Schnellnavigation"></nav>
   <button class="fab" id="qnote" type="button" aria-label="Schnell-Notiz" title="Schnell-Notiz" hidden>+</button>
 </div>
-<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-17 21:35","test":false};</script>
+<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 07:55","test":false};</script>
 <script>
 // Datenanbindung. Bei Google (google.script.run vorhanden) läuft alles über api() in Code.gs,
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:
 // Anmeldung als Team (nur Name) oder Lagerleitung (Name + Passwort), Admin mit Admin-Passwort.
 window.LaleiStore = (() => {
-  const SHORT = ["tasks", "config", "journal", "hoecks", "people", "kids", "att", "plan", "info", "eval", "assets", "trash", "rooms", "todos", "feedback", "attreq", "daypage", "presence", "media", "board", "swap", "trips", "groups", "count", "shop", "log"];
+  const SHORT = ["tasks", "config", "journal", "hoecks", "people", "kids", "att", "plan", "info", "eval", "assets", "trash", "rooms", "todos", "feedback", "attreq", "daypage", "presence", "media", "board", "swap", "trips", "groups", "count", "shop", "log", "versions"];
   const TEAM_READ = ["config", "people", "kids", "plan", "rooms", "info", "att", "attreq", "todos", "feedback", "hoecks", "board", "swap", "trips", "groups", "count", "media"];
-  const NO_LOG = ["presence", "count", "todos", "feedback", "attreq", "swap", "log", "media"];
+  const NO_LOG = ["presence", "count", "todos", "feedback", "attreq", "swap", "log", "media", "versions"];
   const TOKEN_DAYS = 60;
   const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
   const isGas = typeof google !== "undefined" && google.script && google.script.run;
@@ -1264,6 +1378,7 @@ window.LaleiStore = (() => {
     if (!sec) sec = { admin: s0.adminHash || null, lagerPw: {}, personPw: {}, tokens: {} };
     if (!sec.admins) { sec.admins = sec.admin ? [{ id: "a1", name: "Admin", h: sec.admin }] : []; delete sec.admin; }
     if (!sec.global) sec.global = { wartung: null, fehler: [], nutzung: {} };
+    if (!sec.global.toolfb) sec.global.toolfb = []; if (!sec.global.notify) sec.global.notify = []; if (!sec.global.vorlagen) sec.global.vorlagen = { tasks: [], pack: [] };
     for (const [k, v] of Object.entries(s0.lagerPw || {})) if (!(k in sec.lagerPw)) sec.lagerPw[k] = v;
     const save = () => { ls.set(KEY, JSON.stringify(db)); ls.set(SKEY, JSON.stringify(sec)); };
     const hash = async (s) => Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("lalei|" + s))), (b) => b.toString(16).padStart(2, "0")).join("");
@@ -1319,6 +1434,11 @@ window.LaleiStore = (() => {
         if (a === "removeAdmin") { if (sec.admins.length < 2) throw new Error("LETZTER_ADMIN"); sec.admins = sec.admins.filter((x) => x.id !== payload.id); save(); return {}; }
         if (a === "setWartung") { sec.global.wartung = { text: String(payload.text || "").slice(0, 300), on: !!payload.on }; db.rev++; save(); return {}; }
         if (a === "clearFehler") { sec.global.fehler = []; save(); return {}; }
+        if (a === "toolFeedback") return { items: sec.global.toolfb, notify: sec.global.notify };
+        if (a === "toolFeedbackRead") { sec.global.toolfb.forEach((x) => { if (!payload.id || x.id === payload.id) x.read = true; }); if (payload.remove) sec.global.toolfb = sec.global.toolfb.filter((x) => x.id !== payload.remove); db.rev++; save(); return {}; }
+        if (a === "setNotify") { sec.global.notify = (payload.personen || []).map((x) => ({ lager: x.lager, person: x.person })); db.rev++; save(); return {}; }
+        if (a === "getVorlagen") return clone(sec.global.vorlagen);
+        if (a === "setVorlagen") { sec.global.vorlagen = { tasks: (payload.vorlagen.tasks || []).slice(0, 30), pack: (payload.vorlagen.pack || []).slice(0, 30) }; save(); return {}; }
         if (a === "setLagerPw") { if ((payload.pw || "").length < 6) throw new Error("PASSWORT_ZU_KURZ"); sec.lagerPw[payload.lager] = payload.pw; save(); return {}; }
         if (a === "resetPerson") { delete sec.personPw[payload.lager + "|" + payload.person]; for (const [t, s] of Object.entries(sec.tokens)) if (s.lager === payload.lager && s.person === payload.person) delete sec.tokens[t]; save(); return {}; }
         if (a === "logoutAll") { sec.tokens = {}; save(); return {}; }
@@ -1339,6 +1459,8 @@ window.LaleiStore = (() => {
         throw new Error("UNBEKANNTE_AKTION");
       }
       const sess = session(tok);
+      if (op === "vorlagen") { if (sess.role !== "lalei" && sess.role !== "lesen") throw new Error("KEINE_BERECHTIGUNG"); return clone(sec.global.vorlagen); }
+      if (op === "toolFeedback") { const txt = String(payload.text || "").trim(); if (!txt) throw new Error("TEXT_FEHLT"); sec.global.toolfb = [{ id: rnd(8), at: new Date().toISOString(), lager: sess.lager, name: payload.anon ? "Anonym" : nameOf(sess.lager, sess.person), role: sess.role, art: payload.art || "Idee", text: txt.slice(0, 2000), read: false }, ...sec.global.toolfb].slice(0, 200); db.rev++; save(); return {}; }
       if (op === "changePw") { if (sess.role !== "lalei" && sess.role !== "lesen") throw new Error("KEINE_BERECHTIGUNG"); const key = sess.lager + "|" + sess.person; if (sec.personPw[key] !== (await hash(payload.oldPw || ""))) throw new Error("FALSCHES_PASSWORT"); if ((payload.newPw || "").length < 6) throw new Error("PASSWORT_ZU_KURZ"); sec.personPw[key] = await hash(payload.newPw); save(); return {}; }
       if (op === "sync" && sess.role !== "admin") { const k = sess.lager + "|" + sess.person; const prevN = sec.global.nutzung[k]; if (!prevN || Date.now() - new Date(prevN.at).getTime() > 600000) { sec.global.nutzung[k] = { lager: sess.lager, name: nameOf(sess.lager, sess.person), role: sess.role, at: new Date().toISOString() }; save(); } }
       if (op === "sync") {
@@ -1346,6 +1468,7 @@ window.LaleiStore = (() => {
         if (payload.rev === db.rev && !payload.full) return { rev: db.rev };
         const data = { lager: lagerList() };
         if (lager) Object.assign(data, filterFor({ ...sess, lager }, lagerColls(lager)));
+        if (sec.global.notify.some((x) => x.lager === sess.lager && x.person === sess.person)) { const nfb = sec.global.toolfb.filter((x) => !x.read).length; if (nfb) data.toolFb = nfb; }
         return { rev: db.rev, data };
       }
       if (op === "write") {
@@ -1413,14 +1536,14 @@ window.LaleiStore = (() => {
   const collSnap = (coll) => { const docs = [...data[coll].keys()].sort().map((id) => docSnap(coll, id)); return { docs, size: docs.length, empty: !docs.length, docChanges: () => [], metadata: {} }; };
   function emit(colls) { for (const l of listeners) if (colls.has(l.coll)) { try { l.cb(l.id ? docSnap(l.coll, l.id) : collSnap(l.coll)); } catch (e) { console.error(e); } } }
   // letzter Stand pro Lager im Browser, damit man ohne Netz lesen und weiterarbeiten kann
-  let offline = false;
+  let offline = false, toolFb = 0;
   const cacheKey = () => "lalei-cache-" + lagerId + "-" + (sess ? sess.person : "");
   function saveCache(res) { if (!lagerId || !sess) return; try { const d = { ...res.data, media: {} }; ls.set(cacheKey(), JSON.stringify({ at: new Date().toISOString(), data: d })); } catch {} }
   function applyServer(res) {
     if (!res) return;
     if (res.data) {
       if (!res.cached) { saveCache(res); offline = false; }
-      data.lager = new Map(Object.entries(res.data.lager || {}));
+      data.lager = new Map(Object.entries(res.data.lager || {})); toolFb = res.data.toolFb || 0;
       for (const c of SHORT) data[c] = new Map(Object.entries(res.data[c] || {}));
       rev = res.rev; emit(new Set(["lager", ...SHORT]));
     } else rev = res.rev;
@@ -1553,6 +1676,8 @@ window.LaleiStore = (() => {
   const admin = (adminPw, action, extra = {}) => raw("admin", { adminPw, action, ...extra });
   const forgotAdmin = (name) => raw("forgotAdmin", { name });
   const changePw = (oldPw, newPw) => call("changePw", { oldPw, newPw });
+  const vorlagen = () => call("vorlagen", {});
+  const toolFeedback = (d) => call("toolFeedback", d);
   // Admin-Zugang für Vorlagen und neue Lager
   async function adminCall(adminPw, fn) { const { token } = await admin(adminPw, "token"); return fn((op, p) => raw(op, p, token)); }
   async function readLager(adminPw, id) { return adminCall(adminPw, (c) => c("sync", { rev: -1, lager: id, full: true }).then((r) => r.data)); }
@@ -1580,7 +1705,7 @@ window.LaleiStore = (() => {
   }
   const peek = (coll, id) => { const v = data[coll] && data[coll].get(id); return v ? clone(v) : null; };
   return {
-    ready, setLager, login, logout, roster, admin, forgotAdmin, changePw, readLager, writeRaw, upload, peek, report,
+    ready, setLager, login, logout, roster, admin, forgotAdmin, changePw, vorlagen, toolFeedback, toolFb: () => toolFb, readLager, writeRaw, upload, peek, report,
     isGas: echt, isApi, isTest: !!CONF.test, version: CONF.version || "", isOffline: () => offline, appUrl: () => appUrl, wartung: () => wartung, lastSyncMs: () => lastSyncMs, wartend: () => outbox.length,
     onRejected: (fn) => (onRejected = fn),
     session: () => sess, lager: () => lagerId, onLoggedOut: (fn) => (onLoggedOut = fn),
@@ -1655,6 +1780,7 @@ window.LaleiStore = (() => {
     const ps = people().slice().sort((a, b) => b.length - a.length);
     let out = esc(text || "");
     out = out.replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)])/g, (u) => `<a href="${u}" target="_blank" rel="noopener">${u.length > 60 ? u.slice(0, 57) + "…" : u}</a>`);
+    out = richGroups(out);
     if (!ps.length) return out;
     const re = new RegExp(`(^|[^\\p{L}\\p{N}_/])@(${ps.map((p) => escRe(esc(p))).join("|")})(?!${NAME_CH})`, "giu");
     return out.replace(re, (m, pre, name) => {
@@ -1663,7 +1789,7 @@ window.LaleiStore = (() => {
     });
   };
   const mentions = (text, name) => !!name && new RegExp(`(^|[^\\p{L}\\p{N}_])@${escRe(name)}(?!${NAME_CH})`, "iu").test(text || "");
-  const mentionHint = () => `<span class="hint">Mit @ markierst du eine Person, z.B. «@${esc(people()[0] || "Name")} organisiert das».</span>`;
+  const mentionHint = () => `<span class="hint">Mit @ markierst du eine Person, z.B. «@${esc(people()[0] || "Name")} organisiert das». Auch @alle, @LaLei oder @Ressort.</span>`;
   const mbox = { el: null, box: null, items: [], idx: 0, start: 0 };
   function hideMention() { if (mbox.box) mbox.box.remove(); mbox.box = null; mbox.el = null; }
   function checkMention(el) {
@@ -1671,11 +1797,12 @@ window.LaleiStore = (() => {
     const m = before.match(new RegExp(`(^|[^\\p{L}\\p{N}_])@(${NAME_CH}*)$`, "u"));
     if (!m) return hideMention();
     const q = m[2].toLowerCase();
-    const list = people().filter((p) => p.toLowerCase().startsWith(q));
+    const groups = mentionGroups().filter((g) => g.token.toLowerCase().startsWith(q));
+    const list = [...people().filter((p) => p.toLowerCase().startsWith(q)), ...groups.map((g) => g.token)];
     if (!list.length) return hideMention();
     mbox.el = el; mbox.items = list; mbox.idx = Math.min(mbox.idx, list.length - 1); mbox.start = pos - m[2].length - 1;
     if (!mbox.box) { mbox.box = document.createElement("div"); mbox.box.className = "mention-box"; mbox.box.setAttribute("role", "listbox"); document.body.appendChild(mbox.box); }
-    mbox.box.innerHTML = list.map((p, i) => `<button type="button" role="option" aria-selected="${i === mbox.idx}" data-pick="${esc(p)}">${av(p)}${esc(p)}</button>`).join("");
+    mbox.box.innerHTML = list.map((p, i) => { const g = groups.find((x) => x.token === p); return `<button type="button" role="option" aria-selected="${i === mbox.idx}" data-pick="${esc(p)}">${g ? `<span class="av av-group" aria-hidden="true">👥</span>${esc(p)} <span class="muted" style="font-size:12px">${esc(g.label)}</span>` : av(p) + esc(p)}</button>`; }).join("");
     const r = el.getBoundingClientRect();
     const below = r.bottom + 4 + mbox.box.offsetHeight < window.innerHeight;
     mbox.box.style.left = Math.max(8, Math.min(r.left, window.innerWidth - mbox.box.offsetWidth - 8)) + "px";
@@ -1937,10 +2064,11 @@ window.LaleiStore = (() => {
     if ((t.links || []).length) meta.push(`${t.links.length} ${t.links.length === 1 ? "Link" : "Links"}`);
     if (t.note) meta.push("Bemerkung");
     if (t.source) meta.push("aus " + esc(t.source.label || "Höck"));
+    if ((t.dependsOn || []).length && !done) { const di = depInfo(t); if (di) meta.push(di); }
     return `<tr class="task ${late ? "late" : ""} ${done ? "done" : ""}">
       <td class="c-date">${fmt(t.deadline)}${late ? `<div><span class="tag late">überfällig</span></div>` : ""}</td>
       <td class="c-main"><div class="t-row"><button class="qdone ${done ? "on" : ""}" data-qdone="${esc(t._id)}" aria-label="${done ? "Wieder öffnen" : "Als erledigt abhaken"}" title="${done ? "Wieder öffnen" : "Abhaken"}">${done ? "✓" : ""}</button><div style="min-width:0"><button class="star ${t.star ? "on" : ""}" data-star="${esc(t._id)}" aria-label="${t.star ? "Nicht mehr wichtig" : "Als wichtig markieren"}" title="Wichtig">★</button><button class="t-title" data-open="${esc(t._id)}">${isNew(t) ? '<span class="new-dot" title="Neu oder geändert seit deinem letzten Besuch"></span>' : ""}${esc(t.title)}</button><div class="t-meta">${meta.map((m) => `<span>${m}</span>`).join("")}</div></div></div></td>
-      <td class="c-who">${person(t.owner)}${t.support ? `<div class="plus">mit ${esc(t.support)}</div>` : ""}</td>
+      <td class="c-who">${ownerCell(t)}${t.support ? `<div class="plus">mit ${esc(t.support)}</div>` : ""}</td>
       <td class="c-stat">${statusSelect(t)}</td></tr>`;
   };
   const taskTable = (list, opts = {}) => {
@@ -2174,21 +2302,22 @@ window.LaleiStore = (() => {
       const cls = (k) => [k.m ? "msw" : "", k.now ? "now" : "", k.pause ? "pause" : "", k.camp ? "camp" : ""].join(" ");
       const head = `<tr><th class="rowh" rowspan="2"></th>${months.map((m) => `<th class="mo" colspan="${m.n}">${m.n > 1 ? m.label : ""}</th>`).join("")}</tr><tr>${wk.map((k) => `<th class="wk ${k.m ? "msw" : ""} ${k.now ? "now" : ""}" title="Woche ab ${fmtFull(k.wi)}">${k.w.getDate()}</th>`).join("")}</tr>`;
       const sep = (label) => `<tr class="sep"><td class="rowh">${label}</td>${wk.map((k) => `<td class="${cls(k)}"></td>`).join("")}</tr>`;
-      const markerRow = (label, pick, render) => `<tr><td class="rowh">${label}</td>${wk.map((k) => { const items = pick(k); return `<td class="c ${cls(k)}">${items.length ? render(items, k) : ""}</td>`; }).join("")}</tr>`;
+      const canDrag = isLaLei() && !isReadOnly() && !isClosed() && !state.asTeam;
+      const markerRow = (label, pick, render) => `<tr><td class="rowh">${label}</td>${wk.map((k) => { const items = pick(k); return `<td class="c ${cls(k)}" data-wi="${k.wi}">${items.length ? render(items, k) : ""}</td>`; }).join("")}</tr>`;
       const hkTip = (h) => `${HK[h.kind || "LaLei"].label}: ${h.title || ""} · ${fmt(h.date)}${h.time ? " " + h.time : ""}${h.place ? " · " + h.place : ""}`;
       const rowFor = (label, list, cl, key) => `<tr class="${cl}"><td class="rowh">${esc(label)}</td>${wk.map((k) => { const items = list.filter((t) => t.deadline >= k.wi && t.deadline <= k.we);
-        if (!items.length) return `<td class="c ${cls(k)}"></td>`;
+        if (!items.length) return `<td class="c ${cls(k)}" data-wi="${k.wi}"></td>`;
         const s = statsFor(items); const sel = state.gSel && state.gSel.key === key && state.gSel.wi === k.wi; const c = s.late ? "late" : s.done === s.total ? "ok" : s.done ? "part" : "";
-        return `<td class="c ${cls(k)}"><button class="cell ${c} ${sel ? "sel" : ""}" style="--p:${pct(s.done, s.total)}%" data-gkey="${esc(key)}" data-wi="${k.wi}" title="${esc(label)}, Woche ab ${fmtFull(k.wi)}: ${s.total} Aufgaben, ${s.done} erledigt">${s.total}</button></td>`; }).join("")}</tr>`;
+        return `<td class="c ${cls(k)}" data-wi="${k.wi}"><button class="cell ${c} ${sel ? "sel" : ""}" style="--p:${pct(s.done, s.total)}%" data-gkey="${esc(key)}" data-wi="${k.wi}" title="${esc(label)}, Woche ab ${fmtFull(k.wi)}: ${s.total} Aufgaben, ${s.done} erledigt">${s.total}</button></td>`; }).join("")}</tr>`;
       const rows = [];
       if (tl.ms || tl.lalei || tl.team) rows.push(sep("Termine"));
-      if (tl.ms) rows.push(markerRow("Meilensteine", (k) => ms.filter((m) => m.date >= k.wi && m.date <= k.we), (items) => items.map((m) => msMark(m, ms.indexOf(m) + 1)).join("")));
+      if (tl.ms) rows.push(markerRow("Meilensteine", (k) => ms.filter((m) => m.date >= k.wi && m.date <= k.we), (items) => items.map((m) => canDrag ? msMark(m, ms.indexOf(m) + 1).replace("<button", `<button draggable="true" data-drag-ms="${esc(m.id)}"`) : msMark(m, ms.indexOf(m) + 1)).join("")));
       for (const kind of ["LaLei", "Team"]) { if (!(kind === "LaLei" ? tl.lalei : tl.team)) continue;
         rows.push(markerRow(HK[kind].label + "s", (k) => hk.filter((h) => (h.kind || "LaLei") === kind && h.date >= k.wi && h.date <= k.we), (items) => `<button class="mk ${HK[kind].cls}" data-open-hoeck="${esc(items[0]._id)}" title="${esc(items.map(hkTip).join("\n"))}">${items.length > 1 ? items.length : kind[0]}</button>`)); }
       if (tl.tasks) {
         if (tl.ress) {
           rows.push(sep(`Aufgaben ${tl.ress === "_mine" ? (me() ? "von " + esc(me()) : "(Name wählen)") : esc(tl.ress.replace("|", " › "))}`));
-          for (const t of all) rows.push(`<tr class="taskrow"><td class="rowh"><button class="t-title" data-open="${esc(t._id)}" title="${esc(t.title)}">${esc(t.title)}</button></td>${wk.map((k) => `<td class="c ${cls(k)}">${t.deadline >= k.wi && t.deadline <= k.we ? `<button class="mk task ${isLate(t) ? "late" : ""}" data-s="${esc(t.status)}" data-open="${esc(t._id)}" title="${esc(t.title)} · ${fmt(t.deadline)} · ${esc(t.status)}"></button>` : ""}</td>`).join("")}</tr>`);
+          for (const t of all) rows.push(`<tr class="taskrow"><td class="rowh"><button class="t-title" data-open="${esc(t._id)}" title="${esc(t.title)}">${esc(t.title)}</button></td>${wk.map((k) => `<td class="c ${cls(k)}" data-wi="${k.wi}">${t.deadline >= k.wi && t.deadline <= k.we ? `<button class="mk task ${isLate(t) ? "late" : ""}" data-s="${esc(t.status)}" data-open="${esc(t._id)}"${canDrag ? ` draggable="true" data-drag-task="${esc(t._id)}"` : ""} title="${esc(t.title)} · ${fmt(t.deadline)} · ${esc(t.status)}"></button>` : ""}</td>`).join("")}</tr>`);
           if (!all.length) rows.push(`<tr><td class="rowh muted">Keine Aufgaben</td>${wk.map((k) => `<td class="${cls(k)}"></td>`).join("")}</tr>`);
         } else {
           rows.push(sep("Aufgaben pro Ressort"));
@@ -5320,6 +5449,676 @@ window.LaleiStore = (() => {
   // ---------- App (Service Worker) ----------
   if (STORE.isApi && !STORE.isTest && "serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 
+  // =====================================================================
+  // Etappe 2a: Aufgaben – Verantwortlich automatisch, «Nächster Höck», Rückgängig, frühere Fassungen,
+  // Mehrfachauswahl, Kanban, gespeicherte Ansichten, «Ich übernehme», Abhängigkeiten, Zeitplan ziehen
+  // =====================================================================
+  STATUSES.splice(STATUSES.indexOf("Erledigt"), 0, "Nächster Höck");
+  Object.assign(ERR, { TEXT_FEHLT: "Bitte einen Text eingeben." });
+  const cloneDoc = (x) => (x ? JSON.parse(JSON.stringify(x)) : null);
+  const docOhneId = (x) => { const c = cloneDoc(x); if (c) delete c._id; return c; };
+
+  // ---------- Verantwortlich automatisch: Leitung von Teilbereich bzw. Ressort ----------
+  function leadOf(ressortName, teil) {
+    const r = ressortByName(ressortName); if (!r) return "";
+    if (teil) { const s = subsOf(r).find((x) => x.name === teil); if (s && s.lead) return s.lead; }
+    return r.lead || "";
+  }
+  // Aufgaben ohne von Hand gesetzte Verantwortliche bekommen die aktuelle Leitung
+  function autoOwnerOps(match) {
+    const ops = [];
+    for (const t of state.tasks.values()) {
+      if (t.ownerManual || t.status === "Erledigt" || !match(t)) continue;
+      const lead = leadOf(t.ressort, t.teil); if (lead && t.owner !== lead && (!t.owner || t.owner === match.alt)) ops.push({ op: "update", coll: "tasks", id: t._id, data: { owner: lead } });
+    }
+    return ops;
+  }
+  // Leitung geändert: bisherige automatische Zuteilungen nachziehen
+  view.addEventListener("change", (e) => {
+    const m = (e.target.dataset.cfg || "").match(/^ressorts\.([^.]+)(?:\.subs\.([^.]+))?\.lead$/); if (!m || !isLaLei()) return;
+    const r = (cfg().ressorts || {})[m[1]]; if (!r) return; const alt = m[2] ? ((r.subs || {})[m[2]] || {}).lead || "" : r.lead || "";
+    const subName = m[2] ? ((r.subs || {})[m[2]] || {}).name : null;
+    setTimeout(() => {
+      const match = (t) => t.ressort === r.name && (subName ? t.teil === subName : !t.teil || !leadOfSub(r, t.teil));
+      match.alt = alt; const ops = autoOwnerOps(match);
+      if (ops.length) state.db.batch(ops).then(() => toast(`${ops.length} Aufgaben gehen jetzt an ${e.target.value || "niemand"}`)).catch(handleWriteError);
+    }, 900);
+  }, true);
+  const leadOfSub = (r, teil) => { const s = subsOf(r).find((x) => x.name === teil); return s && s.lead; };
+  // Aufgaben ohne Verantwortliche (schnell erfasst, eingefügt, aus Vorlage …) an die Leitung geben
+  let autoOwnerLast = 0;
+  function autoOwnerErstmals() {
+    if (!isLaLei() || isReadOnly() || isClosed() || state.asTeam || !state.loaded.tasks || !state.config || Date.now() - autoOwnerLast < 20000) return;
+    autoOwnerLast = Date.now();
+    const match = () => true; match.alt = ""; const ops = autoOwnerOps(match).filter((x) => !(state.tasks.get(x.id) || {}).owner);
+    if (ops.length) state.db.batch(ops).catch(() => {});
+  }
+
+  // ---------- Rückgängig ----------
+  // docs: [{coll, id, prev}] – prev = Stand vorher (null = gab es nicht)
+  function undoable(label, docs) {
+    if (!docs.length) return;
+    toastAction(label, "Rückgängig", () => state.db.batch(docs.map((d) => (d.prev ? { op: "set", coll: d.coll, id: d.id, data: d.prev } : { op: "delete", coll: d.coll, id: d.id }))).then(() => toast("Rückgängig gemacht")).catch(handleWriteError));
+  }
+
+  // ---------- Frühere Fassungen ----------
+  state.versions = state.versions || [];
+  const versionsOf = (coll, id) => (state.versions || []).filter((v) => v.coll === coll && v.docId === id).sort((a, b) => (b.savedAt || "").localeCompare(a.savedAt || ""));
+  // vorherigen Stand als Fassung sichern (höchstens 10 pro Eintrag)
+  function versionOps(coll, id, prev) {
+    if (!prev || !isLaLei()) return [];
+    const data = docOhneId(prev); const json = JSON.stringify(data); if (json.length > 45000) return [];
+    const vid = `${coll}~${id}~${Date.now().toString(36)}`;
+    const ops = [{ op: "set", coll: "versions", id: vid, data: { coll, docId: id, savedAt: nowStamp(), at: prev.updatedAt || prev.createdAt || "", by: prev.updatedBy || prev.author || "", data } }];
+    for (const v of versionsOf(coll, id).slice(9)) ops.push({ op: "delete", coll: "versions", id: v._id });
+    return ops;
+  }
+  function showVersions(coll, id, titel) {
+    const list = versionsOf(coll, id);
+    const kurz = (d) => esc(String(d.title || d.topic || "")).slice(0, 80) + (coll === "tasks" ? ` · ${esc(d.status || "")}${d.owner ? " · " + esc(d.owner) : ""}${d.deadline ? " · " + fmtFull(d.deadline) : ""}` : ` · ${(d.items || []).length} Traktanden`);
+    const o = modal(`<div class="lg-head"><span class="eyebrow">Frühere Fassungen</span><h2>${esc(titel || "")}</h2></div>
+      ${list.length ? `<div class="stack" style="gap:8px">${list.map((v) => `<div class="ver-row"><div><b>${esc(stampFmt(v.at || v.savedAt))}</b>${v.by ? ` <span class="muted">von ${esc(v.by)}</span>` : ""}<div class="muted" style="font-size:12.5px">${kurz(v.data || {})}</div></div><button class="btn small" data-ver="${esc(v._id)}">Wiederherstellen</button></div>`).join("")}</div>` : '<div class="empty">Noch keine früheren Fassungen. Sie entstehen ab jetzt bei jedem Speichern (die letzten 10).</div>'}
+      <div class="lg-foot"><span></span><button class="btn" data-ver-close>Schliessen</button></div>`, "wide-modal");
+    o.onclick = async (e) => {
+      if (e.target === o || e.target.closest("[data-ver-close]")) return closeDrawer();
+      const b = e.target.closest("[data-ver]"); if (!b) return; const v = list.find((x) => x._id === b.dataset.ver); if (!v) return;
+      const cur = (coll === "tasks" ? state.tasks.get(id) : (coll === "hoecks" ? state.hoecks : state.journal).find((x) => x._id === id));
+      const data = { ...cloneDoc(v.data), updatedAt: nowStamp(), updatedBy: me() };
+      try { await state.db.batch([...versionOps(coll, id, cur), { op: "set", coll, id, data }]); closeDrawer(); toast("Frühere Fassung wiederhergestellt"); undoable("Fassung wiederhergestellt", [{ coll, id, prev: docOhneId(cur) }]); } catch (err) { handleWriteError(err); }
+    };
+  }
+
+  // ---------- writeTask: Rückgängig, Fassungen, «Nächster Höck», von Hand gesetzt ----------
+  let ownerAutoSave = false; // Aufgabenfenster speichert mit automatisch gesetzter Leitung
+  const writeTaskOrig = writeTask;
+  writeTask = async function (id, patch, logText) {
+    const prev = cloneDoc(state.tasks.get(id)); if (!prev) return;
+    patch = { ...patch }; const still = patch._still; delete patch._still;
+    if (patch.owner !== undefined && patch.owner !== (prev.owner || "")) patch.ownerManual = !ownerAutoSave;
+    ownerAutoSave = false;
+    const vOps = patch.title !== undefined || patch.note !== undefined ? versionOps("tasks", id, prev) : [];
+    const geaendert = ["status", "owner", "deadline", "ressort", "teil", "title", "note", "star", "support"].filter((k) => patch[k] !== undefined && patch[k] !== (prev[k] ?? (k === "star" ? false : "")));
+    await writeTaskOrig(id, patch, logText);
+    if (!state.tasks.get(id)) return;
+    if (vOps.length && geaendert.some((k) => k === "title" || k === "note")) state.db.batch(vOps).catch(() => {});
+    if (patch.status === "Nächster Höck" && prev.status !== "Nächster Höck") alsTraktandum(id);
+    if (still || !geaendert.length) return;
+    const was = geaendert.length > 1 ? "Gespeichert" : geaendert[0] === "status" ? `Status «${patch.status}»` : geaendert[0] === "owner" ? `Verantwortlich: ${patch.owner || "niemand"}` : geaendert[0] === "deadline" ? `Deadline ${fmtFull(patch.deadline)}` : "Gespeichert";
+    setTimeout(() => undoable(`${was} · ${prev.title.slice(0, 40)}`, [{ coll: "tasks", id, prev: docOhneId(prev) }]), 60);
+  };
+  // Aufgabe mit Status «Nächster Höck» wird ein Traktandum
+  async function alsTraktandum(id) {
+    const t = state.tasks.get(id); if (!t || state.journal.some((e) => e.taskId === id && e.status !== "Besprochen")) return;
+    try { await state.db.collection("journal").add({ type: "idea", title: t.title, text: `Aufgabe (${t.ressort}${t.teil ? " › " + t.teil : ""}${t.owner ? ", " + t.owner : ""})${t.note ? "\n" + t.note : ""}`, by: me(), forDate: "", status: "Offen", date: iso(today()), taskId: id, createdAt: nowStamp(), updatedAt: nowStamp(), updatedBy: me() }); toast("Als Traktandum für den nächsten Höck eingetragen"); } catch (e) { handleWriteError(e); }
+  }
+
+  // ---------- Verantwortlich direkt in der Liste, «Ich übernehme», Abhängigkeiten ----------
+  function ownerCell(t) {
+    if (!isLaLei() || isReadOnly() || isClosed() || state.asTeam) return person(t.owner);
+    return `<div class="owner-pick">${t.owner ? av(t.owner) : '<span class="av av-empty" aria-hidden="true">?</span>'}<select class="owner" data-owner="${esc(t._id)}" aria-label="Verantwortlich für ${esc(t.title)}">${personOptions(t.owner, "Nicht zugeteilt")}</select></div>${!t.owner && me() && t.status !== "Erledigt" ? `<button class="link take" data-take="${esc(t._id)}">Ich übernehme</button>` : ""}`;
+  }
+  function depInfo(t) {
+    const offen = (t.dependsOn || []).map((id) => state.tasks.get(id)).filter((x) => x && x.status !== "Erledigt");
+    return offen.length ? `<span class="tag plain dep" title="${esc(offen.map((x) => x.title).join("\n"))}">⛓ wartet auf ${offen.length === 1 ? "«" + esc(offen[0].title.slice(0, 30)) + "»" : offen.length + " Aufgaben"}</span>` : "";
+  }
+  view.addEventListener("change", (e) => {
+    const s = e.target.closest("[data-owner]"); if (!s) return; const t = state.tasks.get(s.dataset.owner); if (!t) return;
+    writeTask(t._id, { owner: s.value }, `Verantwortlich: ${s.value || "nicht zugeteilt"}`);
+  });
+  view.addEventListener("click", (e) => { const b = e.target.closest("[data-take]"); if (!b) return; writeTask(b.dataset.take, { owner: me() }, `${me()} übernimmt`); });
+
+  // ---------- Aufgabenfenster: Verantwortlich automatisch, Abhängigkeiten, Fassungen, Seitenansicht ----------
+  const renderDrawerOrig = renderDrawer;
+  renderDrawer = function () {
+    renderDrawerOrig(); const o = $(".overlay"); if (!o || !openTaskId) return;
+    const isNew = openTaskId === "_new"; const own = $("#d-owner", o); const ress = $("#d-ress", o), teil = $("#d-teil", o);
+    if (own && isNew && !own.value) { const l = leadOf(ress.value, teil.value); if (l) { own.value = l; own.dataset.auto = "1"; } }
+    if (own && !isNew) { const t0 = state.tasks.get(openTaskId) || {}; own.dataset.auto = !t0.ownerManual && t0.owner && t0.owner === leadOf(t0.ressort, t0.teil) ? "1" : ""; }
+    const sv = $("#d-save", o); if (sv && own) sv.addEventListener("click", () => { ownerAutoSave = own.dataset.auto === "1"; }, true);
+    if (own) {
+      own.addEventListener("change", () => { own.dataset.auto = "0"; });
+      const nach = () => { if (own.dataset.auto === "1" || !own.value) { const l = leadOf(ress.value, teil.value); own.value = l; own.dataset.auto = l ? "1" : ""; } };
+      ress && ress.addEventListener("change", () => setTimeout(nach, 0)); teil && teil.addEventListener("change", nach);
+      own.closest(".field").insertAdjacentHTML("beforeend", `<span class="hint">Leer gelassen geht die Aufgabe an die Leitung des Ressorts bzw. Teilbereichs.</span>`);
+    }
+    if (!isNew) {
+      const t = state.tasks.get(openTaskId); const deps = (t.dependsOn || []).map((id) => state.tasks.get(id)).filter(Boolean);
+      const andere = allTasks().filter((x) => x._id !== t._id && !(t.dependsOn || []).includes(x._id));
+      const ck = $("#d-ck-wrap", o).closest(".field");
+      ck.insertAdjacentHTML("beforebegin", `<div class="field"><span>Wartet auf</span><div class="dep-list">${deps.map((x) => `<span class="pchip-s ${x.status === "Erledigt" ? "kid" : ""}">${x.status === "Erledigt" ? "✓ " : ""}<button class="link" data-open="${esc(x._id)}">${esc(x.title)}</button><button type="button" class="x" data-dep-rm="${esc(x._id)}" aria-label="Entfernen">✕</button></span>`).join("") || '<span class="muted" style="font-size:13px">Nichts. Diese Aufgabe kann sofort angegangen werden.</span>'}</div>
+        <div class="log-add"><input list="dep-opts" id="d-dep" placeholder="Aufgabe suchen, auf die diese wartet" aria-label="Abhängigkeit"><datalist id="dep-opts">${andere.slice(0, 400).map((x) => `<option value="${esc(x.title)} · ${esc(x.ressort)}">`).join("")}</datalist><button type="button" class="btn small" data-dep-add>+</button></div></div>`);
+      const dup = $("#d-dup", o); if (dup && isLaLei()) dup.insertAdjacentHTML("afterend", `<button class="btn small ghost" data-versions-task title="Frühere Fassungen dieser Aufgabe">Fassungen</button>`);
+      if (!t.owner && me() && !isReadOnly()) own.closest(".field").insertAdjacentHTML("beforeend", `<button type="button" class="link take-d" data-take-d>Ich übernehme</button>`);
+      const ocOrig = o.onclick;
+      o.onclick = (e) => {
+        const tt = openTaskId && openTaskId !== "_new" ? state.tasks.get(openTaskId) : null; if (!tt) return ocOrig && ocOrig(e);
+        const op = e.target.closest(".dep-list [data-open]"); if (op) return openTask(op.dataset.open);
+        if (e.target.closest("[data-take-d]")) { own.value = me(); own.dataset.auto = "0"; drawerDirty = true; return; }
+        const rm = e.target.closest("[data-dep-rm]"); if (rm) { writeTask(tt._id, { dependsOn: (tt.dependsOn || []).filter((x) => x !== rm.dataset.depRm), _still: true }).then(() => { if (!drawerDirty) renderDrawer(); }); return; }
+        if (e.target.closest("[data-dep-add]")) { const v = $("#d-dep", o).value; const hit = allTasks().find((x) => `${x.title} · ${x.ressort}` === v || x.title === v); if (!hit) return toast("Aufgabe nicht gefunden. Bitte aus der Liste wählen."); writeTask(tt._id, { dependsOn: [...(tt.dependsOn || []), hit._id], _still: true }).then(() => { if (!drawerDirty) renderDrawer(); else toast("Abhängigkeit gespeichert"); }); return; }
+        if (e.target.closest("[data-versions-task]")) return showVersions("tasks", tt._id, tt.title);
+        return ocOrig && ocOrig(e);
+      };
+    }
+    document.body.classList.toggle("task-side", window.innerWidth >= 1280);
+  };
+  const closeDrawerOrig = closeDrawer;
+  closeDrawer = function () { closeDrawerOrig(); document.body.classList.remove("task-side"); };
+  const openEntryOrig = openEntry;
+  openEntry = function (...a) { document.body.classList.remove("task-side"); return openEntryOrig(...a); };
+
+  // ---------- Aufgaben-Seite: Liste oder Kanban, Auswahl, gespeicherte Ansichten ----------
+  state.taskView = store.get("lager-aufgaben-ansicht") || "liste"; state.sel = new Set(); state.selMode = false;
+  const myViews = () => ((state.todos || {}).views || []);
+  const saveMyViews = (views2) => state.db.doc("todos/" + myId()).set({ ...(state.todos || {}), items: todoItems(), views: views2, updatedAt: nowStamp() }).catch(handleWriteError);
+  const tasksShellOrig = views.tasks.shell, tasksUpdateOrig = views.tasks.update;
+  views.tasks.shell = () => tasksShellOrig().replace('<div class="toolbar" style="padding-block:8px"><span class="info" id="f-info"></span>', `<div class="toolbar task-tools" style="padding-block:8px"><span class="info" id="f-info"></span>
+    <div class="seg view-seg" role="group" aria-label="Ansicht"><button type="button" data-tview="liste" aria-pressed="${state.taskView === "liste"}">Liste</button><button type="button" data-tview="kanban" aria-pressed="${state.taskView === "kanban"}">Kanban</button></div>
+    <button class="btn small ${state.selMode ? "primary" : ""}" data-selmode>${state.selMode ? "Auswahl beenden" : "Auswählen"}</button>
+    ${menu([...myViews().map((v) => [`data-view-load="${esc(v.id)}"`, "★ " + esc(v.name)]), ["data-view-save", "Aktuelle Ansicht speichern …"], myViews().length ? ["data-view-manage", "Ansichten verwalten …"] : null], "Ansichten")}`);
+  views.tasks.update = function () {
+    tasksUpdateOrig(); autoOwnerErstmals(); const box = $("#task-list"); if (!box) return;
+    if (state.taskView === "kanban") box.innerHTML = kanbanHtml(gefilterteAufgaben());
+    else if (state.selMode) box.querySelectorAll("tr.task").forEach((tr) => { const id = (tr.querySelector("[data-open]") || {}).dataset?.open; if (!id) return; tr.classList.toggle("selected", state.sel.has(id)); const td = tr.querySelector(".c-date"); td.insertAdjacentHTML("afterbegin", `<input type="checkbox" class="sel-cb" data-sel="${esc(id)}" ${state.sel.has(id) ? "checked" : ""} aria-label="Auswählen">`); });
+    bulkBar();
+  };
+  // gleiche Filter wie die Liste (Quick-Reiter, Ressort, Person, Status, Stichwort, Suche)
+  function gefilterteAufgaben() {
+    const f = state.filter; const q = (f.q || "").trim().toLowerCase(); const t0 = iso(today()), lim = iso(new Date(today().getTime() + 21 * DAY));
+    const QF = { open: (t) => t.status !== "Erledigt", star: (t) => t.star && t.status !== "Erledigt", late: isLate, soon: (t) => t.status !== "Erledigt" && t.deadline >= t0 && t.deadline <= lim, none: (t) => !t.owner && t.status !== "Erledigt", new: isNew, done: (t) => t.status === "Erledigt", all: () => true };
+    const quick = curTab("tasks");
+    return allTasks().filter((t) => {
+      if (f.ressort) { const [r, s] = f.ressort.split("|"); if (t.ressort !== r || (s && t.teil !== s)) return false; }
+      if (f.person === "_none" && t.owner) return false; if (f.person && f.person !== "_none" && t.owner !== f.person && t.support !== f.person) return false;
+      if (f.status && !f.status.startsWith("_") && t.status !== f.status) return false; if (f.tag && !tagsOf(t).includes(f.tag)) return false;
+      if (q && !`${t.title} ${t.note} ${t.ressort} ${t.teil} ${t.owner} ${t.support} ${(t.checklist || []).map((c) => c.t).join(" ")}`.toLowerCase().includes(q)) return false;
+      return quick === "open" && state.taskView === "kanban" ? true : (QF[quick] || QF.all)(t);
+    });
+  }
+  function kanbanHtml(list) {
+    const cols = STATUSES.filter((s) => s !== "Erledigt" || curTab("tasks") !== "open");
+    return `<div class="kanban">${cols.map((s) => { const items = list.filter((t) => (t.status || "Offen") === s); return `<div class="kb-col" data-kb-col="${esc(s)}"><div class="kb-head"><span class="kb-dot" data-s="${esc(s)}"></span><b>${esc(s)}</b><span class="muted">${items.length}</span></div><div class="kb-list">${items.slice(0, 120).map((t) => `<div class="kb-card ${isLate(t) ? "late" : ""}" draggable="true" data-kb="${esc(t._id)}" data-open="${esc(t._id)}" tabindex="0"><div class="kb-title">${t.star ? '<span class="star on">★</span>' : ""}${esc(t.title)}</div><div class="kb-meta"><span>${esc(t.ressort)}${t.teil ? " › " + esc(t.teil) : ""}</span>${t.deadline ? `<span class="${isLate(t) ? "late-n" : ""}">${fmt(t.deadline)}</span>` : ""}${t.owner ? av(t.owner) : ""}</div>${depInfo(t)}</div>`).join("") || '<div class="kb-empty">leer</div>'}${items.length > 120 ? `<div class="kb-empty">… und ${items.length - 120} weitere</div>` : ""}</div></div>`; }).join("")}</div><p class="hint" style="padding:0 16px 12px">Karten in eine andere Spalte ziehen ändert den Status. Klick öffnet die Aufgabe.</p>`;
+  }
+  // Leiste für ausgewählte Aufgaben
+  function bulkBar() {
+    let bar = $("#bulk-bar"); const n = state.sel.size;
+    if (!state.selMode || state.view !== "tasks") { if (bar) bar.remove(); return; }
+    if (!bar) { bar = document.createElement("div"); bar.id = "bulk-bar"; bar.className = "bulk-bar"; document.body.appendChild(bar); }
+    bar.innerHTML = `<b>${n} ausgewählt</b><button class="link" data-bulk="all">alle sichtbaren</button>${n ? `<span class="bulk-sep"></span>
+      <select data-bulk-status aria-label="Status setzen"><option value="">Status …</option>${STATUSES.map((s) => `<option>${s}</option>`).join("")}</select>
+      <select data-bulk-owner aria-label="Verantwortlich"><option value="">Verantwortlich …</option>${personOptions("", "Niemand").replace('<option value="">Niemand</option>', '<option value="_none">Niemand</option>')}</select>
+      <select data-bulk-shift aria-label="Deadline verschieben"><option value="">Deadline …</option><option value="7">+1 Woche</option><option value="14">+2 Wochen</option><option value="30">+1 Monat</option><option value="-7">−1 Woche</option></select>
+      <select data-bulk-ress aria-label="Ressort"><option value="">Ressort …</option>${ressorts().map((r) => `<option>${esc(r.name)}</option>`).join("")}</select>
+      <button class="btn small ghost danger" data-bulk="del">Löschen</button>` : ""}<button class="btn small" data-bulk="off">Fertig</button>`;
+  }
+  async function bulkApply(patchFn, label) {
+    const ids = [...state.sel]; const prev = ids.map((id) => ({ coll: "tasks", id, prev: docOhneId(state.tasks.get(id)) })).filter((x) => x.prev);
+    const ops = prev.map((x) => { const t = state.tasks.get(x.id); const p = patchFn(t); return { op: "update", coll: "tasks", id: x.id, data: { ...p, updatedAt: nowStamp(), updatedBy: me(), log: [...(t.log || []), { at: nowStamp(), by: me(), text: label }] } }; });
+    try { await state.db.batch(ops); undoable(`${ops.length} Aufgaben: ${label}`, prev); state.sel.clear(); views.tasks.update(); } catch (e) { handleWriteError(e); }
+  }
+  document.addEventListener("change", (e) => {
+    const t = e.target; if (!t.closest || !t.closest("#bulk-bar") || !t.value) return; const v = t.value; t.value = "";
+    if (t.matches("[data-bulk-status]")) return bulkApply(() => ({ status: v }), `Status: ${v}`);
+    if (t.matches("[data-bulk-owner]")) return bulkApply(() => ({ owner: v === "_none" ? "" : v, ownerManual: true }), `Verantwortlich: ${v === "_none" ? "niemand" : v}`);
+    if (t.matches("[data-bulk-shift]")) return bulkApply((x) => ({ deadline: x.deadline ? addDays(x.deadline, +v) : x.deadline }), `Deadline ${+v > 0 ? "+" : ""}${v} Tage`);
+    if (t.matches("[data-bulk-ress]")) return bulkApply(() => ({ ressort: v, teil: "" }), `Ressort: ${v}`);
+  });
+  document.addEventListener("click", async (e) => {
+    const b = e.target.closest && e.target.closest("#bulk-bar [data-bulk]"); if (!b) return; const a = b.dataset.bulk;
+    if (a === "off") { state.selMode = false; state.sel.clear(); return render(); }
+    if (a === "all") { gefilterteAufgaben().forEach((t) => state.sel.add(t._id)); return views.tasks.update(); }
+    if (a === "del") { const ids = [...state.sel]; state.sel.clear(); for (const id of ids) await trash([{ coll: "tasks", id }], (state.tasks.get(id) || {}).title || "Aufgabe"); toast(`${ids.length} Aufgaben im Papierkorb`); views.tasks.update(); }
+  });
+  view.addEventListener("click", (e) => {
+    const cb = e.target.closest("[data-sel]"); if (cb) { e.stopPropagation(); cb.checked ? state.sel.add(cb.dataset.sel) : state.sel.delete(cb.dataset.sel); cb.closest("tr").classList.toggle("selected", cb.checked); bulkBar(); return; }
+    if (e.target.closest("[data-selmode]")) { state.selMode = !state.selMode; state.sel.clear(); state.taskView = "liste"; return render(); }
+    const tv = e.target.closest("[data-tview]"); if (tv) { state.taskView = tv.dataset.tview; store.set("lager-aufgaben-ansicht", state.taskView); state.selMode = false; return render(); }
+    const vl = e.target.closest("[data-view-load]"); if (vl) { const v = myViews().find((x) => x.id === vl.dataset.viewLoad); if (v) { state.filter = { ...state.filter, ...v.f }; state.tabs.tasks = v.tab; state.taskView = v.tv || "liste"; render(); toast(`Ansicht «${v.name}»`); } return; }
+    if (e.target.closest("[data-view-save]")) return ansichtSpeichern();
+    if (e.target.closest("[data-view-manage]")) return ansichtenVerwalten();
+  }, true);
+  function ansichtSpeichern() {
+    const o = modal(`<div class="lg-head"><span class="eyebrow">Gespeicherte Ansicht</span><h2>Aktuelle Ansicht speichern</h2></div><p class="muted" style="margin:0">Gespeichert werden Reiter, Filter und Suche. Nur du siehst deine Ansichten.</p><input id="av-name" placeholder="Name, z.B. Logistik offen"><div class="lg-foot"><button class="link" data-av-no>Abbrechen</button><button class="btn primary" data-av-ok>Speichern</button></div>`);
+    setTimeout(() => $("#av-name", o).focus(), 30);
+    o.onclick = (e) => { if (e.target === o || e.target.closest("[data-av-no]")) return closeDrawer(); if (!e.target.closest("[data-av-ok]")) return; const name = $("#av-name", o).value.trim(); if (!name) return; const f = state.filter;
+      saveMyViews([...myViews(), { id: uid(), name, f: { q: f.q, ressort: f.ressort, person: f.person, status: f.status, tag: f.tag || "" }, tab: curTab("tasks"), tv: state.taskView }]).then(() => { closeDrawer(); toast(`Ansicht «${name}» gespeichert`); render(); }); };
+  }
+  function ansichtenVerwalten() {
+    const o = modal("", ""); const draw = () => { o.querySelector(".modal").innerHTML = `<div class="lg-head"><span class="eyebrow">Gespeicherte Ansichten</span><h2>Verwalten</h2></div>${myViews().map((v) => `<div class="ver-row"><b>${esc(v.name)}</b><button class="btn small ghost danger" data-av-rm="${esc(v.id)}">Löschen</button></div>`).join("") || '<span class="muted">Keine.</span>'}<div class="lg-foot"><span></span><button class="btn" data-av-close>Fertig</button></div>`; };
+    o.onclick = (e) => { if (e.target === o || e.target.closest("[data-av-close]")) { closeDrawer(); return render(); } const r = e.target.closest("[data-av-rm]"); if (r) saveMyViews(myViews().filter((x) => x.id !== r.dataset.avRm)).then(draw); };
+    draw();
+  }
+  // Kanban: Karten ziehen
+  let kbDrag = null;
+  view.addEventListener("dragstart", (e) => { const c = e.target.closest && e.target.closest("[data-kb]"); if (c) { kbDrag = c.dataset.kb; e.dataTransfer.effectAllowed = "move"; c.classList.add("dragging"); } });
+  view.addEventListener("dragend", (e) => { const c = e.target.closest && e.target.closest("[data-kb]"); if (c) c.classList.remove("dragging"); document.querySelectorAll(".kb-col.over").forEach((x) => x.classList.remove("over")); });
+  view.addEventListener("dragover", (e) => { const col = e.target.closest && e.target.closest("[data-kb-col]"); if (col && kbDrag) { e.preventDefault(); document.querySelectorAll(".kb-col.over").forEach((x) => x !== col && x.classList.remove("over")); col.classList.add("over"); } });
+  view.addEventListener("drop", (e) => { const col = e.target.closest && e.target.closest("[data-kb-col]"); if (!col || !kbDrag) return; e.preventDefault(); const id = kbDrag; kbDrag = null; setStatus(id, col.dataset.kbCol); });
+
+  // ---------- Zeitplan: Aufgaben und Meilensteine auf eine andere Woche ziehen ----------
+  let tlDrag = null;
+  view.addEventListener("dragstart", (e) => { const m = e.target.closest && e.target.closest("[data-drag-task],[data-drag-ms]"); if (!m) return; const td = m.closest("td[data-wi]"); tlDrag = { task: m.dataset.dragTask, ms: m.dataset.dragMs, wi: td && td.dataset.wi }; e.dataTransfer.effectAllowed = "move"; });
+  view.addEventListener("dragover", (e) => { const td = e.target.closest && e.target.closest("#gantt td[data-wi]"); if (td && tlDrag) { e.preventDefault(); document.querySelectorAll("#gantt td.drop").forEach((x) => x.classList.remove("drop")); td.classList.add("drop"); } });
+  view.addEventListener("drop", (e) => {
+    const td = e.target.closest && e.target.closest("#gantt td[data-wi]"); if (!td || !tlDrag || !tlDrag.wi) return; e.preventDefault();
+    const diff = daysBetween(parse(tlDrag.wi), parse(td.dataset.wi)); const d = tlDrag; tlDrag = null; document.querySelectorAll("#gantt td.drop").forEach((x) => x.classList.remove("drop")); if (!diff) return;
+    if (d.task) { const t = state.tasks.get(d.task); if (t && t.deadline) writeTask(t._id, { deadline: addDays(t.deadline, diff) }, `Deadline im Zeitplan verschoben: ${fmtFull(addDays(t.deadline, diff))}`); }
+    if (d.ms) { const m = (cfg().milestones || {})[d.ms]; if (m) writeConfig({ milestones: { [d.ms]: { date: addDays(m.date, diff) } } }).then(() => toast(`Meilenstein «${m.name}» verschoben auf ${fmtFull(addDays(m.date, diff))}`)); }
+  });
+
+  // ---------- Übersicht: ruhige Ressorts (nur für die Hauptleitung) ----------
+  const ovUpdateOrig2 = views.overview.update;
+  views.overview.update = function () {
+    ovUpdateOrig2(); autoOwnerErstmals();
+    const hl = (cfg().ressorts || {}).hl; if (!hl || !hl.lead || hl.lead !== me()) return;
+    const grenze = Date.now() - 21 * DAY; const ruhig = [];
+    for (const r of ressorts()) { if (r.id === "hl") continue; const list = allTasks().filter((t) => t.ressort === r.name); const offen = list.filter((t) => t.status !== "Erledigt"); if (!offen.length) continue;
+      const zuletzt = Math.max(0, ...list.map((t) => ts(t.updatedAt || t.createdAt))); if (zuletzt < grenze) ruhig.push({ r, offen: offen.length, zuletzt }); }
+    if (ruhig.length) $("#ov-setup").insertAdjacentHTML("beforeend", `<section class="card quiet-card"><div class="card-head"><h2>Ruhige Ressorts</h2><span class="muted">nur für dich als Hauptleitung · seit 3 Wochen nichts mehr geändert</span></div><div class="card-body stack" style="gap:6px">${ruhig.map((x) => `<div class="hint-row plain"><b>${esc(x.r.name)}</b> · ${x.offen} offene Aufgaben · zuletzt ${x.zuletzt ? fmtFull(iso(new Date(x.zuletzt))) : "nie"} ${x.r.lead ? "· " + esc(x.r.lead) : ""} <button class="link" data-ress-page="${esc(x.r.id)}">ansehen</button></div>`).join("")}</div></section>`);
+  };
+
+  // =====================================================================
+  // Etappe 2b: Protokoll – Erwähnungen (@alle, @LaLei, @Ressort), «Speichern» ohne Schliessen,
+  // gemeinsam bearbeiten (Zusammenführen), Rückgängig, frühere Fassungen, Feldhöhe merken,
+  // Diktieren, Höck-Modus, Höck als Outlook-Termin (.ics)
+  // =====================================================================
+  NEUES.unshift({ id: "2026-11-etappe2", titel: "Neu: Aufgaben und Protokoll", punkte: [
+    "<b>Verantwortlich</b> ist automatisch die Leitung des Ressorts bzw. Teilbereichs, ausser ihr wählt jemand anderes. Ändern geht direkt in der Liste.",
+    "Neuer Status <b>«Nächster Höck»</b>: Die Aufgabe kommt als Traktandum auf die Liste für den nächsten Höck.",
+    "Aufgaben als <b>Kanban</b> ansehen, <b>mehrere auswählen</b> und gemeinsam ändern, eigene <b>Ansichten speichern</b>, im Zeitplan <b>ziehen</b>.",
+    "Fast alles lässt sich <b>rückgängig</b> machen, frühere <b>Fassungen</b> lassen sich wiederherstellen.",
+    "Im Protokoll: <b>«Speichern»</b> (bleibt offen) und «Speichern &amp; schliessen», zu zweit gleichzeitig schreiben, <b>Diktieren</b> 🎤 und der <b>Höck-Modus</b>.",
+    "<b>@alle</b>, <b>@LaLei</b> und <b>@Ressort</b> erwähnen. Unter «Meine Aufgaben › Erwähnungen» steht jede Zeile einzeln, mit «Als Aufgabe».",
+    "Einen Höck als <b>Outlook-Termin</b> herunterladen.",
+  ] });
+  const cl = (v) =>(v === undefined ? undefined : JSON.parse(JSON.stringify(v)));
+  const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+
+  // ---------- Gruppen-Erwähnungen ----------
+  const tokenOf = (name) => String(name || "").replace(/[^\p{L}\p{N}_.-]/gu, "");
+  function mentionGroups() {
+    const namen = people().map((p) => p.toLowerCase());
+    const out = [{ token: "alle", label: "alle Leitenden", hits: () => true }, { token: "LaLei", label: "Lagerleitung", hits: (n) => peopleBy("LaLei").includes(n) }];
+    for (const r of state.config ? ressorts() : []) {
+      const tk = tokenOf(r.name); if (!tk || out.some((x) => x.token.toLowerCase() === tk.toLowerCase())) continue;
+      out.push({ token: tk, label: "Ressort " + r.name, hits: (n) => !!n && (r.lead === n || r.stv === n || subsOf(r).some((s) => s.lead === n || s.stv === n)) });
+    }
+    return out.filter((g) => !namen.includes(g.token.toLowerCase()));
+  }
+  function richGroups(html) {
+    if (!state.config || !html.includes("@")) return html; const gs = mentionGroups();
+    const re = new RegExp(`(^|[^\\p{L}\\p{N}_/])@(${gs.map((g) => escRe(g.token)).join("|")})(?!${NAME_CH})`, "giu");
+    return html.replace(re, (m, pre, tk) => { const g = gs.find((x) => x.token.toLowerCase() === tk.toLowerCase()); return `${pre}<span class="mention group ${g && g.hits(me()) ? "me" : ""}" title="${esc(g ? g.label : "")}">@${esc(g ? g.token : tk)}</span>`; });
+  }
+  // betrifft mich dieser Text? (@Name, @alle, @LaLei, @Ressort)
+  function mentionsMe(text) {
+    const n = me(); if (!n || !text || !String(text).includes("@")) return false;
+    if (mentions(text, n)) return true;
+    return mentionGroups().some((g) => g.hits(n) && mentions(text, g.token));
+  }
+
+  // ---------- Meine Aufgaben › Erwähnungen: jede Zeile einzeln ----------
+  let mentHits = [];
+  const mineUpdateOrig = views.mine.update;
+  views.mine.update = function () {
+    mineUpdateOrig(); const mm = $("#mine-mentions"); if (!mm) return;
+    const hits = [];
+    const add = (h, text) => { for (const line of String(text || "").split("\n")) if (line.trim() && mentionsMe(line)) hits.push({ ...h, text: line.trim() }); };
+    for (const t of state.tasks.values()) {
+      const h = { date: (t.updatedAt || "").slice(0, 10) || t.deadline, tag: "Aufgabe", cls: "", title: t.title, attr: `data-open="${esc(t._id)}"` };
+      add(h, t.note); for (const l of t.log || []) add({ ...h, date: (l.at || "").slice(0, 10) || h.date }, l.text); for (const c of t.checklist || []) add(h, c.t);
+    }
+    for (const e of state.journal) { const ty = typeOf(e); add({ date: entryDate(e), tag: ty === "meeting" ? HK[e.kind || "LaLei"].label : J_TYPES[ty].tag, cls: ty === "meeting" ? HK[e.kind || "LaLei"].cls : "type-" + ty, title: e.title || e.topic || "", attr: `data-open-entry="${esc(e._id)}"`, entry: e._id }, entryText(e)); }
+    for (const h of state.hoecks) add({ date: h.date, tag: HK[h.kind || "LaLei"].label, cls: HK[h.kind || "LaLei"].cls, title: h.title || "", attr: `data-open-hoeck="${esc(h._id)}"` }, h.note);
+    const seen = new Set();
+    mentHits = hits.filter((h) => { const k = h.attr + "|" + h.text; if (seen.has(k)) return false; seen.add(k); return true; }).sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+    mm.innerHTML = mentHits.length ? mentHits.slice(0, 80).map((h, i) => `<div class="mrow ment-row" ${h.attr} role="button" tabindex="0"><div class="entry-top"><span class="tag plain ${h.cls}">${h.tag}</span><b style="font-weight:600">${esc(h.title)}</b><span class="muted" style="font-size:12px;margin-left:auto">${fmtFull(h.date)}</span></div><div class="ment-line"><div class="rich">${rich(h.text)}</div>${isReadOnly() ? "" : `<button class="btn small" data-ment-task="${i}">Als Aufgabe</button>`}</div></div>`).join("") + (mentHits.length > 80 ? `<div class="card-body muted" style="font-size:13px">… und ${mentHits.length - 80} ältere</div>` : "")
+      : `<div class="empty"><b>Keine Erwähnungen</b>Hier erscheint jede Zeile, in der jemand @${esc(me())}, @alle, @LaLei oder dein Ressort schreibt.</div>`;
+  };
+  view.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-ment-task]"); if (!b) return; e.stopPropagation(); e.stopImmediatePropagation();
+    const h = mentHits[+b.dataset.mentTask]; if (!h) return;
+    openTask("_new", { title: h.text.slice(0, 140), owner: me(), note: `Aus «${h.title}» (${fmtFull(h.date)}):\n${h.text}`, ...(h.entry ? { source: { entry: h.entry, label: `${h.title} (${fmtFull(h.date)})` } } : {}) });
+  }, true);
+
+  // ---------- Protokoll-Fenster ----------
+  const ENTRY_TYPES = ["hoeck", "meeting", "note", "contact", "idea"];
+  const collOf = (type) => (type === "hoeck" ? "hoecks" : "journal");
+  const curEntry = () => (ed && ed.id ? (ed.type === "hoeck" ? state.hoecks : state.journal).find((x) => x._id === ed.id) : null);
+  const withItemIds = (doc) => { if (doc && Array.isArray(doc.items)) doc.items = doc.items.map((it, i) => ({ ...it, id: it.id || "i" + i })); return doc; };
+  const isEntry = () => !!ed && ENTRY_TYPES.includes(ed.type);
+  const hatAenderungen = () => isEntry() && ed.orig && !same({ ...ed.draft, _showAll: 0 }, { ...ed.orig, _showAll: 0 });
+
+  // meine Änderungen (draft gegenüber orig) auf den aktuellen Stand (cur) anwenden – Traktandum für Traktandum
+  function mergeEntry(draft, orig, cur) {
+    const out = withItemIds(cl(cur)); delete out._id;
+    for (const k of new Set([...Object.keys(draft), ...Object.keys(orig)])) {
+      if (k === "items" || k === "_showAll") continue;
+      if (!same(draft[k], orig[k])) { if (draft[k] === undefined) delete out[k]; else out[k] = cl(draft[k]); }
+    }
+    if (Array.isArray(draft.items)) {
+      const ci = out.items || [], oi = (orig.items || []), di = draft.items; const byId = (arr, id) => arr.find((x) => x.id === id);
+      const res = [];
+      for (const it of ci) { const o = byId(oi, it.id), d = byId(di, it.id); if (o && !d) continue; res.push(d && o && !same(d, o) ? cl(d) : it); }
+      for (const d of di) if (!byId(ci, d.id)) { const o = byId(oi, d.id); if (!o || !same(d, o)) res.push(cl(d)); }
+      out.items = res;
+    }
+    return out;
+  }
+
+  const renderEntryOrig = renderEntryDrawer;
+  renderEntryDrawer = function () {
+    if (isEntry()) {
+      if (!ed.orig) { if (ed.type === "meeting") ed.draft.items.forEach((it, i) => { if (!it.id) it.id = "i" + i; }); ed.orig = ed.id ? cl(ed.draft) : {}; }
+      else if (ed.type === "meeting") ed.draft.items.forEach((it) => { if (!it.id) it.id = uid(); });
+    }
+    renderEntryOrig();
+    const o = $(".overlay"); if (!o || !ed) return;
+    applyTaHeights(o); addDictate(o);
+    if (!isEntry()) return;
+    const save = $("#e-save", o);
+    if (save && !isReadOnly()) { save.textContent = "Speichern & schliessen"; save.insertAdjacentHTML("beforebegin", `<button class="btn" id="e-save-stay" title="Speichern, das Fenster bleibt offen (Ctrl+S)">Speichern</button>`); $("#e-save-stay", o).onclick = () => saveEntry(true); }
+    const headBtns = $(".drawer-head > span", o);
+    if (headBtns) {
+      const extra = [];
+      if (ed.type === "meeting" && !isReadOnly()) extra.push(`<button class="btn small" data-hmode title="Ein Traktandum nach dem anderen, gross und ohne Ablenkung">Höck-Modus</button>`);
+      if (ed.type === "hoeck") extra.push(`<button class="btn small ghost" data-ics title="Termin für den Outlook-Kalender herunterladen">Outlook</button>`);
+      if (ed.id && isLaLei()) extra.push(`<button class="btn small ghost" data-ver-e title="Frühere Fassungen dieses Eintrags">Fassungen</button>`);
+      headBtns.insertAdjacentHTML("afterbegin", extra.join(""));
+    }
+    const oc = o.onclick;
+    o.onclick = (e) => {
+      if (ed && isEntry()) {
+        if (e.target.closest("[data-hmode]")) return hoeckModus(0);
+        if (e.target.closest("[data-ics]")) return icsDownload({ ...ed.draft, _id: ed.id });
+        if (e.target.closest("[data-ver-e]")) { if (hatAenderungen()) return toast("Bitte zuerst speichern, dann die früheren Fassungen ansehen."); return showVersions(collOf(ed.type), ed.id, ed.draft.title || ed.draft.topic || ""); }
+      }
+      return oc && oc(e);
+    };
+  };
+
+  const saveEntryOrig = saveEntry;
+  saveEntry = async function (keepOpen) {
+    if (!isEntry()) return saveEntryOrig();
+    keepOpen = keepOpen === true;
+    const o = $(".overlay"); const isHoeck = ed.type === "hoeck"; const coll = collOf(ed.type);
+    let d = cl(ed.draft);
+    if (!isHoeck) d.type = ed.type;
+    const need = { hoeck: "date", meeting: "date", note: "title", contact: "contactName", idea: "title" }[ed.type];
+    if (!d[need]) { const el = $(`[data-f="${need}"]`); if (el) el.focus(); toast("Bitte die Pflichtangabe ausfüllen."); return; }
+    if ((isHoeck || ed.type === "meeting") && !d.title) d.title = HK[d.kind || "LaLei"].label;
+    if (ed.type === "idea" && !d.date) d.date = iso(today());
+    delete d._showAll;
+    const cur = curEntry(); let mergedBy = "";
+    // jemand anderes hat inzwischen gespeichert: Änderungen zusammenführen statt überschreiben
+    if (ed.id && cur && ts(cur.updatedAt) > ts(ed.base)) { d = mergeEntry(d, ed.orig || {}, cur); delete d._showAll; mergedBy = cur.updatedBy || "jemand"; }
+    if (ed.type === "meeting") d.items = (d.items || []).filter((it) => it.title || it.notes || it.decision || (it.links || []).length);
+    d.updatedAt = nowStamp(); d.updatedBy = me();
+    const btns = o ? o.querySelectorAll("#e-save, #e-save-stay") : []; btns.forEach((b) => (b.disabled = true));
+    try {
+      const wasNew = !ed.id; const id = ed.id || state.db.newId(); if (wasNew) d.createdAt = nowStamp();
+      await state.db.batch([...(cur ? versionOps(coll, id, cur) : []), { op: "set", coll, id, data: d }]);
+      if (ed.type === "meeting") for (const it of d.items) if (it.ideaId) { const idea = state.journal.find((x) => x._id === it.ideaId); if (idea && idea.status !== "Besprochen") await state.db.doc("journal/" + it.ideaId).update({ status: "Besprochen", meetingTitle: `${d.title} (${fmtFull(d.date)})` }); }
+      store.set(draftKey(ed.type, ed.id), "");
+      const prev = cur ? docOhneId(cur) : null;
+      const label = wasNew ? "Gespeichert" : mergedBy ? `Gespeichert und mit den Änderungen von ${mergedBy} zusammengeführt` : "Gespeichert";
+      setTimeout(() => toastAction(label, "Rückgängig", async () => { try { await state.db.batch([prev ? { op: "set", coll, id, data: prev } : { op: "delete", coll, id }]); if (ed && ed.id === id) closeDrawer(); toast("Rückgängig gemacht"); } catch (err) { handleWriteError(err); } }), 60);
+      if (keepOpen && ed) {
+        const nd = withItemIds(cl(d)); if (ed.type === "meeting" && !nd.items.length) nd.items.push({ id: uid(), title: "", notes: "", decision: "", links: [] });
+        Object.assign(ed, { id, base: d.updatedAt, orig: cl(nd), draft: nd, touched: false, found: null, conflict: null, force: false, confirmDel: false });
+        setPresence(coll + "/" + id); renderEntryDrawer();
+      } else closeDrawer();
+    } catch (err) { btns.forEach((b) => (b.disabled = false)); handleWriteError(err); }
+  };
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "s" && isEntry() && !isReadOnly()) { e.preventDefault(); saveEntry(true).then(() => { if ($(".hoeck-mode")) hmDraw && hmDraw(); }); }
+  });
+
+  // ---------- Gleichzeitig bearbeiten: Änderungen anderer laufend übernehmen ----------
+  function liveMerge() {
+    if (!isEntry() || !ed.id || !ed.orig || $(".hoeck-mode")) return;
+    const cur = curEntry(); if (!cur || ts(cur.updatedAt) <= ts(ed.base)) return;
+    const a = document.activeElement; const o = $(".overlay");
+    if (a && o && o.contains(a) && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) { ed.mergeLater = true; return; }
+    ed.draft = mergeEntry(ed.draft, ed.orig, cur); ed.orig = withItemIds(cl(docOhneId(cur))); ed.base = cur.updatedAt; ed.mergeLater = false; ed.conflict = null; ed.force = false;
+    renderEntryDrawer(); toast(`Änderungen von ${cur.updatedBy || "jemand"} übernommen`);
+  }
+  const refreshOrig = refresh;
+  refresh = function (force) { refreshOrig(force); liveMerge(); };
+  document.addEventListener("focusout", () => setTimeout(() => { if (ed && ed.mergeLater) liveMerge(); }, 120));
+  const presenceOrig = updatePresenceNote;
+  updatePresenceNote = function () {
+    presenceOrig(); const el = $("#presence-note");
+    if (el && !el.hidden && isEntry()) el.innerHTML = el.innerHTML.replace("Sprecht euch ab, sonst überschreibt ihr euch.", "Ihr könnt gleichzeitig schreiben: Beim Speichern werden eure Änderungen zusammengeführt. Am besten bearbeitet ihr verschiedene Traktanden.");
+  };
+
+  // ---------- Aufgabenfenster: Feldhöhe und Diktieren auch dort ----------
+  const renderDrawerOrig3 = renderDrawer;
+  renderDrawer = function () { renderDrawerOrig3(); const o = $(".overlay"); if (o && openTaskId) { applyTaHeights(o); addDictate(o); } };
+
+  // ---------- Feldhöhe merken (aufgezogene Textfelder bleiben gross) ----------
+  const TA_KEY = "lalei-feldhoehen";
+  const taKey = (t) => t.dataset.k || t.dataset.hmK || t.dataset.f || t.id || "";
+  const taHeights = () => { try { return JSON.parse(store.get(TA_KEY) || "{}") || {}; } catch { return {}; } };
+  function applyTaHeights(root) { const h = taHeights(); (root || document).querySelectorAll("textarea").forEach((t) => { const k = taKey(t); if (k && h[k]) t.style.height = h[k] + "px"; }); }
+  document.addEventListener("pointerup", (e) => {
+    const t = e.target; if (!t || t.tagName !== "TEXTAREA") return;
+    setTimeout(() => { const k = taKey(t); const v = parseInt(t.style.height, 10); if (!k || !v) return; const h = taHeights(); if (h[k] === v) return; h[k] = v; store.set(TA_KEY, JSON.stringify(h)); document.querySelectorAll("textarea").forEach((x) => { if (x !== t && taKey(x) === k) x.style.height = v + "px"; }); }, 0);
+  });
+
+  // ---------- Diktieren ----------
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  function addDictate(root) {
+    if (!SR || isReadOnly()) return;
+    root.querySelectorAll(".drawer textarea, .hoeck-mode textarea").forEach((t) => {
+      if (t.nextElementSibling && t.nextElementSibling.matches("[data-dictate]")) return;
+      t.parentElement.classList.add("has-dictate");
+      t.insertAdjacentHTML("afterend", `<button type="button" class="dictate" data-dictate aria-pressed="false" title="Diktieren: sprechen statt tippen" aria-label="Diktieren">🎤</button>`);
+    });
+  }
+  let rec = null;
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest && e.target.closest("[data-dictate]"); if (!btn) return; e.preventDefault(); e.stopPropagation();
+    if (rec) { rec.stop(); return; }
+    const t = btn.previousElementSibling; if (!t || t.tagName !== "TEXTAREA") return;
+    rec = new SR(); rec.lang = "de-CH"; rec.continuous = true; rec.interimResults = false;
+    btn.classList.add("on"); btn.setAttribute("aria-pressed", "true"); t.focus();
+    rec.onresult = (ev) => {
+      let txt = ""; for (let i = ev.resultIndex; i < ev.results.length; i++) if (ev.results[i].isFinal) txt += ev.results[i][0].transcript;
+      txt = txt.trim(); if (!txt) return;
+      const pos = t.selectionEnd ?? t.value.length; const pre = t.value.slice(0, pos); const ins = (pre && !/\s$/.test(pre) ? " " : "") + txt;
+      t.value = pre + ins + t.value.slice(pos); t.setSelectionRange(pre.length + ins.length, pre.length + ins.length);
+      t.dispatchEvent(new Event("input", { bubbles: true }));
+    };
+    rec.onerror = (ev) => { if (ev.error === "not-allowed" || ev.error === "service-not-allowed") toast("Das Mikrofon ist nicht erlaubt. Bitte im Browser freigeben."); else if (ev.error === "no-speech") toast("Nichts gehört. Nochmals versuchen."); };
+    rec.onend = () => { btn.classList.remove("on"); btn.setAttribute("aria-pressed", "false"); rec = null; };
+    try { rec.start(); toast("Sprich jetzt. Nochmals auf 🎤 tippen zum Beenden."); } catch { rec = null; btn.classList.remove("on"); }
+  }, true);
+
+  // ---------- Höck-Modus: ein Traktandum nach dem anderen ----------
+  let hmDraw = null;
+  function hoeckModus(start) {
+    if (!ed || ed.type !== "meeting") return;
+    let i = Math.max(0, Math.min(start, ed.draft.items.length - 1)); const t0 = Date.now();
+    const box = document.createElement("div"); box.className = "hoeck-mode"; box.setAttribute("role", "dialog"); box.setAttribute("aria-modal", "true"); box.setAttribute("aria-label", "Höck-Modus");
+    document.body.appendChild(box);
+    const draw = () => {
+      if (!ed || ed.type !== "meeting") return zu();
+      const items = ed.draft.items; i = Math.max(0, Math.min(i, items.length - 1)); const it = items[i];
+      box.innerHTML = `<div class="hm-top"><div><span class="eyebrow">Höck-Modus</span><b>${esc(ed.draft.title || HK[ed.draft.kind || "LaLei"].label)}</b></div><span class="muted hm-clock" id="hm-clock">${Math.floor((Date.now() - t0) / 60000)} Min.</span><button class="btn small" data-hm-close>Zurück zum Protokoll</button></div>
+        <nav class="hm-nav" aria-label="Traktanden">${items.map((x, j) => `<button type="button" class="${j === i ? "on" : ""} ${x.notes || x.decision ? "done" : ""}" data-hm-go="${j}">${j + 1}. ${esc((x.title || "Ohne Titel").slice(0, 32))}</button>`).join("")}<button type="button" data-hm-add>+ Traktandum</button></nav>
+        <div class="hm-main"><span class="eyebrow">Traktandum ${i + 1} von ${items.length}</span>
+          <input class="hm-title" data-hm-k="title" value="${esc(it.title)}" placeholder="Traktandum" aria-label="Traktandum">
+          <label class="field"><span>Notizen</span><textarea data-hm-k="notes" data-mention rows="9" placeholder="Was wird besprochen? Mit @Name hältst du fest, wer etwas macht.">${esc(it.notes)}</textarea></label>
+          <label class="field"><span>Entscheid</span><textarea data-hm-k="decision" data-mention rows="3" placeholder="optional">${esc(it.decision)}</textarea></label></div>
+        <div class="hm-foot"><button class="btn" data-hm-prev ${i === 0 ? "disabled" : ""}>← Vorheriges</button><button class="btn" data-hm-save>Speichern</button><button class="btn primary" data-hm-next>${i < items.length - 1 ? "Nächstes →" : "+ Neues Traktandum"}</button></div>`;
+      applyTaHeights(box); addDictate(box);
+      const ta = box.querySelector('[data-hm-k="notes"]'); if (ta) ta.focus();
+    };
+    hmDraw = draw;
+    const zu = () => { clearInterval(tick); box.remove(); hmDraw = null; if (ed) renderEntryDrawer(); };
+    const neu = () => { ed.draft.items.push({ id: uid(), title: "", notes: "", decision: "", links: [] }); i = ed.draft.items.length - 1; draw(); const ti = box.querySelector(".hm-title"); if (ti) ti.focus(); };
+    box.oninput = (e) => { const k = e.target.dataset.hmK; if (!k || !ed) return; ed.draft.items[i][k] = e.target.value; ed.touched = true; autosaveDraft(); if (k === "title") { const nb = box.querySelector(`[data-hm-go="${i}"]`); if (nb) nb.textContent = `${i + 1}. ${(e.target.value || "Ohne Titel").slice(0, 32)}`; } };
+    box.onclick = async (e) => {
+      if (e.target.closest("[data-hm-close]")) return zu();
+      const g = e.target.closest("[data-hm-go]"); if (g) { i = +g.dataset.hmGo; return draw(); }
+      if (e.target.closest("[data-hm-add]")) return neu();
+      if (e.target.closest("[data-hm-prev]")) { i--; return draw(); }
+      if (e.target.closest("[data-hm-next]")) { if (i < ed.draft.items.length - 1) { i++; draw(); } else neu(); return; }
+      if (e.target.closest("[data-hm-save]")) { await saveEntry(true); if (document.body.contains(box)) draw(); }
+    };
+    box.onkeydown = (e) => {
+      if (e.key === "Escape" && !mbox.box) { e.stopPropagation(); return zu(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === "ArrowRight") { e.preventDefault(); if (i < ed.draft.items.length - 1) { i++; draw(); } }
+      if ((e.ctrlKey || e.metaKey) && e.key === "ArrowLeft") { e.preventDefault(); if (i > 0) { i--; draw(); } }
+    };
+    const tick = setInterval(() => { const c = box.querySelector("#hm-clock"); if (c) c.textContent = `${Math.floor((Date.now() - t0) / 60000)} Min.`; }, 20000);
+    draw();
+  }
+
+  // ---------- Höck als Outlook-Termin (.ics) ----------
+  function icsDownload(h) {
+    if (!h.date) return toast("Bitte zuerst ein Datum eintragen.");
+    const [hh, mm] = String(h.time || "19:30").split(":").map((x) => parseInt(x, 10) || 0);
+    const p2 = (n) => String(n).padStart(2, "0");
+    const stamp = (dIso, H, M) => `${dIso.replace(/-/g, "")}T${p2(H)}${p2(M)}00`;
+    let endDate = h.date, eH = hh + 2; if (eH >= 24) { eH -= 24; endDate = addDays(h.date, 1); }
+    const escI = (s) => String(s || "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+    const fold = (line) => { const out = []; let s = line; while (s.length > 60) { out.push(s.slice(0, 60)); s = " " + s.slice(60); } out.push(s); return out.join("\r\n"); };
+    const title = h.title || HK[h.kind || "LaLei"].label;
+    const offen = openIdeas().map((x) => "- " + x.title);
+    const url = (STORE.appUrl && STORE.appUrl()) || location.href.split("#")[0];
+    const desc = [h.note, offen.length ? "Offene Traktanden:\n" + offen.join("\n") : "", "Lager-Tool: " + url].filter(Boolean).join("\n\n");
+    const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Cevi Staefa-Hombi//Lager-Tool//DE", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+      "BEGIN:VTIMEZONE", "TZID:Europe/Zurich", "BEGIN:DAYLIGHT", "TZOFFSETFROM:+0100", "TZOFFSETTO:+0200", "TZNAME:CEST", "DTSTART:19700329T020000", "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU", "END:DAYLIGHT",
+      "BEGIN:STANDARD", "TZOFFSETFROM:+0200", "TZOFFSETTO:+0100", "TZNAME:CET", "DTSTART:19701025T030000", "RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU", "END:STANDARD", "END:VTIMEZONE",
+      "BEGIN:VEVENT", `UID:${h._id || uid()}-${state.lagerId}@lager-tool`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "")}`,
+      `DTSTART;TZID=Europe/Zurich:${stamp(h.date, hh, mm)}`, `DTEND;TZID=Europe/Zurich:${stamp(endDate, eH, mm)}`,
+      `SUMMARY:${escI(title + (lagerDoc().title ? " · " + lagerDoc().title : ""))}`, h.place ? `LOCATION:${escI(h.place)}` : "", `DESCRIPTION:${escI(desc)}`,
+      "BEGIN:VALARM", "TRIGGER:-PT2H", "ACTION:DISPLAY", "DESCRIPTION:Erinnerung", "END:VALARM", "END:VEVENT", "END:VCALENDAR"].filter(Boolean).map(fold);
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([lines.join("\r\n") + "\r\n"], { type: "text/calendar;charset=utf-8" }));
+    a.download = `${title.replace(/[^\p{L}\p{N} _-]/gu, "").trim() || "Hoeck"} ${h.date}.ics`; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    toast("Kalender-Datei erstellt. Öffnen trägt den Höck in Outlook ein; dort kannst du ihn als Einladung weiterleiten.");
+  }
+
+  // =====================================================================
+  // Vorlagen für alle Lager: Aufgaben-Vorlagen und Packlisten-Vorlagen (z.B. «HeLa»)
+  // Erstellt im Admin aus einem bestehenden Lager, eingefügt im Lager (Aufgaben bzw. Packliste)
+  // =====================================================================
+  const lagerStart = (c) => { const d = (c || {}).dates || {}; return d.start || d.prep || ""; };
+
+  // ---------- Admin: Vorlagen verwalten ----------
+  let adPw = "", vlAdmin = null, vlMsg = "";
+  document.addEventListener("submit", (e) => {
+    const f = e.target; if (!f.matches) return;
+    if (f.matches("[data-ad-login]")) { adPw = ($("#ad-pw") || {}).value || ""; vlAdmin = null; vlMsg = ""; }
+    if (f.matches("[data-ad-newpw]")) { const a = ($("#ad-n1") || {}).value, b = ($("#ad-n2") || {}).value; if (a && a === b) setTimeout(() => (adPw = a), 1500); }
+  }, true);
+  function vlSection() {
+    const v = vlAdmin || { tasks: [], pack: [] };
+    const lagers = STORE.lagerList();
+    const opts = lagers.map((l) => `<option value="${esc(l._id)}">${esc(l.title || l._id)}</option>`).join("");
+    const list = (arr, kind) => arr.length ? arr.map((x, i) => `<div class="ad-person"><b>${esc(x.name)}</b><span class="muted">${kind === "tasks" ? `${x.items.length} Aufgaben` : `${x.items.length} Punkte`}${x.from ? " · aus " + esc(x.from) : ""}</span><button class="btn small ghost" data-vl-ren="${kind}|${i}">Umbenennen</button><button class="btn small ghost danger" data-vl-rm="${kind}|${i}">Löschen</button></div>`).join("") : '<span class="muted">Noch keine.</span>';
+    return `<section class="card" id="ad-vorlagen"><div class="card-head"><h2>Vorlagen für alle Lager</h2></div><div class="card-body stack" style="gap:12px">
+      ${vlMsg ? `<div class="ok-note">${vlMsg}</div>` : ""}
+      <p class="hint" style="margin:0">Eine Vorlage übernimmt Aufgaben (ohne Namen, Deadlines relativ zum Lagerbeginn) bzw. die Packliste aus einem bestehenden Lager. Die Lagerleitung fügt sie dann im eigenen Lager ein und kann alles anpassen.</p>
+      ${vlAdmin ? `<span class="field-label">Aufgaben-Vorlagen</span>${list(v.tasks, "tasks")}
+      <span class="field-label">Packlisten-Vorlagen</span>${list(v.pack, "pack")}
+      <div class="stack" style="gap:8px"><span class="field-label">Neue Vorlage</span><div class="form-grid">
+        <input id="vl-name" placeholder="Titel, z.B. HeLa" aria-label="Titel der Vorlage">
+        <select id="vl-lager" class="input" aria-label="Aus Lager">${opts}</select>
+        <select id="vl-kind" class="input" aria-label="Art"><option value="tasks">Aufgaben</option><option value="pack">Packliste</option></select></div>
+        <button class="btn small" data-vl-new style="align-self:flex-start">Aus diesem Lager erstellen</button></div>` : '<span class="muted">Wird geladen …</span>'}</div></section>`;
+  }
+  async function vlLoad() { try { vlAdmin = await STORE.admin(adPw, "getVorlagen"); } catch (e) { vlAdmin = { tasks: [], pack: [] }; vlMsg = esc(errMsg(e)); } vlPaint(); }
+  async function vlSave(next, msg) { try { await STORE.admin(adPw, "setVorlagen", { vorlagen: next }); vlAdmin = next; vlMsg = msg; } catch (e) { vlMsg = esc(errMsg(e)); } vlPaint(); }
+  function vlPaint() {
+    const m = $(".admin-modal"); if (!m || !adPw || !/Angemeldet als Admin/.test(m.textContent)) return;
+    const html = vlSection(); const old = $("#ad-vorlagen", m);
+    if (old) old.outerHTML = html; else { const ref = [...m.querySelectorAll("section.card")].find((s) => /Wartungshinweis/.test(s.textContent)); if (ref) ref.insertAdjacentHTML("beforebegin", html); else { const foot = $(".lg-foot", m); if (foot) foot.insertAdjacentHTML("beforebegin", html); } }
+    if (!vlAdmin) vlLoad();
+  }
+  const showAdminOrigVl = showAdmin;
+  showAdmin = function () {
+    adPw = ""; vlAdmin = null; vlMsg = ""; showAdminOrigVl();
+    const m = $(".admin-modal"); if (!m) return;
+    new MutationObserver(() => { if (!$("#ad-vorlagen", m)) vlPaint(); }).observe(m, { childList: true });
+    m.addEventListener("click", async (e) => {
+      const rm = e.target.closest("[data-vl-rm]"), ren = e.target.closest("[data-vl-ren]");
+      if (rm) { const [k, i] = rm.dataset.vlRm.split("|"); const x = vlAdmin[k][+i]; if (!confirm(`Vorlage «${x.name}» löschen?`)) return; const next = { ...vlAdmin, [k]: vlAdmin[k].filter((_, j) => j !== +i) }; return vlSave(next, `Vorlage «${esc(x.name)}» gelöscht.`); }
+      if (ren) { const [k, i] = ren.dataset.vlRen.split("|"); const x = vlAdmin[k][+i]; const n = (prompt("Neuer Titel", x.name) || "").trim(); if (!n) return; const next = { ...vlAdmin, [k]: vlAdmin[k].map((y, j) => (j === +i ? { ...y, name: n } : y)) }; return vlSave(next, "Umbenannt."); }
+      if (!e.target.closest("[data-vl-new]")) return;
+      const name = $("#vl-name", m).value.trim(), lager = $("#vl-lager", m).value, kind = $("#vl-kind", m).value;
+      if (!name) { vlMsg = ""; $("#vl-name", m).focus(); return toast("Bitte einen Titel eingeben."); }
+      const b = e.target.closest("[data-vl-new]"); b.disabled = true; b.textContent = "Wird erstellt …";
+      try {
+        const data = await STORE.readLager(adPw, lager); const c = ((data.config || {}).main) || {}; const start = lagerStart(c);
+        const titel = (STORE.lagerList().find((l) => l._id === lager) || {}).title || lager;
+        let items;
+        if (kind === "tasks") {
+          items = Object.values(data.tasks || {}).map((t) => ({ title: t.title, ressort: t.ressort || "", teil: t.teil || "", offset: t.deadline && start ? daysBetween(parse(start), parse(t.deadline)) : null, note: t.note || "", checklist: (t.checklist || []).map((x) => ({ t: x.t, done: false })), ongoing: !!t.ongoing, repeat: t.repeat || "", star: !!t.star })).filter((t) => t.title);
+          items.sort((a, b2) => (a.offset ?? 9999) - (b2.offset ?? 9999));
+        } else items = (c.packlist || []).map((x) => ({ section: x.section || "Diverses", t: x.t, lalei: !!x.lalei }));
+        if (!items.length) { vlMsg = `Im Lager «${esc(titel)}» gibt es noch keine ${kind === "tasks" ? "Aufgaben" : "Packliste"}.`; return vlPaint(); }
+        const next = { ...vlAdmin, [kind]: [...vlAdmin[kind], { id: uid(), name, from: titel, at: nowStamp(), items }] };
+        await vlSave(next, `Vorlage «${esc(name)}» mit ${items.length} ${kind === "tasks" ? "Aufgaben" : "Punkten"} erstellt.`);
+      } catch (err) { vlMsg = esc(errMsg(err)); vlPaint(); }
+    });
+  };
+
+  // ---------- Im Lager: Vorlagen einfügen ----------
+  let vlLager = null;
+  const ladeVorlagen = async () => { if (!vlLager) vlLager = await STORE.vorlagen(); return vlLager; };
+  const tasksShellOrigVl = views.tasks.shell;
+  views.tasks.shell = () => tasksShellOrigVl().replace(/(<button type="button" data-task-paste>[^<]*<\/button>)/, `$1<button type="button" data-task-vorlage>Aus Vorlage einfügen</button>`);
+  view.addEventListener("click", async (e) => { if (e.target.closest("[data-task-vorlage]")) aufgabenVorlage(); });
+  async function aufgabenVorlage() {
+    let v; try { v = await ladeVorlagen(); } catch (e) { return toast(errMsg(e)); }
+    const list = v.tasks || []; const start = lagerStart(cfg());
+    const o = modal(`<div class="lg-head"><span class="eyebrow">Aufgaben</span><h2>Aus Vorlage einfügen</h2></div>
+      ${list.length ? `<label class="field"><span>Vorlage</span><select id="tv-sel" class="input">${list.map((x, i) => `<option value="${i}">${esc(x.name)} (${x.items.length} Aufgaben)</option>`).join("")}</select></label>
+      <p class="hint" style="margin:0">${start ? `Die Deadlines werden ab dem Lagerbeginn (${fmtFull(start)}) berechnet.` : "Noch kein Lagerbeginn eingetragen: Die Aufgaben kommen ohne Deadline."} Verantwortlich wird jeweils die Ressortleitung. Aufgaben mit gleichem Titel, die es schon gibt, werden übersprungen.</p>`
+      : '<p class="muted">Es gibt noch keine Aufgaben-Vorlagen. Ein Admin erstellt sie unter «Admin › Vorlagen für alle Lager».</p>'}
+      <div class="lg-foot"><button class="link" data-tv-no>Abbrechen</button>${list.length ? '<button class="btn primary" data-tv-go>Einfügen</button>' : ""}</div>`);
+    o.onclick = async (e) => {
+      if (e.target === o || e.target.closest("[data-tv-no]")) return closeDrawer();
+      if (!e.target.closest("[data-tv-go]")) return;
+      const tpl = list[+$("#tv-sel", o).value]; const da = new Set(allTasks().map((t) => t.title.trim().toLowerCase()));
+      const namen = new Set(ressorts().map((r) => r.name)); const fallback = (ressorts()[0] || {}).name || "";
+      const ops = tpl.items.filter((t) => !da.has(t.title.trim().toLowerCase())).map((t, i) => ({ op: "set", coll: "tasks", id: state.db.newId(), data: {
+        title: t.title, ressort: namen.has(t.ressort) ? t.ressort : fallback, teil: namen.has(t.ressort) ? t.teil || "" : "", owner: "", support: "", status: "Offen",
+        deadline: start && t.offset != null ? addDays(start, t.offset) : "", note: t.note || "", checklist: t.checklist || [], links: [], ongoing: !!t.ongoing, repeat: t.repeat || "", star: !!t.star,
+        order: Date.now() + i, createdAt: nowStamp(), updatedAt: nowStamp(), updatedBy: me(), log: [{ at: nowStamp(), by: me(), text: `Aus Vorlage «${tpl.name}»` }] } }));
+      if (!ops.length) { closeDrawer(); return toast("Alle Aufgaben dieser Vorlage gibt es schon."); }
+      try { for (let i = 0; i < ops.length; i += 150) await state.db.batch(ops.slice(i, i + 150)); closeDrawer(); autoOwnerLast = 0;
+        toastAction(`${ops.length} Aufgaben aus «${tpl.name}» eingefügt`, "Rückgängig", () => state.db.batch(ops.map((x) => ({ op: "delete", coll: "tasks", id: x.id }))).then(() => toast("Rückgängig gemacht")).catch(handleWriteError));
+      } catch (err) { handleWriteError(err); }
+    };
+  }
+  const packUpdateOrigVl = views.pack.update;
+  views.pack.update = function () {
+    packUpdateOrigVl(); const box = $("#pack-tpl"); if (!box || !isLaLei() || isReadOnly() || isClosed() || state.asTeam || $("[data-pv-row]", box)) return;
+    box.insertAdjacentHTML("beforeend", `<div class="card-body" data-pv-row style="border-top:1px solid var(--line)"><button class="btn small" data-pack-vorlage>Aus Vorlage einfügen (z.B. HeLa)</button></div>`);
+  };
+  view.addEventListener("click", async (e) => {
+    if (!e.target.closest("[data-pack-vorlage]")) return;
+    let v; try { v = await ladeVorlagen(); } catch (err) { return toast(errMsg(err)); }
+    const list = v.pack || [];
+    const o = modal(`<div class="lg-head"><span class="eyebrow">Packliste</span><h2>Aus Vorlage einfügen</h2></div>
+      ${list.length ? `<label class="field"><span>Vorlage</span><select id="pv-sel" class="input">${list.map((x, i) => `<option value="${i}">${esc(x.name)} (${x.items.length} Punkte)</option>`).join("")}</select></label><p class="hint" style="margin:0">Die Punkte kommen zur bestehenden Packliste dazu (doppelte werden übersprungen) und lassen sich danach ändern.</p>`
+      : '<p class="muted">Es gibt noch keine Packlisten-Vorlagen. Ein Admin erstellt sie unter «Admin › Vorlagen für alle Lager».</p>'}
+      <div class="lg-foot"><button class="link" data-pv-no>Abbrechen</button>${list.length ? '<button class="btn primary" data-pv-go>Einfügen</button>' : ""}</div>`);
+    o.onclick = async (ev) => {
+      if (ev.target === o || ev.target.closest("[data-pv-no]")) return closeDrawer();
+      if (!ev.target.closest("[data-pv-go]")) return;
+      const tpl = list[+$("#pv-sel", o).value]; const cur = packTemplate(); const da = new Set(cur.map((x) => (x.section + "|" + x.t).toLowerCase()));
+      const neu = tpl.items.filter((x) => !da.has((x.section + "|" + x.t).toLowerCase())).map((x) => ({ id: "t" + uid(), section: x.section, t: x.t, ...(x.lalei ? { lalei: true } : {}) }));
+      closeDrawer(); if (!neu.length) return toast("Alle Punkte gibt es schon.");
+      await writeConfig({ packlist: [...cur, ...neu] }); toast(`${neu.length} Punkte aus «${tpl.name}» eingefügt`);
+    };
+  });
+
   // ---------- boot ----------
   state.jTab = store.get("lalei-jtab") || "all";
   try { state.tabs = JSON.parse(store.get("lalei-tabs") || "{}") || {}; } catch { state.tabs = {}; }
@@ -5356,7 +6155,7 @@ window.LaleiStore = (() => {
     on("attreq", (snap) => { state.attreq = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
     on("daypage", (snap) => { state.daypages = new Map(snap.docs.map((d) => [d.id, d.data()])); });
     on("presence", (snap) => { state.presence = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
-    for (const c of ["board", "swap", "trips", "groups"]) on(c, (snap) => { state[c] = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
+    for (const c of ["board", "swap", "trips", "groups", "versions"]) on(c, (snap) => { state[c] = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
     for (const c of ["count", "shop", "log", "media"]) on(c, () => {});
     STORE.onLoggedOut((id) => { if (state.lagerId === id) { toast("Bitte melde dich neu an."); showStart(); showLogin(id); } });
     const last = store.get("lalei-lager");
