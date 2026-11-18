@@ -125,3 +125,22 @@
     more.setAttribute("aria-selected", String(!unten.includes(state.view)));
   };
   window.addEventListener("resize", () => { if (state.lagerId) appbarPaint(); });
+
+  // ---------- Neue Version: selbst erkennen und aktualisieren ----------
+  // Prüft beim Zurückkehren zur App und alle 10 Minuten. Ist nichts offen und wird nicht getippt, lädt es still neu,
+  // sonst kommt ein Hinweis mit «Neu laden».
+  if (STORE.isApi && STORE.version) {
+    let gemeldet = false;
+    const pruefen = async () => {
+      if (gemeldet || document.visibilityState === "hidden") return;
+      try {
+        const r = await fetch((STORE.isTest ? "../" : "") + "version.txt?x=" + Date.now(), { cache: "no-store" }); if (!r.ok) return;
+        const v = (await r.text()).trim(); if (!v || v === STORE.version) return;
+        const ruhig = !$(".overlay") && !$(".hoeck-mode") && !$(".cmdk") && !(document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) && !(typeof ungespeichert === "function" && ungespeichert());
+        if (ruhig) { location.reload(); return; }
+        gemeldet = true; toastAction("Neue Version des Lager-Tools", "Neu laden", () => location.reload());
+      } catch {}
+    };
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") pruefen(); });
+    setInterval(pruefen, 10 * 60 * 1000); setTimeout(pruefen, 5000);
+  }
