@@ -51,12 +51,27 @@
     }
     for (const e of state.journal) { const ty = typeOf(e); add({ date: entryDate(e), tag: ty === "meeting" ? HK[e.kind || "LaLei"].label : J_TYPES[ty].tag, cls: ty === "meeting" ? HK[e.kind || "LaLei"].cls : "type-" + ty, title: e.title || e.topic || "", attr: `data-open-entry="${esc(e._id)}"`, entry: e._id }, entryText(e)); }
     for (const h of state.hoecks) add({ date: h.date, tag: HK[h.kind || "LaLei"].label, cls: HK[h.kind || "LaLei"].cls, title: h.title || "", attr: `data-open-hoeck="${esc(h._id)}"` }, h.note);
-    const seen = new Set();
-    mentHits = hits.filter((h) => { const k = h.attr + "|" + h.text; if (seen.has(k)) return false; seen.add(k); return true; }).sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-    mm.innerHTML = mentHits.length ? mentHits.slice(0, 80).map((h, i) => `<div class="mrow ment-row" ${h.attr} role="button" tabindex="0"><div class="entry-top"><span class="tag plain ${h.cls}">${h.tag}</span><b style="font-weight:600">${esc(h.title)}</b><span class="muted" style="font-size:12px;margin-left:auto">${fmtFull(h.date)}</span></div><div class="ment-line"><div class="rich">${rich(h.text)}</div>${isReadOnly() ? "" : `<button class="btn small" data-ment-task="${i}">Als Aufgabe</button>`}</div></div>`).join("") + (mentHits.length > 80 ? `<div class="card-body muted" style="font-size:13px">… und ${mentHits.length - 80} ältere</div>` : "")
-      : `<div class="empty"><b>Keine Erwähnungen</b>Hier erscheint jede Zeile, in der jemand @${esc(me())}, @alle, @LaLei oder dein Ressort schreibt.</div>`;
+    const seen = new Set(); const fertig = new Set(mentFertig());
+    const alle = hits.filter((h) => { const k = mentKey(h); h.key = k; if (seen.has(k)) return false; seen.add(k); return true; }).sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+    const nErl = alle.filter((h) => fertig.has(h.key)).length;
+    mentHits = state.mentAlle ? alle : alle.filter((h) => !fertig.has(h.key));
+    const kann = !isReadOnly();
+    fillTabs("mine", { todo: todoItems().filter((x) => !x.done).length, ment: alle.length - nErl });
+    mm.innerHTML = (mentHits.length ? mentHits.slice(0, 80).map((h, i) => { const erl = fertig.has(h.key); return `<div class="mrow ment-row ${erl ? "ment-erl" : ""}" ${h.attr} role="button" tabindex="0"><div class="entry-top"><span class="tag plain ${h.cls}">${h.tag}</span><b style="font-weight:600">${esc(h.title)}</b><span class="muted" style="font-size:12px;margin-left:auto">${fmtFull(h.date)}</span></div><div class="ment-line"><div class="rich">${rich(h.text)}</div>${kann ? `<span class="ment-acts">${erl ? "" : `<button class="btn small" data-ment-task="${i}">Als Aufgabe</button>`}<button class="btn small ${erl ? "" : "primary"}" data-ment-done="${i}">${erl ? "Wieder offen" : "Erledigt"}</button></span>` : ""}</div></div>`; }).join("") + (mentHits.length > 80 ? `<div class="card-body muted" style="font-size:13px">… und ${mentHits.length - 80} ältere</div>` : "")
+      : `<div class="empty"><b>${nErl ? "Alles erledigt" : "Keine Erwähnungen"}</b>${nErl ? "" : `Hier erscheint jede Zeile, in der jemand @${esc(me())}, @alle, @LaLei oder dein Ressort schreibt.`}</div>`)
+      + (nErl ? `<div class="card-body ment-toggle"><button class="link" data-ment-alle>${state.mentAlle ? "Erledigte ausblenden" : `${nErl} erledigte anzeigen`}</button></div>` : "");
   };
+  // erledigte Erwähnungen: im privaten Bereich der Person gespeichert (gilt auf allen Geräten)
+  function mentKey(h) { const s = h.attr + "|" + h.text; let x = 0; for (let i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) | 0; return (x >>> 0).toString(36) + s.length.toString(36); }
+  const mentFertig = () => ((state.todos || {}).mentDone || []);
+  function mentSetze(key, erledigt) {
+    const alt = mentFertig(); const neu = erledigt ? [...new Set([...alt, key])].slice(-500) : alt.filter((k) => k !== key);
+    state.todos = { ...(state.todos || {}), mentDone: neu }; views.mine.update();
+    state.db.doc("todos/" + myId()).set({ ...(state.todos || {}), items: todoItems(), mentDone: neu, updatedAt: nowStamp() }).catch(handleWriteError);
+  }
   view.addEventListener("click", (e) => {
+    if (e.target.closest("[data-ment-alle]")) { state.mentAlle = !state.mentAlle; return views.mine.update(); }
+    const d = e.target.closest("[data-ment-done]"); if (d) { e.stopPropagation(); e.stopImmediatePropagation(); const h = mentHits[+d.dataset.mentDone]; if (!h) return; const war = mentFertig().includes(h.key); mentSetze(h.key, !war); if (!war) toastAction("Als erledigt markiert", "Rückgängig", () => mentSetze(h.key, false)); return; }
     const b = e.target.closest("[data-ment-task]"); if (!b) return; e.stopPropagation(); e.stopImmediatePropagation();
     const h = mentHits[+b.dataset.mentTask]; if (!h) return;
     openTask("_new", { title: h.text.slice(0, 140), owner: me(), note: `Aus «${h.title}» (${fmtFull(h.date)}):\n${h.text}`, ...(h.entry ? { source: { entry: h.entry, label: `${h.title} (${fmtFull(h.date)})` } } : {}) });

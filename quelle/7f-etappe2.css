@@ -80,7 +80,11 @@ tr.task.selected td { background: color-mix(in srgb, var(--accent) 7%, transpare
 .av-group { background: var(--line); font-size: 12px; }
 .ment-line { display: flex; align-items: flex-start; gap: var(--sp-3); margin-top: 4px; }
 .ment-line .rich { flex: 1; min-width: 0; }
-.ment-line .btn { flex: none; opacity: 0.75; }
+.ment-line .btn { flex: none; }
+.ment-acts { display: flex; gap: 6px; flex: none; flex-wrap: wrap; justify-content: flex-end; }
+.ment-erl { opacity: 0.55; }
+.ment-toggle { text-align: center; }
+@media (max-width: 600px) { .ment-line { flex-direction: column; gap: 8px; } .ment-acts { align-self: flex-end; } }
 .ment-row:hover .ment-line .btn { opacity: 1; }
 
 /* Protokoll-Fenster */
