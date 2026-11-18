@@ -203,6 +203,9 @@
     },
     // rows: [[cellXml, …], …]; cellXml enthält Absätze; o.head = erste Zeile ist Kopfzeile; o.labelCol = erste Spalte schattiert
     tbl(widths, rows, o = {}) {
+      // zweispaltige Angaben-Tabellen: leere Felder weglassen
+      const leer = (c) => ["", "–", "-"].includes([...String(c || "").matchAll(/<w:t[^>]*>([^<]*)<\/w:t>/g)].map((m) => m[1]).join("").trim());
+      if (widths.length === 2 && !o.keepEmpty) rows = rows.filter((cells, ri) => (o.head && ri === 0) || !leer(cells[1]));
       const grid = widths.map((w) => `<w:gridCol w:w="${w}"/>`).join("");
       const b = (n) => `<w:${n} w:val="single" w:sz="4" w:space="0" w:color="${LINE}"/>`;
       const body = rows.map((cells, ri) => {
@@ -351,7 +354,7 @@
     if (t.source) meta.push("aus " + esc(t.source.label || "Höck"));
     if ((t.dependsOn || []).length && !done) { const di = depInfo(t); if (di) meta.push(di); }
     return `<tr class="task ${late ? "late" : ""} ${done ? "done" : ""}">
-      <td class="c-date">${fmt(t.deadline)}${late ? `<div><span class="tag late">überfällig</span></div>` : ""}</td>
+      <td class="c-date">${fmt(t.deadline)}${late ? `<div><span class="tag late">überfällig</span></div>` : !done && t.deadline ? `<div class="rel-day">${relDay(t.deadline)}</div>` : ""}</td>
       <td class="c-main"><div class="t-row"><button class="qdone ${done ? "on" : ""}" data-qdone="${esc(t._id)}" aria-label="${done ? "Wieder öffnen" : "Als erledigt abhaken"}" title="${done ? "Wieder öffnen" : "Abhaken"}">${done ? "✓" : ""}</button><div style="min-width:0"><button class="star ${t.star ? "on" : ""}" data-star="${esc(t._id)}" aria-label="${t.star ? "Nicht mehr wichtig" : "Als wichtig markieren"}" title="Wichtig">★</button><button class="t-title" data-open="${esc(t._id)}">${isNew(t) ? '<span class="new-dot" title="Neu oder geändert seit deinem letzten Besuch"></span>' : ""}${esc(t.title)}</button><div class="t-meta">${meta.map((m) => `<span>${m}</span>`).join("")}</div></div></div></td>
       <td class="c-who">${ownerCell(t)}${t.support ? `<div class="plus">mit ${esc(t.support)}</div>` : ""}</td>
       <td class="c-stat">${statusSelect(t)}</td></tr>`;
@@ -374,9 +377,9 @@
     return `<option value="">${blank}</option>` + groups.map(([fn, l]) => `<optgroup label="${FUNKTION[fn]}">${l.map((p) => `<option ${p === sel ? "selected" : ""}>${esc(p)}</option>`).join("")}</optgroup>`).join("") + (sel && !known.includes(sel) ? `<option selected>${esc(sel)}</option>` : "");
   };
   const LINK_ICO = `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>`;
-  const linksView = (links) => (links || []).length ? `<div class="links">${links.map((l) => `<div class="link-row">${LINK_ICO}<a ${linkAttrs(l)} title="${esc(l.title || l.url)}">${esc(l.title || l.url)}</a></div>`).join("")}</div>` : "";
+  const linksView = (links) => (links || []).length ? `<div class="links">${links.map((l) => `<div class="link-row">${linkIco(l)}<a ${linkAttrs(l)} title="${esc(l.title || l.url)}">${esc(l.title || l.url)}</a></div>`).join("")}</div>` : "";
   // editierbare Linkliste: key identifiziert die Liste für die Klick-Handler
-  const linksEditor = (key, links, canEdit = true) => `<div class="links" data-links="${esc(key)}">${(links || []).map((l, i) => `<div class="link-row">${LINK_ICO}<a ${linkAttrs(l)} title="${esc(l.title || l.url)}">${esc(l.title || l.url)}</a>${canEdit ? `<button type="button" class="x" data-link-rm="${esc(key)}|${i}" aria-label="Link entfernen">✕</button>` : ""}</div>`).join("") || '<span class="muted" style="font-size:13px">Noch keine Links.</span>'}</div>
+  const linksEditor = (key, links, canEdit = true) => `<div class="links" data-links="${esc(key)}">${(links || []).map((l, i) => `<div class="link-row">${linkIco(l)}<a ${linkAttrs(l)} title="${esc(l.title || l.url)}">${esc(l.title || l.url)}</a>${canEdit ? `<button type="button" class="x" data-link-rm="${esc(key)}|${i}" aria-label="Link entfernen">✕</button>` : ""}</div>`).join("") || '<span class="muted" style="font-size:13px">Noch keine Links.</span>'}</div>
     ${canEdit ? `<div class="link-add" data-link-add="${esc(key)}"><input placeholder="Titel, z.B. Lagerhausvertrag" aria-label="Link-Titel"><input placeholder="Link einfügen (SharePoint, Drive …)" aria-label="Link-Adresse"><button type="button" class="btn small" data-link-go="${esc(key)}">+ Link</button></div>` : ""}`;
   function readLinkAdd(root, key) {
     const box = root.querySelector(`[data-link-add="${CSS.escape(key)}"]`); if (!box) return null;
@@ -1228,7 +1231,7 @@
   const viewAllowed = (v) => !!views[v] && (isLaLei() ? !["home", "org", "myatt"].includes(v) : TEAM_VIEWS.includes(v));
   function render() {
     const v = views[viewKey()];
-    if (!state.loaded.config || !state.loaded.tasks) { $("#view").innerHTML = `<div class="card empty">Daten werden geladen …</div>`; mounted = null; return; }
+    if (!state.loaded.config || !state.loaded.tasks) { $("#view").innerHTML = skeletonHtml(); mounted = null; return; }
     $("#view").innerHTML = v.shell(); mounted = state.view; $("#view").classList.toggle("ro", isClosed()); v.update();
   }
   function refresh(force) {
@@ -1338,7 +1341,7 @@
         for (const r of Object.values(ress)) { r.lead = ""; r.stv = ""; for (const s of Object.values(r.subs || {})) { s.lead = ""; s.stv = ""; } }
         const msIn = sc.milestones || {}; const ms = {}; for (const [k, m] of Object.entries(msIn)) ms[k] = { ...m, date: sh(m.date) };
         const tips = {}; for (const [rid, ev] of Object.entries(src.eval || {})) if ((ev.tips || "").trim()) tips[rid === "general" ? "Allgemein" : (ress[rid] || {}).name || rid] = ev.tips;
-        config = { ressorts: ress, milestones: ms, dates: { firstSession: sh(sc.dates?.firstSession), pauseFrom: "", pauseTo: "", prep, start, end }, days: defaultDays(prep, start, end), dayparts: sc.dayparts || ["Morgen", "Nachmittag", "Abend"], mail: { enabled: false }, prevTips: tips, prevTipsFrom: srcLager.title || "", packlist: sc.packlist || [], agendaDefaults: sc.agendaDefaults || [], dayBlocks: sc.dayBlocks || [] };
+        config = { ressorts: ress, milestones: ms, dates: { firstSession: sh(sc.dates?.firstSession), pauseFrom: "", pauseTo: "", prep, start, end }, days: defaultDays(prep, start, end), dayparts: sc.dayparts || ["Morgen", "Nachmittag", "Abend"], mail: { enabled: false }, prevTips: tips, prevTipsFrom: srcLager.title || "", prevWissen: wissenAus(src, sc, srcLager.title || ""), packlist: sc.packlist || [], agendaDefaults: sc.agendaDefaults || [], dayBlocks: sc.dayBlocks || [] };
         for (const [tid, t] of Object.entries(src.tasks || {})) ops.push({ op: "set", coll: P("tasks"), id: tid, data: { ressort: t.ressort, teil: t.teil || "", title: t.title, note: t.note || "", deadline: sh(t.deadline), status: "Offen", owner: "", support: "", order: t.order ?? 0, checklist: (t.checklist || []).map((c) => ({ t: c.t, done: false })), links: t.links || [] } });
         if ($("#nl-people").checked) for (const [pid, p] of Object.entries(src.people || {})) ops.push({ op: "set", coll: P("people"), id: pid, data: { ...p, funktion: "" } });
         if ($("#nl-info").checked && src.info && src.info.main) info = src.info.main;

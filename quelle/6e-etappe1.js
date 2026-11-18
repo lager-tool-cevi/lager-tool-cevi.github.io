@@ -8,6 +8,8 @@
   });
   const kb = (n) => (n > 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB");
   const ROLLE = { lalei: "Lagerleitung", lesen: "Nur lesen", team: "Team" };
+  const BEREICHE = [["tasks", "Aufgaben"], ["protokoll", "Protokoll und Höcks"], ["people", "Leitende"], ["kids", "Teilnehmende"], ["att", "Anwesenheit"], ["plan", "Schichtplan"], ["einteilung", "Einteilung (Zimmer, Fahrten, Gruppen)"], ["info", "Infos & Links"], ["config", "Lagerdaten und Ressorts"], ["board", "Pinnwand"], ["eval", "Auswertung"], ["daypage", "Tagesseiten"]];
+  const BEREICH_COLLS = { protokoll: ["journal", "hoecks"], einteilung: ["rooms", "trips", "groups"] };
 
   // ---------- Admin ----------
   showAdmin = function () {
@@ -42,6 +44,7 @@
           sec("Sicherheit", `<p class="hint" style="margin:0">Anmeldungen laufen nach 60 Tagen ab (ohne «angemeldet bleiben» nach 12 Stunden). Beim Zurücksetzen eines Passworts wird die Person überall abgemeldet.</p><button class="btn small ${st.sureOut ? "red" : ""}" data-ad-logoutall style="align-self:flex-start">${st.sureOut ? "Wirklich alle abmelden?" : "Alle abmelden"}</button>`),
           sec("Sicherungen", `<p class="hint" style="margin:0">${STORE.isGas ? "Jeden Sonntag wird automatisch eine Kopie in eurem Google Drive gespeichert (Ordner «Lager-Tool Sicherungen»)." : "Vorschau: einmal pro Woche wird automatisch im Browser gesichert (höchstens 5)."}</p>
             <label class="field"><span>Lager</span><select id="ad-rest-lager" class="input">${d.lagers.map((l) => `<option value="${esc(l.id)}">${esc(l.title)}</option>`).join("")}</select></label>
+            <div class="field"><span>Nur diese Bereiche zurückspielen (nichts angekreuzt = ganzes Lager)</span><div class="area-picks">${BEREICHE.map(([k, l]) => `<label class="toggle"><input type="checkbox" data-ad-area="${k}" ${(st.areas || []).includes(k) ? "checked" : ""}> ${l}</label>`).join("")}</div></div>
             ${st.backups.length ? st.backups.map((b) => `<div class="ad-person"><b>${esc(b.name)}</b><span class="muted"></span><button class="btn small" data-ad-restore="${esc(b.id)}">${st.restore && st.restore.id === b.id ? "Wirklich zurückspielen?" : "Zurückspielen …"}</button></div>`).join("") : '<span class="muted">Noch keine Sicherung.</span>'}
             ${st.restore ? `<div class="conflict-note"><b>Vorschau:</b> ${esc(st.restore.text)}<br>Nochmals «Wirklich zurückspielen?» klicken, um den Stand der Sicherung zu übernehmen.</div>` : ""}`, '<button class="btn small" data-ad-backup>Jetzt sichern</button>'),
         ].join("");
@@ -66,9 +69,10 @@
       if (e.target.closest("[data-ad-fclear]")) return tun(() => STORE.admin(st.pw, "clearFehler"), "Fehlerberichte geleert.");
       if (e.target.closest("[data-ad-logoutall]")) { if (!st.sureOut) { st.sureOut = true; return draw(); } st.sureOut = false; return tun(() => STORE.admin(st.pw, "logoutAll"), "Alle wurden abgemeldet, auch du in diesem Browser."); }
       if (e.target.closest("[data-ad-backup]")) return tun(() => STORE.admin(st.pw, "backupNow"), "Sicherung erstellt.");
-      const rsb = e.target.closest("[data-ad-restore]"); if (rsb) { const lager = $("#ad-rest-lager", o).value; const bid = rsb.dataset.adRestore;
-        try { if (!st.restore || st.restore.id !== bid || st.restore.lager !== lager) { const r = await STORE.admin(st.pw, "restore", { backup: bid, lager, dryRun: true }); const keys = [...new Set([...Object.keys(r.now || {}), ...Object.keys(r.then || {})])].filter((k) => k !== "log" && k !== "presence"); st.restore = { id: bid, lager, text: keys.map((k) => `${k}: jetzt ${(r.now || {})[k] || 0}, Sicherung ${(r.then || {})[k] || 0}`).join(" · ") || "keine Daten" }; return draw(); }
-          await STORE.admin(st.pw, "restore", { backup: bid, lager }); st.restore = null; st.msg = "Zurückgespielt. Das Lager hat jetzt den Stand der Sicherung."; } catch (err) { st.err = errMsg(err); } return draw(); }
+      const ar = e.target.closest("[data-ad-area]"); if (ar) { st.areas = [...o.querySelectorAll("[data-ad-area]:checked")].map((x) => x.dataset.adArea); st.restore = null; return; }
+      const rsb = e.target.closest("[data-ad-restore]"); if (rsb) { const lager = $("#ad-rest-lager", o).value; const bid = rsb.dataset.adRestore; const colls = (st.areas || []).flatMap((k) => BEREICH_COLLS[k] || [k]); const sig = colls.join(",");
+        try { if (!st.restore || st.restore.id !== bid || st.restore.lager !== lager || st.restore.sig !== sig) { const r = await STORE.admin(st.pw, "restore", { backup: bid, lager, dryRun: true }); const keys = [...new Set([...Object.keys(r.now || {}), ...Object.keys(r.then || {})])].filter((k) => k !== "log" && k !== "presence" && (!colls.length || colls.includes(k))); st.restore = { id: bid, lager, sig, text: (colls.length ? "Nur ausgewählte Bereiche. " : "Ganzes Lager. ") + (keys.map((k) => `${COLL_LABEL[k] || k}: jetzt ${(r.now || {})[k] || 0}, Sicherung ${(r.then || {})[k] || 0}`).join(" · ") || "keine Daten") }; return draw(); }
+          await STORE.admin(st.pw, "restore", { backup: bid, lager, ...(colls.length ? { colls } : {}) }); st.restore = null; st.msg = colls.length ? "Die ausgewählten Bereiche haben jetzt den Stand der Sicherung." : "Zurückgespielt. Das Lager hat jetzt den Stand der Sicherung."; } catch (err) { st.err = errMsg(err); } return draw(); }
     };
     o.onsubmit = async (e) => {
       e.preventDefault(); const f = e.target; st.msg = ""; st.err = "";

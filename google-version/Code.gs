@@ -344,7 +344,9 @@ function sichern_() {
 }
 function zurueckspielen_(d) {
   const kopie = datenBlatt_(SpreadsheetApp.openById(d.backup)); const pre = d.lager + ':';
-  const gehoert = function (r) { const c = String(r[0]); return c.indexOf(pre) === 0 || (c === 'lager' && String(r[1]) === d.lager); };
+  // nur ausgewählte Bereiche (z.B. nur Aufgaben) oder das ganze Lager
+  const nur = Array.isArray(d.colls) && d.colls.length ? d.colls.map(String) : null;
+  const gehoert = function (r) { const c = String(r[0]); if (c === 'lager') return !nur && String(r[1]) === d.lager; if (c.indexOf(pre) !== 0) return false; return !nur || nur.indexOf(c.slice(pre.length).split('#')[0]) >= 0; };
   const alt = zeilen_(kopie).filter(gehoert);
   const zaehle = function (rows) { const c = {}; rows.forEach(function (r) { const k = String(r[0]) === 'lager' ? 'lager' : String(r[0]).slice(pre.length); c[k] = (c[k] || 0) + 1; }); return c; };
   if (d.dryRun) return { now: zaehle(zeilen_(datenBlatt_()).filter(gehoert)), then: zaehle(alt) };
@@ -384,7 +386,7 @@ function filterFuer_(sess, colls) {
       else if (c === 'info') { const m = JSON.parse(JSON.stringify(d)); if (m.sections) m.sections = m.sections.filter(function (s) { return !s.lalei; }); out.info[id] = m; }
       else if (c === 'count') out.count[id] = { checked: d.checked || {}, resetAt: d.resetAt || '' };
       else if (c === 'kids') out.kids[id] = { vorname: d.vorname || '', nachname: d.nachname || '', stufe: d.stufe || '' };
-      else if (c === 'config') { if (id === 'main') { const m = JSON.parse(JSON.stringify(d)); delete m.mail; delete m.prevTips; out.config.main = m; } }
+      else if (c === 'config') { if (id === 'main') { const m = JSON.parse(JSON.stringify(d)); delete m.mail; delete m.prevTips; delete m.prevWissen; out.config.main = m; } }
       else if (c !== 'people') out[c][id] = d;
     });
     if (c === 'people') { const sec = sicherheitsIds_((colls.config || {}).main, src); Object.keys(src).forEach(function (id) { const p = src[id]; out.people[id] = { ceviname: p.ceviname || '', vorname: p.vorname || '', nachname: p.nachname || '', stufe: p.stufe || '', funktion: p.funktion || '', order: p.order || 0 }; if (sec.indexOf(id) >= 0) out.people[id].telefon = p.telefon || ''; }); }

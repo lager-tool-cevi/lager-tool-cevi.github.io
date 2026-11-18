@@ -45,7 +45,7 @@ window.LaleiStore = (() => {
       if (c === "attreq" || c === "feedback") { for (const [id, d] of Object.entries(src)) if (d.person === sess.person) out[c][id] = d; continue; }
       if (c === "people") { const sec = securityIds((colls.config || {}).main, src); for (const [id, p] of Object.entries(src)) out.people[id] = { ceviname: p.ceviname || "", vorname: p.vorname || "", nachname: p.nachname || "", stufe: p.stufe || "", funktion: p.funktion || "", order: p.order || 0, ...(sec.includes(id) ? { telefon: p.telefon || "" } : {}) }; continue; }
       if (c === "kids") { for (const [id, k] of Object.entries(src)) out.kids[id] = { vorname: k.vorname || "", nachname: k.nachname || "", stufe: k.stufe || "" }; continue; }
-      if (c === "config") { const m = src.main ? clone(src.main) : null; if (m) { delete m.mail; delete m.prevTips; out.config.main = m; } continue; }
+      if (c === "config") { const m = src.main ? clone(src.main) : null; if (m) { delete m.mail; delete m.prevTips; delete m.prevWissen; out.config.main = m; } continue; }
       out[c] = src;
     }
     return out;
@@ -155,11 +155,13 @@ window.LaleiStore = (() => {
         if (a === "backups") return { backups: backups().map((b) => ({ id: b.id, at: b.at, name: "Sicherung vom " + new Date(b.at).toLocaleString("de-CH") })) };
         if (a === "restore") {
           const b = backups().find((x) => x.id === payload.backup); if (!b) throw new Error("SICHERUNG_FEHLT");
-          const pre = payload.lager + ":"; const count = (rows) => { const c = {}; for (const k of Object.keys(rows)) if (k.startsWith(pre)) { const s = k.slice(pre.length).split("|")[0]; c[s] = (c[s] || 0) + 1; } return c; };
+          const pre = payload.lager + ":"; const nur = (payload.colls || []).length ? payload.colls : null;
+          const inArea = (k) => k.startsWith(pre) && (!nur || nur.includes(k.slice(pre.length).split("|")[0]));
+          const count = (rows) => { const c = {}; for (const k of Object.keys(rows)) if (k.startsWith(pre)) { const s = k.slice(pre.length).split("|")[0]; c[s] = (c[s] || 0) + 1; } return c; };
           if (payload.dryRun) return { now: count(db.rows), then: count(b.rows) };
-          for (const k of Object.keys(db.rows)) if (k.startsWith(pre) && !k.includes(":media|")) delete db.rows[k];
-          for (const [k, v] of Object.entries(b.rows)) if (k.startsWith(pre)) db.rows[k] = v;
-          if (b.rows["lager|" + payload.lager]) db.rows["lager|" + payload.lager] = b.rows["lager|" + payload.lager];
+          for (const k of Object.keys(db.rows)) if (inArea(k) && !k.includes(":media|")) delete db.rows[k];
+          for (const [k, v] of Object.entries(b.rows)) if (inArea(k)) db.rows[k] = v;
+          if (!nur && b.rows["lager|" + payload.lager]) db.rows["lager|" + payload.lager] = b.rows["lager|" + payload.lager];
           db.rev++; save(); return {};
         }
         if (a === "deleteLager") { for (const k of Object.keys(db.rows)) if (k.startsWith(payload.lager + ":")) delete db.rows[k]; delete db.rows["lager|" + payload.lager]; delete sec.lagerPw[payload.lager]; db.rev++; save(); return {}; }
@@ -412,7 +414,7 @@ window.LaleiStore = (() => {
   }
   const peek = (coll, id) => { const v = data[coll] && data[coll].get(id); return v ? clone(v) : null; };
   return {
-    ready, setLager, login, logout, roster, admin, forgotAdmin, changePw, vorlagen, toolFeedback, toolFb: () => toolFb, readLager, writeRaw, upload, peek, report,
+    syncNow: () => sync(true), ready, setLager, login, logout, roster, admin, forgotAdmin, changePw, vorlagen, toolFeedback, toolFb: () => toolFb, readLager, writeRaw, upload, peek, report,
     isGas: echt, isApi, isTest: !!CONF.test, version: CONF.version || "", isOffline: () => offline, appUrl: () => appUrl, wartung: () => wartung, lastSyncMs: () => lastSyncMs, wartend: () => outbox.length,
     onRejected: (fn) => (onRejected = fn),
     session: () => sess, lager: () => lagerId, onLoggedOut: (fn) => (onLoggedOut = fn),
