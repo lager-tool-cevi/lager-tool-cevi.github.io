@@ -70,7 +70,7 @@
     const o = modal(`<div class="mehr-kopf">${av(me() || "?")}<div><b>${esc(me() || "–")}</b><span class="muted">${isReadOnly() ? "Nur lesen" : isLaLei() ? "Lagerleitung" : "Team"} · ${esc(lagerDoc().title || "")}</span></div><button class="btn small ghost" data-mehr-zu aria-label="Schliessen">✕</button></div>
       <div class="mehr-konto">
         <button type="button" data-mehr="lager">${SV.lager}<span>Alle Lager</span></button>
-        <button type="button" data-mehr-view="prefs">${SV.set}<span>Einstellungen</span></button>
+        <button type="button" data-mehr-view="prefs">${svgOf($('#tabs button[data-view="prefs"]')) || SV.set}<span>Einstellungen</span></button>
         <button type="button" data-mehr="fb">${SV.fb}<span>Feedback</span></button>
         <button type="button" data-mehr="logout">${SV.logout}<span>Abmelden</span></button>
       </div>
