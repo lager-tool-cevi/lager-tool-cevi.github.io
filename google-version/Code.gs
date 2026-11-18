@@ -16,7 +16,7 @@ const START_LAGER = { pfila27: '170a0835f8d8ee4d1923788791285b5fce2320898d04d028
 // Hierhin geht ein neues Admin-Passwort, wenn jemand «Passwort vergessen?» wählt
 const ADMIN_MAIL = 'lagerleitung@cevi-staefa-hombi.ch';
 // Adresse der Website auf GitHub (für Links in Mails und für die Umleitung)
-const WEBSITE = 'https://jajakingge.github.io/lager-tool-cevi/';
+const WEBSITE = 'https://lager-tool-cevi.github.io/';
 
 const DATEN_BLATT = '_daten';
 const MAX_ZELLE = 49000; // Google Sheets erlaubt höchstens 50'000 Zeichen pro Zelle
