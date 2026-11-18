@@ -84,7 +84,12 @@
   const renderSideOrigN4 = renderSide;
   renderSide = function () { renderSideOrigN4(); nd4Malen(); };
   const renderOrigN4 = render;
-  render = function () { renderOrigN4(); nd4Malen(); };
+  render = function () {
+    renderOrigN4(); nd4Malen();
+    // nur ein Zurück: hat die Seite einen eigenen («← Alle Protokolle», «← Alle Tage»), fällt «← Zurück» weg
+    const v = $("#view"), z = v && $("[data-nav-back]", v);
+    if (z && [...v.querySelectorAll("button, a")].some((b) => b !== z && /^\s*←/.test(b.textContent))) z.remove();
+  };
   if ($("#tabs")) new MutationObserver(nd4Bald).observe($("#tabs"), { subtree: true, childList: true, attributes: true, attributeFilter: ["aria-selected", "hidden"] });
 
   // ---------- Menü unter dem eigenen Namen ----------

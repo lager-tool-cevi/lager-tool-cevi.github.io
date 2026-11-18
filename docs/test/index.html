@@ -2414,7 +2414,7 @@ html.nd4 .preview-bar { background: var(--tint); color: var(--ink-2); border-bot
   <nav class="bnav" id="bnav" aria-label="Schnellnavigation"></nav>
   <button class="fab" id="qnote" type="button" aria-label="Schnell-Notiz" title="Schnell-Notiz" hidden>+</button>
 </div>
-<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 21:58","test":true};</script>
+<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 22:05","test":true};</script>
 <script>
 // Datenanbindung. Bei Google (google.script.run vorhanden) läuft alles über api() in Code.gs,
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:
@@ -9276,7 +9276,12 @@ window.LaleiStore = (() => {
   const renderSideOrigN4 = renderSide;
   renderSide = function () { renderSideOrigN4(); nd4Malen(); };
   const renderOrigN4 = render;
-  render = function () { renderOrigN4(); nd4Malen(); };
+  render = function () {
+    renderOrigN4(); nd4Malen();
+    // nur ein Zurück: hat die Seite einen eigenen («← Alle Protokolle», «← Alle Tage»), fällt «← Zurück» weg
+    const v = $("#view"), z = v && $("[data-nav-back]", v);
+    if (z && [...v.querySelectorAll("button, a")].some((b) => b !== z && /^\s*←/.test(b.textContent))) z.remove();
+  };
   if ($("#tabs")) new MutationObserver(nd4Bald).observe($("#tabs"), { subtree: true, childList: true, attributes: true, attributeFilter: ["aria-selected", "hidden"] });
 
   // ---------- Menü unter dem eigenen Namen ----------
