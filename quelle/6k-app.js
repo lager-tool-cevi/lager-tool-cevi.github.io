@@ -29,10 +29,10 @@
     // Leiste unten: kein Pfeil. Tagesseite: zu den Tagen. Alles andere: zur Startseite.
     const wurzel = [...document.querySelectorAll("#bnav [data-view]")].map((b) => b.dataset.view);
     const home = isLaLei() ? "start" : "home";
-    const ziel = state.view === "day" ? "days" : home;
+    const ziel = state.view === "day" ? "days" : "mehr";
     const zurueck = !wurzel.includes(state.view) && state.view !== home; const bb = $("#ab-back"); bb.hidden = !zurueck; bb.dataset.ziel = ziel;
     const nl = (z) => { const b = $(`#tabs button[data-view="${z}"]`); return b ? [...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim() : ""; };
-    $("#ab-back-l").textContent = nl(ziel) || "Start"; bb.setAttribute("aria-label", "Zurück zu " + $("#ab-back-l").textContent);
+    $("#ab-back-l").textContent = ziel === "mehr" ? "Mehr" : nl(ziel) || "Zurück"; bb.setAttribute("aria-label", "Zurück zu " + $("#ab-back-l").textContent);
     const n = bellItems().filter((x) => x.unread).length; const c = $("#ab-bell-n"); c.hidden = !n; c.textContent = n > 9 ? "9+" : n;
     document.body.classList.toggle("app-zurueck", zurueck);
     const more = $("#bnav [data-more]"); if (more) more.setAttribute("aria-selected", String(!wurzel.includes(state.view)));
@@ -44,7 +44,7 @@
   render = function () { renderOrig5(); appbarPaint(); };
   document.addEventListener("click", (e) => {
     const b = e.target.closest && e.target.closest(".appbar .ab-btn"); if (!b) return;
-    if (b.id === "ab-back") return setView(b.dataset.ziel || (isLaLei() ? "start" : "home"));
+    if (b.id === "ab-back") { const z = b.dataset.ziel; return z === "mehr" ? mehrBlatt() : setView(z || (isLaLei() ? "start" : "home")); }
     if (b.id === "ab-search") return cmdk();
     if (b.id === "ab-bell") return bellOpen();
     if (b.id === "ab-sos") return showSos();
@@ -63,25 +63,31 @@
       logout: '<svg viewBox="0 0 24 24"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg>',
       team: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
       app: '<svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M12 7v7M9 11l3 3 3-3"/></svg>',
+      ds: '<svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>',
+      set: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>',
     };
     const installiert = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
     const o = modal(`<div class="mehr-kopf">${av(me() || "?")}<div><b>${esc(me() || "–")}</b><span class="muted">${isReadOnly() ? "Nur lesen" : isLaLei() ? "Lagerleitung" : "Team"} · ${esc(lagerDoc().title || "")}</span></div><button class="btn small ghost" data-mehr-zu aria-label="Schliessen">✕</button></div>
       <div class="mehr-konto">
         <button type="button" data-mehr="lager">${SV.lager}<span>Alle Lager</span></button>
+        <button type="button" data-mehr-view="prefs">${SV.set}<span>Einstellungen</span></button>
         <button type="button" data-mehr="fb">${SV.fb}<span>Feedback</span></button>
-        <button type="button" class="sos-z" data-mehr="sos">${ICO.sos}<span>Notfall</span></button>
         <button type="button" data-mehr="logout">${SV.logout}<span>Abmelden</span></button>
       </div>
       <input type="search" class="mehr-q" placeholder="Seite suchen, z.B. Packliste" aria-label="Seite suchen" autocomplete="off">
+      <div class="mehr-label">Seiten</div>
       <div class="mehr-grid">${kacheln.map((b) => { const cnt = b.querySelector(".count:not([hidden])");
         return `<button type="button" class="mehr-k ${b.dataset.view === state.view ? "on" : ""}" data-mehr-view="${esc(b.dataset.view)}" data-such="${esc(txt(b).toLowerCase())}">${svgOf(b)}<span>${esc(txt(b))}</span>${cnt ? `<i>${esc(cnt.textContent)}</i>` : ""}</button>`; }).join("")}</div>
-      <div class="mehr-leer muted" hidden>Keine Seite gefunden.</div>
-      <div class="mehr-liste">
-        ${extra.map((b) => `<button type="button" class="mehr-z" data-mehr-view="${esc(b.dataset.view)}" data-such="${esc(txt(b).toLowerCase())}">${svgOf(b)}<span>${esc(txt(b))}</span></button>`).join("")}
-        ${isLaLei() && !state.asTeam ? `<button type="button" class="mehr-z" data-mehr="team" data-such="als team ansehen">${SV.team}<span>Als Team ansehen</span></button>` : ""}
-        ${state.asTeam ? `<button type="button" class="mehr-z" data-mehr="lalei" data-such="zurück zur lagerleitung">${SV.team}<span>Zurück zur Lagerleitung</span></button>` : ""}
-        ${installiert ? "" : `<button type="button" class="mehr-z" data-mehr="app" data-such="als app installieren startbildschirm">${SV.app}<span>Als App installieren</span></button>`}
-      </div><div class="mehr-sync muted">${esc(($("#sync-state") || {}).textContent || "")}</div>`, "mehr-blatt");
+      <div class="mehr-label">Allgemein</div>
+      <div class="mehr-grid">
+        ${extra.map((b) => { const cnt = b.querySelector(".count:not([hidden])"); return `<button type="button" class="mehr-k ${b.dataset.view === state.view ? "on" : ""}" data-mehr-view="${esc(b.dataset.view)}" data-such="${esc(txt(b).toLowerCase())}">${svgOf(b)}<span>${esc(txt(b))}</span>${cnt ? `<i>${esc(cnt.textContent)}</i>` : ""}</button>`; }).join("")}
+        ${isLaLei() && !state.asTeam ? `<button type="button" class="mehr-k" data-mehr="team" data-such="als team ansehen">${SV.team}<span>Als Team ansehen</span></button>` : ""}
+        ${state.asTeam ? `<button type="button" class="mehr-k" data-mehr="lalei" data-such="zurück zur lagerleitung">${SV.team}<span>Zurück zur Lagerleitung</span></button>` : ""}
+        ${installiert ? "" : `<button type="button" class="mehr-k" data-mehr="app" data-such="als app installieren startbildschirm">${SV.app}<span>Als App installieren</span></button>`}
+        <button type="button" class="mehr-k" data-mehr="ds" data-such="datenschutz">${SV.ds}<span>Datenschutz</span></button>
+      </div>
+      <div class="mehr-leer muted" hidden>Nichts gefunden.</div>
+      <div class="mehr-sync muted">${esc(($("#sync-state") || {}).textContent || "")}${STORE.version ? " · Version " + esc(STORE.version) : ""}</div>`, "mehr-blatt");
     const q = $(".mehr-q", o);
     q.oninput = () => { const s = q.value.trim().toLowerCase(); let n = 0; o.querySelectorAll("[data-such]").forEach((b) => { const ok = !s || b.dataset.such.includes(s); b.hidden = !ok; if (ok) n++; }); $(".mehr-leer", o).hidden = n > 0; };
     q.onkeydown = (e) => { if (e.key === "Enter") { const b = o.querySelector("[data-such]:not([hidden])"); if (b) b.click(); } };
@@ -91,10 +97,11 @@
       const a = e.target.closest("[data-mehr]"); if (!a) return; const k = a.dataset.mehr;
       if (k === "logout" && !confirm("Wirklich abmelden?")) return;
       closeDrawer();
-      if (k === "sos") return showSos(); if (k === "fb") return toolFeedbackOpen(); if (k === "team") return setAsTeam(true); if (k === "lalei") return setAsTeam(false); if (k === "app") return appInstallieren();
+      if (k === "sos") return showSos(); if (k === "fb") return toolFeedbackOpen(); if (k === "team") return setAsTeam(true); if (k === "lalei") return setAsTeam(false); if (k === "app") return appInstallieren(); if (k === "ds") return showDatenschutz();
       if (k === "lager") return $("[data-home]") && $("[data-home]").click(); if (k === "logout") return $("#logout") && $("#logout").click();
     };
   }
+  document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("[data-app-inst]")) appInstallieren(); });
   // ---------- Als App installieren ----------
   function appInstallieren() {
     if (typeof installEvent !== "undefined" && installEvent) { installEvent.prompt(); installEvent.userChoice.catch(() => {}).finally(() => { installEvent = null; }); return; }

@@ -91,8 +91,10 @@ html:has(.overlay), html:has(.cmdk), html:has(.hoeck-mode), body:has(.overlay), 
   .overlay.center .modal, .overlay:not(.center) .drawer { animation: lt-sheet 260ms cubic-bezier(.2,.8,.2,1) !important; opacity: 1 !important; }
   .overlay { background: rgb(0 0 0 / 0.45) !important; }
   .mehr-blatt { max-height: 88vh !important; max-height: 88dvh !important; overflow-y: auto; }
-  .mehr-konto { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-  .mehr-konto button { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 2px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); font: inherit; font-size: 12px; cursor: pointer; }
+  .mehr-konto { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .mehr-konto button { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 1px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); font: inherit; font-size: 11px; cursor: pointer; min-width: 0; }
+  .mehr-konto button span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mehr-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 4px 2px -6px; }
   .mehr-konto svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; color: var(--muted); }
   .mehr-konto .sos-z, .mehr-konto .sos-z svg { color: var(--late); }
   .mehr-q { height: 42px; border: 0; border-radius: 12px; background: var(--subtle, var(--hover)); color: var(--ink); padding: 0 14px; font: inherit; font-size: 16px; width: 100%; }
