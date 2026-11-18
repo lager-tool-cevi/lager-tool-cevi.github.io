@@ -1,4 +1,4 @@
-﻿# Baut aus «quelle» die fertigen Dateien:
+# Baut aus «quelle» die fertigen Dateien:
 #   docs\index.html        Website auf GitHub Pages (echte Daten über die Google-Schnittstelle)
 #   docs\test\index.html   Testversion (gleiche Daten, mit Hinweis «Testversion»)
 #   vorschau\lager-vorschau.html   Vorschau mit Beispieldaten (für claude.ai)
@@ -30,7 +30,7 @@ if (Test-Path "$root\werkzeuge\api-url.txt") { $api = ([IO.File]::ReadAllText("$
 # ---------- Website ----------
 function Seite([bool]$test, [string]$pfad) {
   $cfg = @{ api = $script:api; test = $test; version = $script:version } | ConvertTo-Json -Compress
-  $links = "<link rel=`"manifest`" href=`"${pfad}manifest.webmanifest`">`n<meta name=`"theme-color`" content=`"#141a3d`">`n<link rel=`"icon`" type=`"image/png`" href=`"${pfad}icons/icon-192.png`">`n<link rel=`"apple-touch-icon`" href=`"${pfad}icons/icon-192.png`">`n<meta name=`"apple-mobile-web-app-capable`" content=`"yes`">`n<meta name=`"apple-mobile-web-app-title`" content=`"Lager-Tool`">`n"
+  $links = "<link rel=`"manifest`" href=`"${pfad}manifest.webmanifest`">`n<meta name=`"theme-color`" content=`"#303090`">`n<link rel=`"icon`" type=`"image/png`" href=`"${pfad}icons/icon-192.png`">`n<link rel=`"apple-touch-icon`" href=`"${pfad}icons/icon-192.png`">`n<meta name=`"apple-mobile-web-app-capable`" content=`"yes`">`n<meta name=`"apple-mobile-web-app-title`" content=`"Lager-Tool`">`n"
   $hc = ($script:head + $script:css).Replace("</head>", $links + "</head>")
   if ($test) { $hc = $hc.Replace("<title>Lager-Tool</title>", "<title>Lager-Tool (Test)</title>") }
   return $hc + $script:body + "<script>window.LAGER_CONFIG = $cfg;</script>`n<script>`n" + $script:store + "</script>`n<script>`n" + $script:app + "</script>`n</body>`n</html>`n"

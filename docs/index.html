@@ -9,7 +9,8 @@
 <meta name="format-detection" content="telephone=no">
 <title>Lager-Tool</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<script>document.documentElement.classList.add("nd4");</script>
 <style>
 /* Layout: app shell — fixed sidebar (brand, navigation, countdown, identity) beside a content column with page header; collapses to a top bar on narrow screens. */
 :root {
@@ -1845,9 +1846,485 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px var(--accent-s
 .kids-del h3 { font-size: var(--fs-md); font-weight: 600; margin-bottom: var(--sp-1); }
 .ds-hint { margin-bottom: var(--sp-3); }
 
+/* =====================================================================
+   Neues Design «Blau mit Bausteinen» (gilt nur mit <html class="nd4">)
+   Weiss mit feinen Linien, Cevi-Blau als Akzent und oben, Cevi-Rot nur für Dringendes.
+   Oben eine blaue Leiste mit Reitern (PC), Bausteine auf dem Start, Aufgaben als Karten in Spalten.
+   ===================================================================== */
+
+/* ---------- Farben und Masse ---------- */
+html.nd4 {
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --bg: #ffffff; --surface: #ffffff; --subtle: #f7f7fa; --hover: #f1f1f6; --press: #e9e9f1; --fill: #f0f0f5;
+  --line: #e8e8ef; --line-strong: #d9d9e3;
+  --ink: #15151f; --ink-2: #45465c; --muted: #7a7b90; --faint: #b0b1c2;
+  --accent: #303090; --accent-hover: #26267a; --accent-ink: #ffffff; --accent-soft: #eeeefa; --accent-line: #d2d3f0; --tint: #f4f4fc;
+  --late: #c01030; --late-soft: #fbeaee; --red: #c01030;
+  --ok: #23824f; --ok-soft: #e7f4ec; --run: #303090; --run-soft: #eeeefa; --wait: #a76a00; --wait-soft: #fbf2df;
+  --team: #6a4c93; --team-soft: #f1ecf7;
+  --side: #303090; --side-ink: #ffffff; --side-muted: rgb(255 255 255 / 0.72); --side-active: rgb(255 255 255 / 0.16);
+  --glass: rgb(255 255 255 / 0.16); --dim: rgb(255 255 255 / 0.74);
+  --r-xs: 6px; --r-sm: 8px; --r: 10px; --r-lg: 14px;
+  --shadow: none; --shadow-1: none;
+  --shadow-2: 0 1px 2px rgb(21 21 31 / 0.05), 0 10px 28px -12px rgb(21 21 31 / 0.22);
+  --shadow-3: 0 2px 6px rgb(21 21 31 / 0.06), 0 28px 60px -20px rgb(21 21 31 / 0.32);
+  --ring: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+  --t: 150ms; --ease: cubic-bezier(.25, .8, .25, 1);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  html.nd4:not([data-theme="light"]) {
+    --bg: #0e0e14; --surface: #16161e; --subtle: #1a1a23; --hover: #20202a; --press: #282833; --fill: #20202a;
+    --line: #272732; --line-strong: #33333f; --ink: #ededf4; --ink-2: #c3c4d4; --muted: #8b8ca2; --faint: #5b5c70;
+    --accent: #9d9fff; --accent-hover: #b3b5ff; --accent-ink: #0e0e14; --accent-soft: #232350; --accent-line: #3a3b78; --tint: #15152a;
+    --late: #ff6b82; --late-soft: #3a1820; --ok: #5fcf90; --ok-soft: #15291e; --run: #9d9fff; --run-soft: #232350; --wait: #e8b45c; --wait-soft: #2f2512;
+    --side: #1c1c4a;
+    --shadow-2: 0 10px 30px -8px rgb(0 0 0 / 0.6); --shadow-3: 0 30px 70px -20px rgb(0 0 0 / 0.75);
+    color-scheme: dark;
+  }
+}
+html.nd4[data-theme="dark"] {
+  --bg: #0e0e14; --surface: #16161e; --subtle: #1a1a23; --hover: #20202a; --press: #282833; --fill: #20202a;
+  --line: #272732; --line-strong: #33333f; --ink: #ededf4; --ink-2: #c3c4d4; --muted: #8b8ca2; --faint: #5b5c70;
+  --accent: #9d9fff; --accent-hover: #b3b5ff; --accent-ink: #0e0e14; --accent-soft: #232350; --accent-line: #3a3b78; --tint: #15152a;
+  --late: #ff6b82; --late-soft: #3a1820; --ok: #5fcf90; --ok-soft: #15291e; --run: #9d9fff; --run-soft: #232350; --wait: #e8b45c; --wait-soft: #2f2512;
+  --side: #1c1c4a;
+  --shadow-2: 0 10px 30px -8px rgb(0 0 0 / 0.6); --shadow-3: 0 30px 70px -20px rgb(0 0 0 / 0.75);
+  color-scheme: dark;
+}
+
+/* ---------- Grundlagen ---------- */
+html.nd4 body { font-family: var(--font); font-size: 14px; line-height: 1.5; letter-spacing: -0.006em; background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
+html.nd4 button, html.nd4 input, html.nd4 select, html.nd4 textarea { font-family: inherit; }
+html.nd4 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-xs); }
+html.nd4 ::selection { background: color-mix(in srgb, var(--accent) 20%, transparent); }
+html.nd4 * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+html.nd4 .muted { color: var(--muted); }
+html.nd4 h1, html.nd4 h2, html.nd4 h3 { letter-spacing: -0.015em; color: var(--ink); }
+html.nd4 .eyebrow, html.nd4 .sec-label, html.nd4 .field-label { font-size: 12px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--muted); }
+html.nd4 .rel-day, html.nd4 .erklaerung { display: none !important; }
+
+/* ---------- PC: Seitenleiste weg, blaue Leiste oben ---------- */
+html.nd4 #nd4-kopf { display: none; }
+@media (min-width: 761px) {
+  html.nd4 .app { display: block; }
+  html.nd4 .side { display: none !important; }
+  html.nd4 .content { min-width: 0; }
+  html.nd4 #nd4-kopf { display: block; position: sticky; top: 0; z-index: 30; }
+}
+.nd4-top { height: 56px; display: flex; align-items: center; gap: 20px; padding: 0 max(24px, env(safe-area-inset-right, 0px)) 0 max(24px, env(safe-area-inset-left, 0px)); background: var(--side); color: var(--side-ink); }
+.nd4-marke { flex: none; display: flex; align-items: center; gap: 10px; border: 0; background: none; padding: 0; cursor: pointer; color: inherit; min-width: 0; }
+.nd4-marke .nd4-chip { background: #ffffff; border-radius: 8px; padding: 5px 9px; display: flex; align-items: center; }
+.nd4-marke img { display: block; height: 18px; width: auto; max-width: 140px; }
+.nd4-marke b { font-size: 14px; font-weight: 600; white-space: nowrap; }
+.nd4-marke .nd4-mark { width: 28px; height: 28px; border-radius: 8px; background: var(--glass); display: grid; place-items: center; font-size: 11.5px; font-weight: 600; }
+.nd4-reiter { flex: 1; display: flex; justify-content: center; gap: 2px; min-width: 0; }
+.nd4-reiter button { border: 0; background: none; color: var(--dim); font: 500 14px/1 var(--font); padding: 9px 16px; border-radius: 999px; cursor: pointer; white-space: nowrap; transition: background var(--t) var(--ease), color var(--t) var(--ease); position: relative; }
+.nd4-reiter button:hover { color: #ffffff; background: rgb(255 255 255 / 0.08); }
+.nd4-reiter button[aria-current="page"] { color: #ffffff; background: var(--glass); }
+.nd4-reiter button .nd4-n { position: absolute; top: 3px; right: 4px; width: 7px; height: 7px; border-radius: 50%; background: #ff5d79; }
+.nd4-werk { flex: none; display: flex; align-items: center; gap: 4px; }
+.nd4-werk > button { position: relative; width: 36px; height: 36px; border: 0; border-radius: 50%; background: none; color: #ffffff; display: grid; place-items: center; cursor: pointer; transition: background var(--t) var(--ease); }
+.nd4-werk > button:hover { background: rgb(255 255 255 / 0.1); }
+.nd4-werk svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.nd4-werk .nd4-sos { width: auto; padding: 0 12px 0 10px; height: 32px; border-radius: 999px; background: #c01030; gap: 6px; display: inline-flex; align-items: center; font: 600 13px/1 var(--font); margin: 0 6px; }
+.nd4-werk .nd4-sos:hover { background: #a80d29; }
+.nd4-werk .nd4-sos svg { width: 15px; height: 15px; }
+.nd4-werk .nd4-zahl { position: absolute; top: 3px; right: 2px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: #ff5d79; color: #ffffff; font: 700 10px/16px var(--font); text-align: center; }
+.nd4-werk .nd4-ich { width: 32px; height: 32px; margin-left: 6px; background: #ffffff; color: #303090; font: 600 12px/1 var(--font); }
+.nd4-werk .nd4-ich:hover { background: #ffffff; box-shadow: 0 0 0 3px rgb(255 255 255 / 0.25); }
+.nd4-werk .nd4-ich.wartet::after { content: ""; position: absolute; right: -1px; bottom: -1px; width: 9px; height: 9px; border-radius: 50%; background: #e3a008; box-shadow: 0 0 0 2px var(--side); }
+.nd4-unter { display: flex; gap: 2px; align-items: center; height: 46px; padding: 0 max(24px, env(safe-area-inset-right, 0px)) 0 max(24px, env(safe-area-inset-left, 0px)); background: color-mix(in srgb, var(--bg) 92%, transparent); -webkit-backdrop-filter: saturate(1.4) blur(12px); backdrop-filter: saturate(1.4) blur(12px); border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.nd4-unter::-webkit-scrollbar { display: none; }
+.nd4-unter[hidden] { display: none; }
+.nd4-unter .nd4-fav { font-size: 12.5px; color: var(--faint); margin-right: 6px; white-space: nowrap; }
+.nd4-unter button { position: relative; flex: none; border: 0; background: none; color: var(--muted); font: 500 13.5px/1 var(--font); height: 32px; padding: 0 12px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; transition: background var(--t) var(--ease), color var(--t) var(--ease); }
+.nd4-unter button:hover { color: var(--ink); background: var(--hover); }
+.nd4-unter button[aria-current="page"] { color: var(--accent); background: var(--accent-soft); }
+.nd4-unter .count { position: static; font: 600 11px/17px var(--font); min-width: 17px; padding: 0 5px; border-radius: 999px; background: var(--late); color: #ffffff; text-align: center; }
+.nd4-unter .fav-stern { font-size: 12px; color: var(--faint); opacity: 0; margin-left: -2px; transition: opacity var(--t); }
+.nd4-unter button:hover .fav-stern, .nd4-unter .fav-stern.an { opacity: 1; }
+.nd4-unter .fav-stern.an { color: #e0a000; }
+/* Menü unter dem eigenen Namen */
+.nd4-menue { position: fixed; z-index: 60; width: 270px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-3); padding: 6px; animation: nd4-pop 140ms var(--ease); }
+.nd4-menue .nd4-wer { display: flex; align-items: center; gap: 10px; padding: 10px 10px 12px; border-bottom: 1px solid var(--line); margin-bottom: 6px; }
+.nd4-menue .nd4-wer div { display: flex; flex-direction: column; min-width: 0; }
+.nd4-menue .nd4-wer b { font-size: 14px; font-weight: 600; }
+.nd4-menue .nd4-wer span { font-size: 12.5px; color: var(--muted); }
+.nd4-menue button { width: 100%; display: flex; align-items: center; gap: 10px; border: 0; background: none; color: var(--ink); font: 400 13.5px/1.2 var(--font); padding: 9px 10px; border-radius: 8px; cursor: pointer; text-align: left; }
+.nd4-menue button:hover { background: var(--hover); }
+.nd4-menue button svg { width: 17px; height: 17px; flex: none; fill: none; stroke: var(--muted); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.nd4-menue button .count { margin-left: auto; position: static; font: 600 11px/17px var(--font); padding: 0 6px; border-radius: 999px; background: var(--fill); color: var(--ink-2); }
+.nd4-menue hr { border: 0; border-top: 1px solid var(--line); margin: 6px 4px; }
+.nd4-menue .nd4-sync { font-size: 12px; color: var(--muted); padding: 6px 10px 4px; }
+.nd4-menue .nd4-raus { color: var(--late); }
+.nd4-menue .nd4-raus svg { stroke: var(--late); }
+@keyframes nd4-pop { from { opacity: 0; transform: translateY(-4px) scale(0.98); } to { opacity: 1; transform: none; } }
+
+/* ---------- Seite ---------- */
+html.nd4 .page { max-width: 1120px; margin-inline: auto; padding-top: 26px; padding-bottom: 64px; gap: 18px; }
+html.nd4 .page-head { align-items: center; gap: 8px 14px; min-height: 36px; }
+html.nd4 .page-head h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.03em; }
+html.nd4 .page-head p { font-size: 13.5px; color: var(--muted); }
+html.nd4 .help-btn { width: 20px; height: 20px; font-size: 11.5px; border: 0; background: var(--fill); color: var(--muted); }
+html.nd4 .back-link { font-size: 13px; color: var(--muted); }
+html.nd4 .back-link:hover { color: var(--accent); }
+html.nd4 .help-box { border: 1px solid var(--line); background: var(--subtle); border-radius: var(--r); }
+html.nd4 .asteam-banner, html.nd4 .closed-banner, html.nd4 .uebung-bar { border-radius: var(--r); }
+
+/* ---------- Flächen: weiss mit feiner Linie ---------- */
+html.nd4 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: none; }
+html.nd4 .card-head { padding: 14px 18px 8px; min-height: 0; border-bottom: 0; gap: 10px; background: transparent; }
+html.nd4 .card-head h2 { font-size: 14.5px; font-weight: 600; letter-spacing: -0.01em; }
+html.nd4 .card-body { padding: 10px 18px 16px; }
+html.nd4 .card-head + .card-body { padding-top: 4px; }
+html.nd4 .stack, html.nd4 .grid-2 { gap: 16px; }
+
+/* ---------- Reiter innerhalb einer Seite ---------- */
+html.nd4 .page-tabs { display: inline-flex; width: fit-content; max-width: 100%; overflow-x: auto; background: var(--fill) !important; border: 0 !important; border-radius: 10px !important; box-shadow: none !important; padding: 3px !important; gap: 2px; margin: 0; scrollbar-width: none; }
+html.nd4 .page-tabs button { height: 30px; min-height: 0 !important; padding: 0 13px !important; border: 0 !important; border-radius: 8px !important; background: transparent !important; color: var(--ink-2) !important; font-size: 13.5px; font-weight: 500; box-shadow: none !important; white-space: nowrap; transition: background var(--t) var(--ease), color var(--t) var(--ease); }
+html.nd4 .page-tabs button:hover { color: var(--ink) !important; }
+html.nd4 .page-tabs button[aria-selected="true"] { background: var(--surface) !important; color: var(--ink) !important; box-shadow: 0 1px 3px rgb(21 21 31 / 0.10), 0 0 0 0.5px rgb(21 21 31 / 0.06) !important; }
+html.nd4 .subtabs .n, html.nd4 .page-tabs .n { font-size: 11.5px; font-weight: 500; background: transparent; color: inherit; opacity: 0.55; padding: 0 0 0 3px; }
+html.nd4 .subtabs .n.late { color: var(--late); opacity: 1; }
+html.nd4 .seg, html.nd4 .view-seg { background: var(--fill); border: 0; border-radius: 10px; padding: 3px; gap: 2px; display: inline-flex; }
+html.nd4 .seg button, html.nd4 .view-seg button { height: 28px; min-height: 0; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-2); font-size: 13px; font-weight: 500; box-shadow: none; }
+html.nd4 .seg button[aria-pressed="true"], html.nd4 .view-seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgb(21 21 31 / 0.10); }
+
+/* ---------- Knöpfe ---------- */
+html.nd4 .btn { height: 34px; min-height: 0; padding: 0 14px; border-radius: 999px; border: 0; background: var(--fill); color: var(--ink); font-size: 13.5px; font-weight: 500; box-shadow: none; gap: 6px; transition: background var(--t) var(--ease), transform 90ms var(--ease), color var(--t) var(--ease); }
+html.nd4 .btn:hover { background: var(--press); filter: none; }
+html.nd4 .btn:active:not(:disabled) { transform: scale(0.97); }
+html.nd4 .btn.primary { background: var(--accent); color: var(--accent-ink); }
+html.nd4 .btn.primary:hover { background: var(--accent-hover); }
+html.nd4 .btn.small { height: 30px; padding: 0 12px; font-size: 13px; }
+html.nd4 .btn.ghost { background: transparent; color: var(--ink-2); }
+html.nd4 .btn.ghost:hover { background: var(--hover); color: var(--ink); }
+html.nd4 .btn.danger, html.nd4 .btn.ghost.danger { color: var(--late); }
+html.nd4 .btn.red { background: var(--late); color: #ffffff; }
+html.nd4 .btn:disabled { opacity: 0.45; }
+html.nd4 .link { color: var(--accent); font-weight: 500; }
+html.nd4 .link:hover { text-decoration: underline; text-underline-offset: 3px; }
+html.nd4 .more-pop { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-3); padding: 6px; min-width: 220px; animation: nd4-pop 140ms var(--ease); }
+html.nd4 .more-pop button { border-radius: 8px; padding: 8px 10px; font-size: 13.5px; }
+html.nd4 .more-pop button:hover { background: var(--hover); }
+
+/* ---------- Eingabefelder ---------- */
+html.nd4 input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="color"]), html.nd4 select, html.nd4 textarea {
+  border: 1px solid var(--line-strong); border-radius: var(--r-sm); background-color: var(--surface); color: var(--ink); font-size: 14px; box-shadow: none;
+  transition: border-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
+}
+html.nd4 input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="color"]):not(.hm-title):not(.cmdk-q), html.nd4 select { min-height: 36px; }
+html.nd4 input:hover, html.nd4 select:hover, html.nd4 textarea:hover { border-color: color-mix(in srgb, var(--line-strong) 50%, var(--muted)); }
+html.nd4 input:focus, html.nd4 select:focus, html.nd4 textarea:focus { outline: none; border-color: var(--accent); box-shadow: var(--ring); }
+html.nd4 input::placeholder, html.nd4 textarea::placeholder { color: var(--faint); }
+html.nd4 input[type="checkbox"], html.nd4 input[type="radio"] { accent-color: var(--accent); width: 16px; height: 16px; }
+html.nd4 .field > span:first-child { font-size: 12.5px; font-weight: 500; color: var(--ink-2); }
+html.nd4 .toolbar { gap: 8px; padding: 12px 16px; background: transparent; border: 0; }
+html.nd4 .quick-add { background: var(--subtle); border: 1px solid transparent; border-radius: 12px; padding: 4px 4px 4px 14px; box-shadow: none; }
+html.nd4 .quick-add input { border: 0 !important; box-shadow: none !important; background: transparent !important; height: 38px; font-size: 14px; padding-left: 0; }
+html.nd4 .quick-add:focus-within { background: var(--surface); border-color: var(--accent); box-shadow: var(--ring); }
+
+/* ---------- Tabellen und Listen ---------- */
+html.nd4 table { border-collapse: separate; border-spacing: 0; }
+html.nd4 th { background: transparent; color: var(--muted); font-size: 12px; font-weight: 500; letter-spacing: 0; text-transform: none; padding: 10px 14px 8px; border-bottom: 1px solid var(--line); }
+html.nd4 td { padding: 10px 14px; border-bottom: 1px solid var(--line); }
+html.nd4 tbody tr:last-child > td { border-bottom: 0; }
+html.nd4 tbody tr:hover > td { background: var(--subtle); }
+html.nd4 .table-wrap { border: 0; border-radius: var(--r-lg); }
+html.nd4 .ttable td { vertical-align: middle; }
+html.nd4 .ttable .c-date { color: var(--muted); font-size: 13px; width: 104px; }
+html.nd4 .ttable .c-date > div:not(:first-child) { display: none; }
+html.nd4 .ttable tr.late .c-date { color: var(--late); font-weight: 500; }
+html.nd4 .ttable .t-title { font-size: 14px; font-weight: 500; color: var(--ink); }
+html.nd4 .ttable .t-title:hover { color: var(--accent); }
+html.nd4 .t-meta { font-size: 12.5px; color: var(--muted); gap: 2px 10px; margin-top: 2px; }
+html.nd4 .ttable tr.done .t-title { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--faint); }
+html.nd4 .ttable tr.grp td { background: transparent; padding: 16px 14px 6px; border-bottom: 0; }
+html.nd4 .grp-in b { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+html.nd4 .grp-in .muted { font-size: 12.5px; }
+html.nd4 .tag.late { background: transparent; color: var(--late); padding: 0; font-weight: 500; }
+html.nd4 .t-row { align-items: flex-start; gap: 12px; }
+html.nd4 .qdone { flex: none; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--faint); background: transparent; color: transparent; font-size: 10px; line-height: 1; display: grid; place-items: center; transition: border-color var(--t) var(--ease), background var(--t) var(--ease), transform 140ms var(--ease); }
+html.nd4 .qdone:hover { border-color: var(--accent); }
+html.nd4 .qdone.on { background: var(--accent); border-color: var(--accent); color: #ffffff; animation: nd4-check 280ms var(--ease); }
+@keyframes nd4-check { 0% { transform: scale(0.75); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+html.nd4 select.status { appearance: none; -webkit-appearance: none; height: 28px; min-height: 0 !important; width: auto; min-width: 0; max-width: 136px; padding: 0 22px 0 10px; border-radius: 999px; border: 0; font-size: 12.5px; font-weight: 500; background-color: var(--fill); color: var(--ink-2); background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%); background-position: right 11px center, right 7px center; background-size: 4px 4px; background-repeat: no-repeat; cursor: pointer; }
+html.nd4 select.status[data-s="Läuft"], html.nd4 select.status[data-s="Nächster Höck"] { background-color: var(--accent-soft); color: var(--accent); }
+html.nd4 select.status[data-s="Wartet"] { background-color: var(--wait-soft); color: var(--wait); }
+html.nd4 select.status[data-s="Erledigt"] { background-color: var(--ok-soft); color: var(--ok); }
+html.nd4 select.owner { border: 0; background-color: transparent; box-shadow: none; font-size: 13.5px; color: var(--ink-2); min-height: 30px !important; padding: 0 6px; }
+html.nd4 select.owner:hover { background-color: var(--hover); }
+html.nd4 .av { font-weight: 600; letter-spacing: 0; }
+html.nd4 .tag { font-size: 12px; font-weight: 500; border: 0; border-radius: 999px; padding: 1px 8px; line-height: 18px; }
+html.nd4 .tag.plain { background: var(--fill); color: var(--ink-2); }
+html.nd4 .tag.ok { background: var(--ok-soft); color: var(--ok); }
+html.nd4 .tag.next { background: var(--accent-soft); color: var(--accent); }
+html.nd4 .tagchip { font-size: 12px; border-radius: 999px; padding: 0 8px; border: 0; background: var(--fill); color: var(--ink-2); }
+@media (hover: hover) {
+  html.nd4 .ttable tr.task .star:not(.on) { visibility: hidden; }
+  html.nd4 .ttable tr.task:hover .star:not(.on) { visibility: visible; opacity: 0.5; }
+}
+html.nd4 .star.on { color: #e0a000; }
+
+/* ---------- Übersicht, Kennzahlen, Lager-Check ---------- */
+html.nd4 .kpis { gap: 12px; }
+html.nd4 .kpi { border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: none; padding: 14px 16px; gap: 2px; }
+html.nd4 .kpi .v { font-size: 24px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.15; }
+html.nd4 .kpi .v small { font-size: 13px; font-weight: 500; color: var(--muted); }
+html.nd4 .kpi .s { font-size: 12.5px; color: var(--muted); }
+html.nd4 .kpi.alert .v { color: var(--late); }
+html.nd4 .bar { height: 4px; border-radius: 99px; background: var(--fill); }
+html.nd4 .bar i { border-radius: 99px; }
+html.nd4 .check-list-big { gap: 0; }
+html.nd4 .chk-row { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 11px 0; min-height: 44px; background: transparent; }
+html.nd4 .chk-row:last-child { border-bottom: 0; }
+html.nd4 .chk-row:hover { background: transparent; }
+html.nd4 .chk-row:hover b { color: var(--accent); }
+html.nd4 .chk-ico { width: 20px; height: 20px; font-size: 11px; font-weight: 700; border-radius: 50%; }
+html.nd4 .chk-row.ok .chk-ico { background: var(--ok-soft); color: var(--ok); }
+html.nd4 .chk-row.bad .chk-ico { background: var(--late-soft); color: var(--late); }
+html.nd4 .chk-row b { font-weight: 500; font-size: 14px; }
+html.nd4 .chk-row.ok b { color: var(--muted); font-weight: 400; }
+html.nd4 .setup-step { border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 10px 12px; box-shadow: none; }
+html.nd4 .setup-step:hover { border-color: var(--line-strong); }
+
+/* ---------- Start: Streifen, Bausteine, Kacheln ---------- */
+html.nd4 #view[data-v="start"] > .page-head { display: none; }
+html.nd4 .start-home { display: grid !important; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+html.nd4 .start-home > * { grid-column: 1 / -1; margin: 0 !important; }
+html.nd4 .start-home > .st-hero { grid-row: 1; background: var(--tint) !important; color: var(--ink) !important; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px 22px; box-shadow: none; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+html.nd4 .start-home > .st-hero::before, html.nd4 .start-home > .st-hero::after { display: none !important; }
+html.nd4 .st-hero .title-img { display: none; }
+html.nd4 .start-home > .st-hero { align-items: flex-start !important; text-align: left; }
+html.nd4 .start-home .st-stand, html.nd4 .start-home .st-zeit { flex: none !important; width: auto !important; }
+html.nd4 .st-zeit { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+html.nd4 .st-zeit b { font-size: 40px; font-weight: 600; letter-spacing: -0.04em; line-height: 1; color: var(--accent) !important; }
+html.nd4 .st-zeit span { font-size: 15px; font-weight: 500; color: var(--ink) !important; }
+html.nd4 .st-stand { display: flex !important; gap: 4px 16px; flex-wrap: wrap; background: none !important; padding: 0 !important; margin: 0 !important; }
+html.nd4 .st-stand button { display: inline-flex !important; flex-direction: row !important; align-items: baseline; gap: 4px; background: none !important; border: 0 !important; padding: 0 !important; min-height: 0 !important; color: var(--muted) !important; font-size: 13px; box-shadow: none !important; cursor: pointer; }
+html.nd4 .st-stand button b { font-size: 13px !important; font-weight: 600; color: var(--ink) !important; }
+html.nd4 .st-stand button span { font-size: 13px !important; color: var(--muted) !important; }
+html.nd4 .st-stand button:hover span { color: var(--accent) !important; text-decoration: underline; text-underline-offset: 3px; }
+html.nd4 .st-stand button.warn b, html.nd4 .st-stand button.warn span { color: var(--late) !important; }
+html.nd4 .st-stand .sos-k { color: var(--late) !important; }
+html.nd4 .start-home > .st-akt { grid-row: 1; justify-self: end; align-self: start; margin: 18px 20px 0 0 !important; display: flex !important; gap: 6px; flex-wrap: wrap; justify-content: flex-end; max-width: 55%; z-index: 1; background: none !important; }
+html.nd4 .st-akt button { min-height: 0 !important; height: 34px; padding: 0 13px 0 10px !important; border-radius: 999px !important; border: 0 !important; background: var(--surface) !important; color: var(--ink) !important; flex-direction: row !important; gap: 6px !important; font-size: 13px !important; font-weight: 500; box-shadow: 0 0 0 1px var(--line) !important; }
+html.nd4 .st-akt button:first-child { background: var(--accent) !important; color: var(--accent-ink) !important; box-shadow: none !important; }
+html.nd4 .st-akt button:hover { background: var(--hover) !important; }
+html.nd4 .st-akt button:first-child:hover { background: var(--accent-hover) !important; }
+html.nd4 .st-akt button svg { width: 16px !important; height: 16px !important; color: inherit !important; }
+html.nd4 .start-home > [data-karte="fuerdich"] { grid-column: 1; grid-row: span 3; }
+html.nd4 .start-home > [data-karte="hoeck"], html.nd4 .start-home > [data-karte="neu"], html.nd4 .start-home > [data-karte="ressort"] { grid-column: 2; }
+html.nd4 .st-card { border-radius: var(--r-lg); }
+html.nd4 .st-card .card-head h2 { font-size: 13px; font-weight: 600; color: var(--muted); }
+html.nd4 .st-list { padding: 0 18px 8px; }
+html.nd4 .st-row { min-height: 44px; padding: 9px 0 !important; font-size: 14px; border-bottom: 1px solid var(--line); background: none !important; }
+html.nd4 .st-row:last-child { border-bottom: 0; }
+html.nd4 .st-row:hover .st-t { color: var(--accent); }
+html.nd4 .st-t { font-size: 14px; font-weight: 500; } html.nd4 .st-t small { font-size: 12.5px; color: var(--muted); font-weight: 400; }
+html.nd4 .st-row.late small { color: var(--late); }
+html.nd4 .st-go { color: var(--faint); }
+html.nd4 .st-hk b { font-size: 15px; font-weight: 600; }
+html.nd4 .st-hk span { font-size: 13px; color: var(--muted); }
+html.nd4 .nd4-leer .card-body { display: flex; flex-direction: column; gap: 2px; }
+html.nd4 .nd4-leer b { font-size: 15px; font-weight: 600; }
+html.nd4 .nd4-leer .link { align-self: flex-start; margin-top: 6px; }
+html.nd4 .st-links { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; background: none !important; border: 0 !important; border-radius: 0 !important; overflow: visible !important; }
+html.nd4 .st-links button { display: flex !important; align-items: center; gap: 12px; min-height: 58px; padding: 10px 14px !important; border: 1px solid var(--line) !important; border-radius: 12px !important; background: var(--surface) !important; font-size: 14px !important; font-weight: 500; color: var(--ink); text-align: left; transition: border-color var(--t) var(--ease), box-shadow var(--t) var(--ease); }
+html.nd4 .st-links button:hover { border-color: var(--line-strong) !important; box-shadow: 0 4px 14px -8px rgb(21 21 31 / 0.25); }
+html.nd4 .st-links button > span:last-child { margin-left: auto; color: var(--faint); }
+html.nd4 .nd4-ico { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; flex: none; }
+html.nd4 .nd4-ico svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+html.nd4 .st-anpassen { text-align: center; }
+html.nd4 .wx-alarm { border-radius: var(--r-lg); }
+
+/* ---------- Aufgaben: Filterliste links, Karten in Spalten ---------- */
+/* Ein Knopf «Offen · 206 ▾» mit Auswahl, Darstellung und gespeicherten Ansichten */
+.nd4-filter { position: relative; flex: none; }
+.nd4-filter .nd4-fknopf { display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 13px; border: 0; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font: 600 13.5px/1 var(--font); cursor: pointer; white-space: nowrap; }
+.nd4-filter .nd4-fknopf::after { content: ""; width: 6px; height: 6px; border-right: 1.6px solid currentColor; border-bottom: 1.6px solid currentColor; transform: rotate(45deg) translateY(-2px); }
+.nd4-panel { display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 40; width: 260px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-3); padding: 6px; animation: nd4-pop 140ms var(--ease); }
+.nd4-filter.offen .nd4-panel { display: flex; flex-direction: column; gap: 1px; }
+.nd4-panel .nd4-rl { margin: 8px 10px 4px; font-size: 12px; font-weight: 600; color: var(--faint); }
+.nd4-panel .nd4-rl:first-child { margin-top: 4px; }
+html.nd4 .nd4-panel .nd4-dar { display: flex; width: auto; margin: 0 4px 4px; }
+html.nd4 .nd4-panel .nd4-dar { flex-wrap: nowrap; }
+html.nd4 .nd4-panel .nd4-dar button { flex: 1 1 auto; padding: 0 6px; font-size: 12.5px; white-space: nowrap; }
+html.nd4 #view[data-v="tasks"] .task-tools .info { display: none; }
+.nd4-panel .nd4-ans:empty { display: none; }
+.nd4-panel .nd4-ans { display: flex; flex-direction: column; gap: 1px; }
+.nd4-panel .nd4-ans button { display: flex; align-items: center; width: 100%; height: 32px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: var(--ink-2); font: 500 13.5px/1 var(--font); text-align: left; cursor: pointer; }
+.nd4-panel .nd4-ans button:hover { background: var(--hover); color: var(--ink); }
+.nd4-panel .nd4-ans [data-view-save] { color: var(--accent); }
+@media (max-width: 760px) { .nd4-panel .nd4-ans button { height: 42px; font-size: 15px; } }
+html.nd4 #view[data-v="tasks"] .task-tools { align-items: center; }
+html.nd4 .nd4-filter .subtabs { display: flex !important; flex-direction: column; width: auto; background: none !important; padding: 0 !important; border-radius: 0 !important; gap: 1px; overflow: visible; position: static !important; margin: 0 !important; }
+html.nd4 .nd4-filter .subtabs button { width: 100%; justify-content: space-between; display: flex; align-items: center; height: 32px; padding: 0 10px !important; border-radius: 8px !important; color: var(--muted) !important; font-size: 13.5px; font-weight: 500; background: none !important; box-shadow: none !important; text-align: left; }
+html.nd4 .nd4-filter .subtabs button:hover { background: var(--hover) !important; color: var(--ink) !important; }
+html.nd4 .nd4-filter .subtabs button[aria-selected="true"] { background: var(--accent-soft) !important; color: var(--accent) !important; box-shadow: none !important; }
+html.nd4 .nd4-filter .subtabs .n { margin-left: auto; opacity: 0.6; font-size: 12.5px; }
+.nd4-filter .nd4-rl { margin: 16px 10px 4px; font-size: 12px; font-weight: 600; color: var(--faint); }
+.nd4-filter .nd4-ress button { width: 100%; display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: var(--muted); font: 400 13.5px/1 var(--font); cursor: pointer; text-align: left; }
+.nd4-filter .nd4-ress button:hover { background: var(--hover); color: var(--ink); }
+.nd4-filter .nd4-ress button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+.nd4-filter .nd4-ress button i { margin-left: auto; font-style: normal; font-size: 12.5px; color: var(--faint); }
+.nd4-filter .nd4-ress .rdot { flex: none; margin: 0 !important; }
+.nd4-filter .nd4-ress button { justify-content: flex-start; }
+html.nd4 .back-link { justify-self: start; align-self: start; text-align: left; }
+html.nd4 #view[data-v="tasks"] .quick-add { margin: 0; }
+html.nd4 #view[data-v="tasks"] > section.card:has(#task-list) { border: 0; border-radius: 0; background: transparent; }
+html.nd4 #view[data-v="tasks"] > section.card:has(#task-list) > .toolbar:first-child { padding: 0 0 8px; }
+html.nd4 #view[data-v="tasks"] .task-tools { padding: 0 0 12px !important; }
+html.nd4 #view[data-v="tasks"] #task-list > .table-wrap { border: 1px solid var(--line); border-radius: var(--r-lg); }
+.nd4-brett { display: grid; grid-template-columns: repeat(var(--sp, 3), minmax(0, 1fr)); gap: 14px; align-items: start; }
+.nd4-sp h3 { margin: 0 0 8px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.nd4-sp h3 i { font-style: normal; font-weight: 500; color: var(--faint); }
+.nd4-sp.late h3 { color: var(--late); } .nd4-sp.late h3 i { color: var(--late); opacity: 0.7; }
+.nd4-sp.ok h3 { color: var(--ok); }
+.nd4-karte { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; background: var(--surface); cursor: pointer; transition: border-color var(--t) var(--ease), box-shadow var(--t) var(--ease); }
+.nd4-karte:hover { border-color: var(--line-strong); box-shadow: 0 4px 14px -8px rgb(21 21 31 / 0.25); }
+.nd4-karte.sel { border-color: var(--accent); box-shadow: var(--ring); }
+.nd4-k1 { display: flex; gap: 10px; align-items: flex-start; }
+.nd4-k1 .qdone { margin-top: 1px; }
+.nd4-kt { flex: 1; min-width: 0; border: 0; background: none; padding: 0; text-align: left; font: 500 13.5px/1.35 var(--font); color: var(--ink); cursor: pointer; }
+.nd4-sp.late .nd4-kt { color: var(--late); }
+.nd4-karte.done .nd4-kt { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--faint); }
+.nd4-k1 .star { font-size: 12px; }
+.nd4-k2 { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); padding-left: 28px; min-width: 0; }
+.nd4-k2 > span:not(.av) { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nd4-k2 .dt { margin-left: auto; flex: none; }
+.nd4-k2 .dt.late { color: var(--late); font-weight: 500; }
+.nd4-k2 .av { width: 18px; height: 18px; font-size: 8.5px; line-height: 18px; flex: none; }
+.nd4-k2 .nd4-niemand { width: 18px; height: 18px; border-radius: 50%; background: var(--fill); color: var(--muted); font-size: 10px; display: grid; place-items: center; flex: none; }
+.nd4-weitere { border: 0; background: none; color: var(--accent); font: 500 13px/1 var(--font); padding: 4px 2px; cursor: pointer; }
+.nd4-sp .nd4-nichts { font-size: 13px; color: var(--faint); padding: 6px 2px; }
+
+/* ---------- Protokoll, Mitteilungen ---------- */
+html.nd4 .entry { padding: 14px 18px; gap: 16px; border-bottom: 1px solid var(--line); }
+html.nd4 .entry:last-child { border-bottom: 0; }
+html.nd4 .entry .d { font-size: 13.5px; font-weight: 600; }
+html.nd4 .entry .d small { font-size: 12px; color: var(--muted); font-weight: 400; }
+html.nd4 .entry h3 { font-size: 15px; font-weight: 600; }
+html.nd4 .entry-link:hover, html.nd4 .mrow:hover { background: var(--subtle); }
+html.nd4 .mrow { padding: 12px 18px; border-color: var(--line); }
+html.nd4 .mention { border-radius: 4px; padding: 0 3px; background: var(--accent-soft); color: var(--accent); }
+
+/* ---------- Fenster ---------- */
+html.nd4 .overlay { background: rgb(14 14 30 / 0.30); }
+@media (min-width: 761px) {
+  html.nd4 .overlay:not(.center) .drawer { width: min(540px, 100%); border-left: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow-3); animation: nd4-slide 220ms var(--ease); }
+  html.nd4 .modal { border: 1px solid var(--line); border-radius: 18px; padding: 24px; background: var(--surface); box-shadow: var(--shadow-3); animation: nd4-dialog 180ms var(--ease); }
+}
+@keyframes nd4-slide { from { transform: translateX(20px); opacity: 0.5; } to { transform: none; opacity: 1; } }
+@keyframes nd4-dialog { from { transform: translateY(8px) scale(0.98); opacity: 0; } to { transform: none; opacity: 1; } }
+html.nd4 .drawer-head { padding: 18px 22px 10px; border-bottom: 0; background: var(--surface); }
+html.nd4 .drawer-head h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
+html.nd4 .drawer-body { padding: 8px 22px 22px; gap: 16px; }
+html.nd4 .drawer-foot { padding: 12px 22px; border-top: 1px solid var(--line); background: var(--surface); }
+html.nd4 .lg-head h2 { font-size: 19px; font-weight: 600; letter-spacing: -0.02em; }
+html.nd4 .modal input:not([type="checkbox"]):not([type="radio"]) { height: 40px; font-size: 15px; }
+html.nd4 .modal .btn.primary { height: 40px; font-size: 14.5px; }
+html.nd4 .role-btn { border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; background: var(--surface); }
+html.nd4 .role-btn:hover { border-color: var(--accent-line); background: var(--accent-soft); }
+html.nd4 .cmdk-in { border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-3); }
+html.nd4 .bell-row:hover, html.nd4 .cmdk-row.on, html.nd4 .cmdk-row:hover { background: var(--hover); }
+
+/* ---------- Lagerwahl und Anmelden ---------- */
+html.nd4 .start { background: var(--bg); }
+html.nd4 .lager-card { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); box-shadow: none; }
+html.nd4 .lager-card:hover { border-color: var(--line-strong); box-shadow: var(--shadow-2); }
+
+/* ---------- Kleinteile ---------- */
+html.nd4 .toast { background: var(--ink); color: var(--bg); border-radius: 12px; font-size: 13.5px; font-weight: 500; padding: 10px 16px; box-shadow: var(--shadow-2); }
+html.nd4 .empty { padding: 32px 16px; color: var(--muted); font-size: 14px; }
+html.nd4 .empty b { color: var(--ink-2); font-size: 15px; font-weight: 600; }
+html.nd4 .hint.wichtig { border-radius: var(--r); }
+html.nd4 .pchip-s { border-radius: 999px; font-size: 13px; padding: 2px 10px 2px 2px; background: var(--fill); border: 0; }
+html.nd4 .fab { border-radius: 50%; background: var(--accent); color: #ffffff; box-shadow: 0 8px 24px -8px var(--accent); }
+html.nd4 .fab:hover { background: var(--accent-hover); }
+html.nd4 .kb-col { background: var(--subtle); border: 0; border-radius: var(--r-lg); }
+html.nd4 .kb-card { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); box-shadow: none; }
+html.nd4 .kb-card:hover { box-shadow: var(--shadow-2); }
+html.nd4 .preview-bar { background: var(--tint); color: var(--ink-2); border-bottom: 1px solid var(--line); }
+
+/* ---------- Handy ---------- */
+@media (max-width: 760px) {
+  html.nd4 body { font-size: 15px; }
+  html.nd4 .appbar { background: var(--side); color: #ffffff; border-bottom: 0; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  html.nd4 .ab-title b { color: #ffffff; font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
+  html.nd4 .ab-title span { color: var(--dim); }
+  html.nd4 .ab-btn { color: #ffffff; }
+  html.nd4 .ab-btn:active { background: rgb(255 255 255 / 0.12); }
+  html.nd4 .ab-back svg { color: #ffffff; }
+  html.nd4 .ab-sos svg { width: 17px; height: 17px; }
+  html.nd4 .ab-sos { width: 34px; height: 34px; margin: 0 4px; background: #c01030; color: #ffffff; }
+  html.nd4 .ab-btn .count { background: #ff5d79; }
+  html.nd4 .page { padding-top: 14px !important; gap: 14px; }
+  html.nd4 .card { border-radius: 14px; }
+  html.nd4 .card-head { padding: 12px 14px 6px; }
+  html.nd4 .card-head h2 { font-size: 15px; }
+  html.nd4 .card-body { padding: 8px 14px 14px; }
+  html.nd4 .page-tabs { position: sticky !important; top: calc(56px + env(safe-area-inset-top, 0px)); z-index: 6; display: flex; width: auto; margin: 0; }
+  html.nd4 .page-tabs button { flex: 1 0 auto; height: 32px; font-size: 14px; }
+  html.nd4 .page-head .btn { height: 34px; }
+  html.nd4 .ttable tr.task { grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px 10px; padding: 12px 14px; align-items: center; border-bottom: 1px solid var(--line); }
+  html.nd4 .ttable tr.task td { border: 0; padding: 0 !important; background: transparent !important; }
+  html.nd4 .ttable tr.task .c-main { grid-column: 1 / -1; grid-row: 1; }
+  html.nd4 .ttable tr.task .c-date { grid-column: 1; grid-row: 2; width: auto; font-size: 13px; padding-left: 30px !important; }
+  html.nd4 .ttable tr.task .c-who { grid-column: 2; grid-row: 2; min-width: 0; }
+  html.nd4 .ttable tr.task .c-who .take, html.nd4 .ttable tr.task .c-who .plus, html.nd4 .ttable tr.task .t-meta, html.nd4 .ttable tr.task .star:not(.on) { display: none !important; }
+  html.nd4 .ttable tr.task .c-stat { grid-column: 3; grid-row: 2; }
+  html.nd4 .ttable .t-title { font-size: 15px; }
+  html.nd4 .bnav { background: color-mix(in srgb, var(--surface) 92%, transparent) !important; border-top: 1px solid var(--line); }
+  html.nd4 .bnav button { color: var(--faint) !important; font-size: 10.5px !important; font-weight: 500; }
+  html.nd4 .bnav button svg { padding: 3px 0; stroke-width: 1.7; }
+  html.nd4 .bnav button[aria-selected="true"] { color: var(--accent) !important; font-weight: 600; }
+  html.nd4 .bnav button[aria-selected="true"] svg { background: transparent; stroke-width: 2.1; }
+  html.nd4 .fab { width: 54px !important; height: 54px !important; border-radius: 50% !important; }
+  /* Mehr: gruppierte Listen */
+  html.nd4 .mehr-blatt { background: var(--subtle) !important; gap: 14px !important; }
+  html.nd4 .mehr-blatt > * { flex-shrink: 0; }
+  html.nd4 .mehr-q { background: var(--surface); border: 1px solid var(--line) !important; border-radius: 10px; height: 40px; }
+  html.nd4 .mehr-label { font-size: 13px; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--muted); margin: 6px 4px -8px; }
+  html.nd4 .mehr-konto button { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; }
+  html.nd4 .mehr-konto svg { color: var(--accent); }
+  html.nd4 .mehr-grid { display: flex; flex-direction: column; gap: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  html.nd4 .mehr-k { flex-direction: row; justify-content: flex-start; gap: 12px; min-height: 50px; padding: 0 14px; border-radius: 0; background: transparent; font-size: 15px; text-align: left; box-shadow: inset 0 -1px 0 var(--line); }
+  html.nd4 .mehr-k:last-child { box-shadow: none; }
+  html.nd4 .mehr-k svg { width: 17px; height: 17px; padding: 7px; box-sizing: content-box; border-radius: 50%; background: var(--accent-soft); color: var(--accent); }
+  html.nd4 .mehr-k::after { content: ""; order: 3; margin-left: auto; width: 7px; height: 7px; border-right: 1.7px solid var(--faint); border-top: 1.7px solid var(--faint); transform: rotate(45deg); }
+  html.nd4 .mehr-k i { position: static; order: 2; margin-left: auto; }
+  html.nd4 .mehr-k:has(i)::after { margin-left: 10px; }
+  html.nd4 .mehr-k.on { background: transparent; box-shadow: inset 0 -1px 0 var(--line); color: var(--accent); }
+  html.nd4 .mehr-k:active { transform: none; background: var(--hover); }
+  html.nd4 .overlay:not(.center) .drawer, html.nd4 .modal { background: var(--surface); }
+  /* Start am Handy: Streifen, Jetzt dran, dann alle Seiten als Liste */
+  html.nd4 .start-home { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  html.nd4 .start-home > * { grid-column: 1 !important; grid-row: auto !important; }
+  html.nd4 .start-home > .st-hero { order: -3; padding: 16px; }
+  html.nd4 .start-home > .st-akt { order: -2; justify-self: stretch; margin: 0 !important; max-width: none; justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  html.nd4 .start-home > [data-karte="fuerdich"], html.nd4 .start-home > .st-links { order: -1; }
+  html.nd4 .st-zeit b { font-size: 34px; }
+  html.nd4 .st-akt button { flex: none; }
+  html.nd4 .st-links { grid-template-columns: minmax(0, 1fr); gap: 0; border: 1px solid var(--line) !important; border-radius: 14px !important; overflow: hidden !important; background: var(--surface) !important; }
+  html.nd4 .st-links button { border: 0 !important; border-bottom: 1px solid var(--line) !important; border-radius: 0 !important; min-height: 52px; box-shadow: none !important; }
+  html.nd4 .st-links button:last-child { border-bottom: 0 !important; }
+  html.nd4 .st-list { padding: 0 14px 6px; }
+  /* Aufgaben am Handy: Knopf «Offen · 206», Karten untereinander */
+  .nd4-filter .nd4-fknopf { height: 34px; font-size: 14px; }
+  .nd4-panel { width: min(300px, calc(100vw - 32px)); }
+  html.nd4 .nd4-filter .subtabs button { height: 42px; font-size: 15px; }
+  .nd4-brett { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .nd4-kt { font-size: 15px; }
+  .nd4-k2 { font-size: 12.5px; }
+  html.nd4 #view[data-v="tasks"] .task-tools .info { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { html.nd4 *, html.nd4 *::before, html.nd4 *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; } }
+
 </style>
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#141a3d">
+<meta name="theme-color" content="#303090">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1937,7 +2414,7 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px var(--accent-s
   <nav class="bnav" id="bnav" aria-label="Schnellnavigation"></nav>
   <button class="fab" id="qnote" type="button" aria-label="Schnell-Notiz" title="Schnell-Notiz" hidden>+</button>
 </div>
-<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 18:43","test":false};</script>
+<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 21:51","test":false};</script>
 <script>
 // Datenanbindung. Bei Google (google.script.run vorhanden) läuft alles über api() in Code.gs,
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:
@@ -8712,6 +9189,223 @@ window.LaleiStore = (() => {
   checkItems = function () { const out = checkItemsOrigKt(); if (lagerVorbei() && (state.kontakte || []).length) out.push([!nichtBehalten().length || !lagerVorbei(180), "Datenschutz: Adressbuch", nichtBehalten().length ? `${nichtBehalten().length} Kontakte, spätestens 6 Monate nach dem Lager aufräumen` : "aufgeräumt", "adressbuch|"]); return out; };
   const adrUpdateOrig = views.adressbuch.update;
   views.adressbuch.update = function () { adrUpdateOrig(); if (isLaLei() && !isReadOnly() && lagerVorbei() && nichtBehalten().length) $("#kt-list").insertAdjacentHTML("afterbegin", `<div class="card-body"><button class="btn small" data-kt-aufraeumen>Nach dem Lager aufräumen (${nichtBehalten().length})</button></div>`); };
+
+  // =====================================================================
+  // Neues Design «Blau mit Bausteinen» (nur mit <html class="nd4">).
+  // Hängt sich an die bestehenden Funktionen an: alle Knöpfe rufen die gleichen Abläufe auf wie bisher.
+  // PC: blaue Leiste oben mit Reitern (Start, Planung, Lager, Allgemein) und den Seiten darunter.
+  // Start: Streifen mit Countdown, Bausteine, Kacheln. Aufgaben: Filterliste links, Karten in Spalten.
+  // =====================================================================
+  NEUES.unshift({ id: "2026-11-design", titel: "Neu: frisches Aussehen", punkte: [
+    "Oben eine blaue Leiste mit den Bereichen Start, Planung, Lager und Allgemein, darunter die Seiten.",
+    "Start: Countdown, «Für dich», nächster Höck und alle Seiten als Kacheln.",
+    "Aufgaben als Karten nach Dringlichkeit. Der Knopf «Offen» wählt, was angezeigt wird, und wie (Karten, Liste, Personen, Kanban).",
+    "Konto, Einstellungen, Hilfe und Abmelden findest du oben rechts unter deinem Kürzel.",
+  ] });
+  const nd4an = () => document.documentElement.classList.contains("nd4");
+  const ND4 = { aktiv: "", mehr: {}, malen: 0 };
+  const nd4Txt = (b) => [...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim();
+  const nd4Svg = {
+    such: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
+    glocke: '<svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>',
+    tel: '<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+    lager: '<svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V10l7-6 7 6v10"/><path d="M10 20v-5h4v5"/></svg>',
+    raus: '<svg viewBox="0 0 24 24"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg>',
+    fb: '<svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/><path d="M8 9h8M8 12h5"/></svg>',
+    team: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+    app: '<svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M12 7v7M9 11l3 3 3-3"/></svg>',
+    ds: '<svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>',
+  };
+
+  // ---------- Reiter aus der bisherigen Seitenleiste ableiten ----------
+  function nd4Gruppen() {
+    const nav = $("#tabs"); if (!nav) return { start: null, gruppen: [], extra: [] };
+    const home = isLaLei() ? "start" : "home";
+    let start = null; const gruppen = []; const extra = []; let g = null; let nachSep = false;
+    for (const el of nav.children) {
+      if (el.classList.contains("fav-label") || el.classList.contains("fav-btn") || el.classList.contains("back")) continue;
+      if (el.classList.contains("nav-label")) { g = el.hidden ? null : { name: el.textContent.trim(), items: [] }; if (g) gruppen.push(g); continue; }
+      if (el.classList.contains("nav-sep")) { nachSep = true; g = null; continue; }
+      if (el.tagName !== "BUTTON" || !el.dataset.view || el.hidden) continue;
+      if (el.dataset.view === home) { start = el; continue; }
+      if (nachSep) { extra.push(el); continue; }
+      if (g) g.items.push(el);
+    }
+    return { start, gruppen: gruppen.filter((x) => x.items.length), extra };
+  }
+  function nd4Favs() {
+    const nav = $("#tabs"); if (!nav) return [];
+    return [...nav.querySelectorAll(".fav-btn[data-view]")].map((f) => nav.querySelector(`button[data-view="${f.dataset.view}"]:not(.fav-btn)`)).filter((b) => b && !b.hidden);
+  }
+  function nd4Kopf() {
+    let k = $("#nd4-kopf"); if (k) return k;
+    const c = $(".content"); if (!c) return null;
+    c.insertAdjacentHTML("afterbegin", `<div id="nd4-kopf"><header class="nd4-top"><button class="nd4-marke" type="button" data-nd4-start aria-label="Zur Startseite"></button><nav class="nd4-reiter" aria-label="Bereiche"></nav>
+      <div class="nd4-werk"><button type="button" data-nd4="such" aria-label="Suchen (Strg+K)" title="Suchen (Strg+K)">${nd4Svg.such}</button><button type="button" data-nd4="glocke" aria-label="Mitteilungen" title="Mitteilungen">${nd4Svg.glocke}<span class="nd4-zahl" hidden></span></button><button type="button" class="nd4-sos" data-nd4="sos">${nd4Svg.tel}Notfall</button><button type="button" class="nd4-ich" data-nd4="ich" aria-label="Konto und Einstellungen" aria-haspopup="menu"></button></div></header>
+      <nav class="nd4-unter" aria-label="Seiten"></nav></div>`);
+    return $("#nd4-kopf");
+  }
+  function nd4Malen() {
+    if (!nd4an() || !state.lagerId) return; const k = nd4Kopf(); if (!k) return;
+    const { start, gruppen } = nd4Gruppen();
+    const lg = lagerLogo(); const L = lagerDoc();
+    $(".nd4-marke", k).innerHTML = lg ? `<span class="nd4-chip">${logoImg(lg)}</span>` : `<span class="nd4-mark">${esc($("#brand-mark") ? $("#brand-mark").textContent : "LL")}</span><b>${esc(L.title || "Lager-Tool")}</b>`;
+    // aktive Gruppe: die mit der gewählten Seite
+    const sel = $('#tabs button[data-view][aria-selected="true"]:not(.fav-btn)');
+    let aktiv = ND4.aktiv;
+    if (sel && start && sel === start) aktiv = "start";
+    else if (sel) { const g = gruppen.find((x) => x.items.includes(sel)); if (g) aktiv = g.name; else aktiv = ""; }
+    if (!aktiv) aktiv = state.view === (isLaLei() ? "start" : "home") ? "start" : ND4.aktiv || "start";
+    ND4.aktiv = aktiv;
+    if (sel && aktiv !== "start") { try { localStorage.setItem("nd4-letzte-" + aktiv, sel.dataset.view); } catch {} }
+    const zaehlt = (g) => g.items.some((b) => { const c = b.querySelector(".count"); return c && !c.hidden && c.textContent.trim(); });
+    $(".nd4-reiter", k).innerHTML = (start ? [`<button type="button" data-nd4-g="start" ${aktiv === "start" ? 'aria-current="page"' : ""}>Start</button>`] : []).concat(gruppen.map((g) => `<button type="button" data-nd4-g="${esc(g.name)}" ${aktiv === g.name ? 'aria-current="page"' : ""}>${esc(g.name)}${aktiv !== g.name && zaehlt(g) ? '<i class="nd4-n" aria-hidden="true"></i>' : ""}</button>`)).join("");
+    // Seiten der aktiven Gruppe (beim Start: die Favoriten)
+    const u = $(".nd4-unter", k);
+    const knopf = (b) => { const c = b.querySelector(".count"); const an = (localStorage.getItem(isLaLei() ? "lalei-favoriten-lalei" : "lalei-favoriten-team") || "").includes(`"${b.dataset.view}"`);
+      return `<button type="button" data-nd4-v="${esc(b.dataset.view)}" ${b.getAttribute("aria-selected") === "true" ? 'aria-current="page"' : ""}>${esc(nd4Txt(b))}${c && !c.hidden && c.textContent.trim() ? `<span class="count">${esc(c.textContent)}</span>` : ""}<span class="fav-stern ${an ? "an" : ""}" data-fav="${esc(b.dataset.view)}" title="${an ? "Nicht mehr als Favorit" : "Als Favorit auf den Start"}" aria-hidden="true">${an ? "★" : "☆"}</span></button>`; };
+    if (aktiv === "start") { const f = nd4Favs(); u.hidden = !f.length; u.innerHTML = f.length ? `<span class="nd4-fav">Favoriten</span>${f.map(knopf).join("")}` : ""; }
+    else { const g = gruppen.find((x) => x.name === aktiv); u.hidden = !g; u.innerHTML = g ? g.items.map(knopf).join("") : ""; }
+    // Glocke, eigener Name, Sync
+    const n = typeof bellItems === "function" ? bellItems().filter((x) => x.unread).length : 0; const z = $(".nd4-zahl", k); z.hidden = !n; z.textContent = n > 9 ? "9+" : n;
+    const ich = $(".nd4-ich", k); ich.textContent = initials(me() || "?"); ich.title = (me() || "") + " · " + (isLaLei() ? "Lagerleitung" : "Team");
+    const sy = ($("#sync-state") || {}).textContent || ""; ich.classList.toggle("wartet", /wartet|offline|nicht/i.test(sy));
+    $(".nd4-sos", k).hidden = !$("#sos") || $("#sos").hidden;
+  }
+  function nd4Bald() { if (ND4.malen) return; ND4.malen = requestAnimationFrame(() => { ND4.malen = 0; nd4Malen(); }); }
+  const renderSideOrigN4 = renderSide;
+  renderSide = function () { renderSideOrigN4(); nd4Malen(); };
+  const renderOrigN4 = render;
+  render = function () { renderOrigN4(); nd4Malen(); };
+  if ($("#tabs")) new MutationObserver(nd4Bald).observe($("#tabs"), { subtree: true, childList: true, attributes: true, attributeFilter: ["aria-selected", "hidden"] });
+
+  // ---------- Menü unter dem eigenen Namen ----------
+  function nd4MenueZu() { const m = $(".nd4-menue"); if (m) m.remove(); }
+  function nd4Menue(btn) {
+    if ($(".nd4-menue")) return nd4MenueZu();
+    const { extra } = nd4Gruppen(); const installiert = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+    const svgOf = (b) => (b.querySelector("svg") ? b.querySelector("svg").outerHTML : "");
+    const m = document.createElement("div"); m.className = "nd4-menue"; m.setAttribute("role", "menu");
+    m.innerHTML = `<div class="nd4-wer">${av(me() || "?")}<div><b>${esc(me() || "–")}</b><span>${isReadOnly() ? "Nur lesen" : isLaLei() ? "Lagerleitung" : "Team"} · ${esc(lagerDoc().title || "")}</span></div></div>
+      <button type="button" role="menuitem" data-nd4m="lager">${nd4Svg.lager}Alle Lager</button>
+      ${extra.map((b) => { const c = b.querySelector(".count"); return `<button type="button" role="menuitem" data-nd4m-v="${esc(b.dataset.view)}">${svgOf(b)}${esc(nd4Txt(b))}${c && !c.hidden && c.textContent.trim() ? `<span class="count">${esc(c.textContent)}</span>` : ""}</button>`; }).join("")}
+      <button type="button" role="menuitem" data-nd4m="fb">${nd4Svg.fb}Feedback zum Tool</button>
+      ${isLaLei() && !state.asTeam ? `<button type="button" role="menuitem" data-nd4m="team">${nd4Svg.team}Als Team ansehen</button>` : ""}
+      ${state.asTeam ? `<button type="button" role="menuitem" data-nd4m="lalei">${nd4Svg.team}Zurück zur Lagerleitung</button>` : ""}
+      ${installiert ? "" : `<button type="button" role="menuitem" data-nd4m="app">${nd4Svg.app}Als App installieren</button>`}
+      <button type="button" role="menuitem" data-nd4m="ds">${nd4Svg.ds}Datenschutz</button>
+      <hr><div class="nd4-sync">${esc(($("#sync-state") || {}).textContent || "")}${STORE.version ? " · Version " + esc(STORE.version) : ""}</div>
+      <button type="button" role="menuitem" class="nd4-raus" data-nd4m="logout">${nd4Svg.raus}Abmelden</button>`;
+    document.body.appendChild(m);
+    const r = btn.getBoundingClientRect(); m.style.top = Math.round(r.bottom + 8) + "px"; m.style.right = Math.max(8, Math.round(window.innerWidth - r.right)) + "px";
+    m.onclick = (e) => {
+      const v = e.target.closest("[data-nd4m-v]"); if (v) { nd4MenueZu(); return setView(v.dataset.nd4mV); }
+      const a = e.target.closest("[data-nd4m]"); if (!a) return; const k = a.dataset.nd4m; nd4MenueZu();
+      if (k === "lager") return $("[data-home]") && $("[data-home]").click();
+      if (k === "fb") return toolFeedbackOpen();
+      if (k === "team") return setAsTeam(true);
+      if (k === "lalei") return setAsTeam(false);
+      if (k === "app") return appInstallieren();
+      if (k === "ds") return showDatenschutz();
+      if (k === "logout") return $("#logout") && $("#logout").click();
+    };
+  }
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest) return;
+    if ($(".nd4-menue") && !e.target.closest(".nd4-menue, [data-nd4='ich']")) nd4MenueZu();
+    const kopf = e.target.closest("#nd4-kopf"); if (!kopf || e.target.closest("[data-fav]")) return;
+    if (e.target.closest("[data-nd4-start]")) return setView(isLaLei() ? "start" : "home");
+    const g = e.target.closest("[data-nd4-g]");
+    if (g) {
+      const name = g.dataset.nd4G; const { start, gruppen } = nd4Gruppen();
+      if (name === "start") return start && start.click();
+      const gr = gruppen.find((x) => x.name === name); if (!gr) return;
+      let ziel = null; try { ziel = localStorage.getItem("nd4-letzte-" + name); } catch {}
+      const b = gr.items.find((x) => x.dataset.view === ziel) || gr.items[0]; ND4.aktiv = name; return b.click();
+    }
+    const v = e.target.closest("[data-nd4-v]"); if (v) { const b = $(`#tabs button[data-view="${v.dataset.nd4V}"]:not(.fav-btn)`); return b ? b.click() : setView(v.dataset.nd4V); }
+    const w = e.target.closest("[data-nd4]"); if (!w) return;
+    if (w.dataset.nd4 === "such") return cmdk();
+    if (w.dataset.nd4 === "glocke") return bellOpen();
+    if (w.dataset.nd4 === "sos") return showSos();
+    if (w.dataset.nd4 === "ich") return nd4Menue(w);
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") nd4MenueZu(); });
+  window.addEventListener("resize", nd4MenueZu);
+
+  // ---------- Start: fehlender Höck als Baustein, Kacheln mit Symbol ----------
+  const startUpdN4 = views.start.update;
+  views.start.update = function () {
+    startUpdN4(); if (!nd4an()) return; const b = $("#start-body"); if (!b || $(".heute-hero", b)) return;
+    if (!$('[data-karte="hoeck"]', b)) {
+      const kann = isLaLei() && !isReadOnly() && !isClosed() && !state.asTeam; const nach = $('[data-karte="fuerdich"]', b);
+      const html = `<section class="card st-card nd4-leer" data-karte="hoeck"><div class="card-head"><h2>Nächster Höck</h2></div><div class="card-body"><b>Noch nicht geplant</b>${kann ? '<button class="link" data-new-hoeck>Höck planen</button>' : ""}</div></section>`;
+      if (nach) nach.insertAdjacentHTML("afterend", html); else b.insertAdjacentHTML("beforeend", html);
+      const p = (() => { try { return JSON.parse(store.get("lalei-start-karten") || "{}"); } catch { return {}; } })();
+      const neu = $('[data-karte="hoeck"]', b); if ((p.aus || []).includes("hoeck")) neu.hidden = true; const i = (p.ordnung || []).indexOf("hoeck"); if (i >= 0) neu.style.order = String(10 + i);
+    }
+    b.querySelectorAll(".st-links button[data-goto]").forEach((x) => { if ($(".nd4-ico", x)) return; const nb = $(`#tabs button[data-view="${x.dataset.goto}"]:not(.fav-btn)`); const s = nb && nb.querySelector("svg"); x.insertAdjacentHTML("afterbegin", `<span class="nd4-ico">${s ? s.outerHTML : ""}</span>`); });
+  };
+
+  // ---------- Aufgaben: Karten in Spalten nach Dringlichkeit ----------
+  try { if (nd4an()) state.taskView = localStorage.getItem("nd4-tview") || "spalten"; } catch {}
+  document.addEventListener("click", (e) => { const t = e.target.closest && e.target.closest("[data-tview]"); if (t && nd4an()) { try { localStorage.setItem("nd4-tview", t.dataset.tview); } catch {} } }, true);
+  const tasksShellN4 = views.tasks.shell;
+  views.tasks.shell = () => { const h = tasksShellN4(); return nd4an() ? h.replace('<button type="button" data-tview="liste"', `<button type="button" data-tview="spalten" aria-pressed="${state.taskView === "spalten"}">Karten</button><button type="button" data-tview="liste"`) : h; };
+  function nd4Karte(t) {
+    const late = isLate(t), done = t.status === "Erledigt";
+    return `<div class="nd4-karte ${late ? "late" : ""} ${done ? "done" : ""} ${state.sel && state.sel.has(t._id) ? "sel" : ""}" data-nd4-karte="${esc(t._id)}">
+      <div class="nd4-k1"><button class="qdone ${done ? "on" : ""}" data-qdone="${esc(t._id)}" aria-label="${done ? "Wieder öffnen" : "Als erledigt abhaken"}" title="${done ? "Wieder öffnen" : "Abhaken"}">${done ? "✓" : ""}</button><button class="nd4-kt" data-open="${esc(t._id)}">${t.star ? '<span class="star on" aria-label="wichtig">★</span> ' : ""}${isNew(t) ? '<span class="new-dot" title="Neu oder geändert seit deinem letzten Besuch"></span>' : ""}${esc(t.title)}</button></div>
+      <div class="nd4-k2">${t.owner ? av(t.owner) : '<span class="nd4-niemand" title="Niemand verantwortlich">?</span>'}<span>${ressDot(t.ressort)}${esc(t.ressort)}${t.teil ? " › " + esc(t.teil) : ""}</span>${t.deadline ? `<span class="dt ${late ? "late" : ""}">${fmt(t.deadline).replace(/^\w+, /, "")}</span>` : ""}</div></div>`;
+  }
+  function nd4Spalten(list) {
+    const t0 = iso(today()), lim = addDays(t0, 14);
+    const nach = (a, b) => (b.star ? 1 : 0) - (a.star ? 1 : 0) || (a.deadline || "9999").localeCompare(b.deadline || "9999");
+    const S = [
+      ["late", "Überfällig", (t) => isLate(t)],
+      ["bald", "Nächste 2 Wochen", (t) => t.status !== "Erledigt" && !isLate(t) && t.deadline && t.deadline <= lim],
+      ["spaeter", "Später", (t) => t.status !== "Erledigt" && !isLate(t) && !(t.deadline && t.deadline <= lim)],
+      ["ok", "Erledigt", (t) => t.status === "Erledigt"],
+    ].map(([k, l, f]) => [k, l, list.filter(f).sort(nach)]).filter(([k, , l]) => k !== "ok" || l.length);
+    if (!list.length) return `<div class="empty"><b>Keine Aufgaben</b>Für diese Auswahl gibt es keine Aufgaben.</div>`;
+    const MAX = 30;
+    return `<div class="nd4-brett" style="--sp:${S.length}">${S.map(([k, l, items]) => { const alle = ND4.mehr[k]; const zeig = alle ? items : items.slice(0, MAX);
+      return `<div class="nd4-sp ${k}"><h3>${l} <i>${items.length}</i></h3>${zeig.map(nd4Karte).join("") || '<div class="nd4-nichts">Nichts</div>'}${items.length > zeig.length ? `<button class="nd4-weitere" data-nd4-mehr="${k}">${items.length - zeig.length} weitere</button>` : ""}</div>`; }).join("")}</div>`;
+  }
+  // Ein Knopf statt Filterliste und Ansicht-Knöpfen: «Offen · 206 ▾» öffnet Auswahl, Darstellung und gespeicherte Ansichten
+  function nd4Filter() {
+    const tools = $("#view .task-tools"); if (!tools || state.view !== "tasks") return;
+    let a = $("#nd4-filter");
+    if (!a) {
+      a = document.createElement("div"); a.id = "nd4-filter"; a.className = "nd4-filter";
+      a.innerHTML = `<button type="button" class="nd4-fknopf" aria-expanded="false" aria-haspopup="true"></button><div class="nd4-panel"><div class="nd4-rl">Anzeigen</div><div class="nd4-tabs"></div><div class="nd4-rl">Darstellung</div><div class="nd4-dar seg"></div><div class="nd4-ans"></div></div>`;
+      tools.prepend(a);
+    }
+    const tabs = $("#tabs-tasks"); if (tabs && tabs.parentElement !== $(".nd4-tabs", a)) $(".nd4-tabs", a).append(tabs);
+    const seg = $(".view-seg", tools); if (seg && !a.contains(seg)) { $(".nd4-dar", a).innerHTML = ""; $(".nd4-dar", a).append(...seg.children); seg.remove(); }
+    // gespeicherte Ansichten direkt als Knöpfe (ohne zweites Aufklappen)
+    const ans = [...tools.querySelectorAll(":scope > details.more")].find((d) => /Ansichten/.test((d.querySelector("summary") || {}).textContent || ""));
+    if (ans) { const box = $(".nd4-ans", a); box.innerHTML = '<div class="nd4-rl">Ansichten</div>'; box.append(...ans.querySelectorAll("button")); ans.remove(); }
+    const s = tabs && tabs.querySelector('[aria-selected="true"]'); const k = $(".nd4-fknopf", a);
+    if (s) { const n = s.querySelector(".n"); k.textContent = nd4Txt(s) + (n ? " · " + n.textContent : ""); }
+  }
+  document.addEventListener("click", (e) => { const a = $("#nd4-filter.offen"); if (a && e.target.closest && !e.target.closest("#nd4-filter")) a.classList.remove("offen"); });
+  const tasksUpdN4 = views.tasks.update;
+  views.tasks.update = function () {
+    tasksUpdN4(); if (!nd4an()) return;
+    const box = $("#task-list"); if (box && state.taskView === "spalten" && !state.selMode) box.innerHTML = nd4Spalten(gefilterteAufgaben());
+    nd4Filter();
+  };
+  document.addEventListener("click", (e) => {
+    if (!nd4an() || !e.target.closest) return;
+    const m = e.target.closest("[data-nd4-mehr]"); if (m) { ND4.mehr[m.dataset.nd4Mehr] = true; return views.tasks.update(); }
+    const r = e.target.closest("[data-nd4-ress]");
+    if (r) { const n = r.dataset.nd4Ress; state.filter.ressort = (state.filter.ressort || "").split("|")[0] === n ? "" : n; const s = $("#f-ress"); if (s) s.value = state.filter.ressort; $("#nd4-filter") && $("#nd4-filter").classList.remove("offen"); return views.tasks.update(); }
+    const k = e.target.closest(".nd4-fknopf"); if (k) { const a = k.parentElement; a.classList.toggle("offen"); k.setAttribute("aria-expanded", String(a.classList.contains("offen"))); return; }
+    if (e.target.closest("#nd4-filter [data-ptab], #nd4-filter [data-tview], #nd4-filter [data-view-save], #nd4-filter [data-view-load], #nd4-filter [data-view-manage]")) { const a = $("#nd4-filter"); if (a) a.classList.remove("offen"); }
+    // ganze Karte anklickbar (ausser Abhaken)
+    const c = e.target.closest("[data-nd4-karte]"); if (c && !e.target.closest("button")) { const t = $(".nd4-kt", c); if (t) t.click(); }
+  });
 
   // ---------- boot ----------
   state.jTab = store.get("lalei-jtab") || "all";

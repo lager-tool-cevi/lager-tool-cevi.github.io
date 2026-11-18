@@ -1,5 +1,5 @@
 {
-    "background_color":  "#f4f5fa",
+    "background_color":  "#ffffff",
     "short_name":  "Lager-Tool",
     "icons":  [
                   {
@@ -20,7 +20,7 @@
                       { "name": "Meine Woche", "short_name": "Woche", "url": "./#woche", "icons": [ { "src": "icons/icon-192.png", "sizes": "192x192" } ] }
                   ],
     "lang":  "de",
-    "theme_color":  "#141a3d",
+    "theme_color":  "#303090",
     "display":  "standalone",
     "name":  "Lager-Tool",
     "scope":  "./",
