@@ -2,7 +2,7 @@
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:
 // Anmeldung als Team (nur Name) oder Lagerleitung (Name + Passwort), Admin mit Admin-Passwort.
 window.LaleiStore = (() => {
-  const SHORT = ["tasks", "config", "journal", "hoecks", "people", "kids", "att", "plan", "info", "eval", "assets", "trash", "rooms", "todos", "feedback", "attreq", "daypage", "presence", "media", "board", "swap", "trips", "groups", "count", "shop", "log", "versions", "react"];
+  const SHORT = ["tasks", "config", "journal", "hoecks", "people", "kids", "att", "plan", "info", "eval", "assets", "trash", "rooms", "todos", "feedback", "attreq", "daypage", "presence", "media", "board", "swap", "trips", "groups", "count", "shop", "log", "versions", "react", "kontakte"];
   const TEAM_READ = ["config", "people", "kids", "plan", "rooms", "info", "att", "attreq", "todos", "feedback", "hoecks", "board", "swap", "trips", "groups", "count", "media", "react"];
   const NO_LOG = ["presence", "count", "todos", "feedback", "attreq", "swap", "log", "media", "versions", "react"];
   const TOKEN_DAYS = 60;

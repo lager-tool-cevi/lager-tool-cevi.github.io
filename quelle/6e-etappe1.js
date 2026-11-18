@@ -8,7 +8,7 @@
   });
   const kb = (n) => (n > 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB");
   const ROLLE = { lalei: "Lagerleitung", lesen: "Nur lesen", team: "Team" };
-  const BEREICHE = [["tasks", "Aufgaben"], ["protokoll", "Protokoll und Höcks"], ["people", "Leitende"], ["kids", "Teilnehmende"], ["att", "Anwesenheit"], ["plan", "Schichtplan"], ["einteilung", "Einteilung (Zimmer, Fahrten, Gruppen)"], ["info", "Infos & Links"], ["config", "Lagerdaten und Ressorts"], ["board", "Pinnwand"], ["eval", "Auswertung"], ["daypage", "Tagesseiten"]];
+  const BEREICHE = [["tasks", "Aufgaben"], ["protokoll", "Protokoll und Höcks"], ["people", "Leitende"], ["kids", "Teilnehmende"], ["att", "Anwesenheit"], ["plan", "Schichtplan"], ["einteilung", "Einteilung (Zimmer, Fahrten, Gruppen)"], ["info", "Infos & Links"], ["config", "Lagerdaten und Ressorts"], ["board", "Pinnwand"], ["eval", "Auswertung"], ["daypage", "Tagesseiten"], ["kontakte", "Adressbuch"]];
   const BEREICH_COLLS = { protokoll: ["journal", "hoecks"], einteilung: ["rooms", "trips", "groups"] };
 
   // ---------- Admin ----------
@@ -89,7 +89,7 @@
     const o = modal(`<div class="lg-head"><span class="eyebrow">Lager-Tool</span><h2>Datenschutz</h2></div><div class="rich datenschutz">
       <p><b>Wer?</b> Das Lager-Tool gehört dem Cevi Stäfa-Hombi und wird von der Lagerleitung betreut. Kontakt: <a href="mailto:lagerleitung@cevi-staefa-hombi.ch">lagerleitung@cevi-staefa-hombi.ch</a>.</p>
       <p><b>Wozu?</b> Nur für die Planung und Durchführung unserer Lager.</p>
-      <p><b>Welche Daten?</b> Von Leitenden: Ceviname, Vor- und Nachname, Stufe, Rolle, Anwesenheit, Einteilungen, Aufgaben und Protokolle, freiwillig Telefon und E-Mail. Von Teilnehmenden: Vorname, Nachname (meist nur der Anfangsbuchstabe), Stufe, Anwesenheit und Einteilung (Zimmer, Gruppe, Fahrt). <b>Keine Gesundheitsdaten.</b></p>
+      <p><b>Welche Daten?</b> Von Leitenden: Ceviname, Vor- und Nachname, Stufe, Rolle, Anwesenheit, Einteilungen, Aufgaben und Protokolle, freiwillig Telefon und E-Mail. Von Teilnehmenden: Vorname, Nachname (meist nur der Anfangsbuchstabe), Stufe, Anwesenheit und Einteilung (Zimmer, Gruppe, Fahrt). <b>Keine Gesundheitsdaten.</b> Im Adressbuch der Lagerleitung: externe Kontakte für die Organisation (z.B. Lagerhaus, Lieferanten) mit Name, Funktion, Telefon und E-Mail. Nur die Lagerleitung sieht es, nach dem Lager wird es aufgeräumt.</p>
       <p><b>Wer sieht was?</b> Die Lagerleitung sieht alles. Das Team sieht seinen eigenen Bereich, Organigramm, Schichtplan, Einteilung und Infos, von Teilnehmenden nur die Namen. Private To-dos und Packlisten sieht nur die Person selbst.</p>
       <p><b>Wo gespeichert?</b> In einer Google-Tabelle und im Google Drive der Lagerleitung (Server von Google, auch in den USA). Die Website liegt auf GitHub und enthält keine Personendaten. Für das Wetter wird nur der Lagerort an open-meteo.com geschickt, für die Schrift wird Google Fonts geladen.</p>
       <p><b>Im Browser</b> speichert das Tool deine Anmeldung, deine Einstellungen und einen Zwischenstand für die Arbeit ohne Netz. Es gibt keine Werbung, kein Tracking und keine Cookies zu Werbezwecken.</p>

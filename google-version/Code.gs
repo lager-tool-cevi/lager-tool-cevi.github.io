@@ -21,7 +21,7 @@ const WEBSITE = 'https://lager-tool-cevi.github.io/';
 const DATEN_BLATT = '_daten';
 const MAX_ZELLE = 49000; // Google Sheets erlaubt höchstens 50'000 Zeichen pro Zelle
 const TOKEN_TAGE = 60;
-const SHORT = ['tasks', 'config', 'journal', 'hoecks', 'people', 'kids', 'att', 'plan', 'info', 'eval', 'assets', 'trash', 'rooms', 'todos', 'feedback', 'attreq', 'daypage', 'presence', 'media', 'board', 'swap', 'trips', 'groups', 'count', 'shop', 'log', 'versions', 'react'];
+const SHORT = ['tasks', 'config', 'journal', 'hoecks', 'people', 'kids', 'att', 'plan', 'info', 'eval', 'assets', 'trash', 'rooms', 'todos', 'feedback', 'attreq', 'daypage', 'presence', 'media', 'board', 'swap', 'trips', 'groups', 'count', 'shop', 'log', 'versions', 'react', 'kontakte'];
 const TEAM_READ = ['config', 'people', 'kids', 'plan', 'rooms', 'info', 'att', 'attreq', 'todos', 'feedback', 'hoecks', 'board', 'swap', 'trips', 'groups', 'count', 'media', 'react'];
 const NO_LOG = ['presence', 'count', 'todos', 'feedback', 'attreq', 'swap', 'log', 'media', 'versions', 'react'];
 

@@ -1348,6 +1348,7 @@
         const tips = {}; for (const [rid, ev] of Object.entries(src.eval || {})) if ((ev.tips || "").trim()) tips[rid === "general" ? "Allgemein" : (ress[rid] || {}).name || rid] = ev.tips;
         config = { ressorts: ress, milestones: ms, dates: { firstSession: sh(sc.dates?.firstSession), pauseFrom: "", pauseTo: "", prep, start, end }, days: defaultDays(prep, start, end), dayparts: sc.dayparts || ["Morgen", "Nachmittag", "Abend"], mail: { enabled: false }, prevTips: tips, prevTipsFrom: srcLager.title || "", prevWissen: wissenAus(src, sc, srcLager.title || ""), packlist: sc.packlist || [], agendaDefaults: sc.agendaDefaults || [], dayBlocks: sc.dayBlocks || [] };
         for (const [tid, t] of Object.entries(src.tasks || {})) ops.push({ op: "set", coll: P("tasks"), id: tid, data: { ressort: t.ressort, teil: t.teil || "", title: t.title, note: t.note || "", deadline: sh(t.deadline), status: "Offen", owner: "", support: "", order: t.order ?? 0, checklist: (t.checklist || []).map((c) => ({ t: c.t, done: false })), links: t.links || [] } });
+        for (const [kid, k] of Object.entries(src.kontakte || {})) if (k.behalten) ops.push({ op: "set", coll: P("kontakte"), id: kid, data: k });
         if ($("#nl-people").checked) for (const [pid, p] of Object.entries(src.people || {})) ops.push({ op: "set", coll: P("people"), id: pid, data: { ...p, funktion: "" } });
         if ($("#nl-info").checked && src.info && src.info.main) info = src.info.main;
         if (src.plan && src.plan.main) plan = { services: src.plan.main.services || defaultServices(), cells: {} };
@@ -2539,7 +2540,7 @@
     on("attreq", (snap) => { state.attreq = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
     on("daypage", (snap) => { state.daypages = new Map(snap.docs.map((d) => [d.id, d.data()])); });
     on("presence", (snap) => { state.presence = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
-    for (const c of ["board", "swap", "trips", "groups", "versions", "react"]) on(c, (snap) => { state[c] = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
+    for (const c of ["board", "swap", "trips", "groups", "versions", "react", "kontakte"]) on(c, (snap) => { state[c] = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
     for (const c of ["count", "shop", "log", "media"]) on(c, () => {});
     STORE.onLoggedOut((id) => { if (state.lagerId === id) { toast("Bitte melde dich neu an."); showStart(); showLogin(id); } });
     const last = store.get("lalei-lager");
