@@ -1572,6 +1572,8 @@ html:has(.overlay), html:has(.cmdk), html:has(.hoeck-mode), body:has(.overlay), 
 .st-links button:first-child { border-top: 0; } .st-links button span { color: var(--muted); font-size: 20px; }
 .st-card .card-head { padding-bottom: 8px; }
 
+.neu-scroll { max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+
 /* ===== Tastatur am Handy ===== */
 @media (max-width: 760px) {
   .ab-back { width: auto; padding: 0 8px 0 2px; border-radius: 999px; display: inline-flex; align-items: center; gap: 0; }
@@ -1732,7 +1734,7 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px var(--accent-s
   <nav class="bnav" id="bnav" aria-label="Schnellnavigation"></nav>
   <button class="fab" id="qnote" type="button" aria-label="Schnell-Notiz" title="Schnell-Notiz" hidden>+</button>
 </div>
-<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 13:30","test":true};</script>
+<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 13:33","test":true};</script>
 <script>
 // Datenanbindung. Bei Google (google.script.run vorhanden) läuft alles über api() in Code.gs,
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:
@@ -5890,11 +5892,19 @@ window.LaleiStore = (() => {
       "Ein <b>Datenschutzhinweis</b> erklärt, was gespeichert wird (Einstellungen und Startseite).",
     ] },
   ];
+  // Einmal pro Erneuerung und Gerät: alles Neue seit dem letzten Besuch in einem einzigen Fenster
   function wasIstNeu() {
-    if (!STORE.isGas || $(".overlay")) return; const gesehen = store.get("lager-neu-gesehen") || "";
-    const n = NEUES.find((x) => x.id > gesehen); if (!n) return; store.set("lager-neu-gesehen", NEUES[0].id);
-    if (!gesehen && role() === "team" && store.get(`lalei-tour-${state.lagerId}-${myId()}`) === null) return; // neues Team-Mitglied bekommt die Tour
-    const o = modal(`<div class="lg-head"><span class="eyebrow">Was ist neu</span><h2>${esc(n.titel)}</h2></div><ul class="neu-list">${n.punkte.map((p) => `<li>${p}</li>`).join("")}</ul><div class="lg-foot"><span></span><button class="btn primary" data-neu-ok>Alles klar</button></div>`);
+    if (!STORE.isGas || $(".overlay")) return;
+    let gesehen; try { gesehen = JSON.parse(store.get("lager-neu-liste") || "null"); } catch { gesehen = null; }
+    if (!Array.isArray(gesehen)) { const alt = store.get("lager-neu-gesehen") || ""; gesehen = alt ? NEUES.map((x) => x.id).filter((id) => id === "2026-11-github" || (alt.startsWith("2026-11-etappe") && id.startsWith("2026-11-etappe") && id <= alt)) : []; }
+    const neu = NEUES.filter((x) => !gesehen.includes(x.id));
+    store.set("lager-neu-liste", JSON.stringify(NEUES.map((x) => x.id)));
+    if (!neu.length) return;
+    if (!gesehen.length && role() === "team") return; // neues Team-Mitglied bekommt die Tour statt Neuigkeiten
+    const zeig = gesehen.length ? neu : neu.slice(0, 1);
+    const o = modal(`<div class="lg-head"><span class="eyebrow">Was ist neu</span><h2>${zeig.length > 1 ? "Neu im Lager-Tool" : esc(zeig[0].titel)}</h2></div>
+      <div class="neu-scroll">${zeig.map((n) => `${zeig.length > 1 ? `<div class="sec-label">${esc(n.titel)}</div>` : ""}<ul class="neu-list">${n.punkte.map((p) => `<li>${p}</li>`).join("")}</ul>`).join("")}</div>
+      <div class="lg-foot"><span></span><button class="btn primary" data-neu-ok>Alles klar</button></div>`);
     o.onclick = (e) => { if (e.target === o || e.target.closest("[data-neu-ok]")) closeDrawer(); };
   }
   const openLagerOrig1 = openLager;

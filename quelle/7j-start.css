@@ -30,6 +30,8 @@
 .st-links button:first-child { border-top: 0; } .st-links button span { color: var(--muted); font-size: 20px; }
 .st-card .card-head { padding-bottom: 8px; }
 
+.neu-scroll { max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+
 /* ===== Tastatur am Handy ===== */
 @media (max-width: 760px) {
   .ab-back { width: auto; padding: 0 8px 0 2px; border-radius: 999px; display: inline-flex; align-items: center; gap: 0; }
