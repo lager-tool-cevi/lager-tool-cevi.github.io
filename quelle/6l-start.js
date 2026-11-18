@@ -51,10 +51,14 @@
   document.addEventListener("focusout", () => setTimeout(() => { if (!tippFeld(document.activeElement)) document.body.classList.remove("tippt"); }, 120));
   if (window.visualViewport) {
     const vv = window.visualViewport;
+    // iPhone: Die Tastatur verkleinert nur den sichtbaren Bereich und schiebt die Seite hoch.
+    // Fenster werden deshalb genau auf den sichtbaren Bereich gelegt (oben = sichtbarer oberer Rand).
+    let warOffen = false;
     const passe = () => {
-      const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop); const r = document.documentElement.style;
-      r.setProperty("--vvh", vv.height + "px"); r.setProperty("--kb", kb + "px"); document.body.classList.toggle("kb-offen", kb > 80);
-      const a = document.activeElement; if (kb > 80 && a && tippFeld(a) && a.closest(".overlay, .hoeck-mode")) setTimeout(() => a.scrollIntoView({ block: "center", behavior: "smooth" }), 60);
+      const offen = istHandy() && window.innerHeight - vv.height > 120; const r = document.documentElement.style;
+      r.setProperty("--vvh", Math.round(vv.height) + "px"); r.setProperty("--vvt", Math.round(vv.offsetTop) + "px"); r.setProperty("--kb", Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)) + "px");
+      document.body.classList.toggle("kb-offen", offen);
+      if (offen && !warOffen) { const a = document.activeElement; if (a && tippFeld(a) && a.closest(".overlay, .hoeck-mode, .cmdk")) setTimeout(() => a.scrollIntoView({ block: "nearest" }), 80); }
+      warOffen = offen;
     };
-    vv.addEventListener("resize", passe); vv.addEventListener("scroll", passe); passe();
-  }
+    vv.addEventListener("resize", passe); vv.addEventListener("scroll", passe); passe();  }

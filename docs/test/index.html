@@ -3,7 +3,7 @@
 <head>
 <base target="_top">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="format-detection" content="telephone=no">
@@ -1579,11 +1579,17 @@ html:has(.overlay), html:has(.cmdk), html:has(.hoeck-mode), body:has(.overlay), 
   body.tippt .bnav, body.tippt .fab, body.kb-offen .bnav, body.kb-offen .fab { display: none !important; }
   body.tippt .page { padding-bottom: 24px !important; }
   /* Fenster bleiben über der Tastatur */
-  body.kb-offen .overlay { height: var(--vvh, 100%); bottom: auto; }
-  body.kb-offen .overlay:not(.center) .drawer { height: calc(var(--vvh, 94vh) - 8px); animation: none !important; }
-  body.kb-offen .overlay.center .modal { max-height: calc(var(--vvh, 92vh) - 8px) !important; animation: none !important; }
-  body.kb-offen .drawer-foot { padding-bottom: 8px; }
-  body.kb-offen .hoeck-mode { height: var(--vvh, 100%); }
+  body.kb-offen .overlay, body.kb-offen .cmdk, body.kb-offen .hoeck-mode { top: var(--vvt, 0px) !important; bottom: auto !important; height: var(--vvh, 100%) !important; }
+  body.kb-offen .overlay:not(.center) { align-items: stretch; }
+  body.kb-offen .overlay:not(.center) .drawer { height: 100% !important; border-radius: 0 !important; animation: none !important; }
+  body.kb-offen .overlay:not(.center) .drawer::before { display: none; }
+  body.kb-offen .overlay.center { align-items: stretch; }
+  body.kb-offen .overlay.center .modal { max-height: none !important; height: 100%; border-radius: 0 !important; animation: none !important; overflow-y: auto; }
+  body.kb-offen .drawer-head { padding-top: 8px; padding-bottom: 8px; }
+  body.kb-offen .drawer-head .eyebrow, body.kb-offen .drawer-head .src-link { display: none; }
+  body.kb-offen .drawer-head h2 { font-size: 16px; }
+  body.kb-offen .drawer-foot { padding: 6px 12px !important; }
+  body.kb-offen .drawer-foot > span:first-child:not(:only-child) { display: none; }
   body.kb-offen .toast { bottom: calc(var(--kb, 0px) + 12px) !important; }
 }
 
@@ -1724,7 +1730,7 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px var(--accent-s
   <nav class="bnav" id="bnav" aria-label="Schnellnavigation"></nav>
   <button class="fab" id="qnote" type="button" aria-label="Schnell-Notiz" title="Schnell-Notiz" hidden>+</button>
 </div>
-<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 13:20","test":true};</script>
+<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 13:23","test":true};</script>
 <script>
 // Datenanbindung. Bei Google (google.script.run vorhanden) läuft alles über api() in Code.gs,
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:
@@ -7370,13 +7376,17 @@ window.LaleiStore = (() => {
   document.addEventListener("focusout", () => setTimeout(() => { if (!tippFeld(document.activeElement)) document.body.classList.remove("tippt"); }, 120));
   if (window.visualViewport) {
     const vv = window.visualViewport;
+    // iPhone: Die Tastatur verkleinert nur den sichtbaren Bereich und schiebt die Seite hoch.
+    // Fenster werden deshalb genau auf den sichtbaren Bereich gelegt (oben = sichtbarer oberer Rand).
+    let warOffen = false;
     const passe = () => {
-      const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop); const r = document.documentElement.style;
-      r.setProperty("--vvh", vv.height + "px"); r.setProperty("--kb", kb + "px"); document.body.classList.toggle("kb-offen", kb > 80);
-      const a = document.activeElement; if (kb > 80 && a && tippFeld(a) && a.closest(".overlay, .hoeck-mode")) setTimeout(() => a.scrollIntoView({ block: "center", behavior: "smooth" }), 60);
+      const offen = istHandy() && window.innerHeight - vv.height > 120; const r = document.documentElement.style;
+      r.setProperty("--vvh", Math.round(vv.height) + "px"); r.setProperty("--vvt", Math.round(vv.offsetTop) + "px"); r.setProperty("--kb", Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)) + "px");
+      document.body.classList.toggle("kb-offen", offen);
+      if (offen && !warOffen) { const a = document.activeElement; if (a && tippFeld(a) && a.closest(".overlay, .hoeck-mode, .cmdk")) setTimeout(() => a.scrollIntoView({ block: "nearest" }), 80); }
+      warOffen = offen;
     };
-    vv.addEventListener("resize", passe); vv.addEventListener("scroll", passe); passe();
-  }
+    vv.addEventListener("resize", passe); vv.addEventListener("scroll", passe); passe();  }
 
   // ---------- boot ----------
   state.jTab = store.get("lalei-jtab") || "all";
