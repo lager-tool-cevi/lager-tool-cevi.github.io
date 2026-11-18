@@ -1910,7 +1910,7 @@ html.nd4 #nd4-kopf { display: none; }
   html.nd4 .app { display: block; }
   html.nd4 .side { display: none !important; }
   html.nd4 .content { min-width: 0; }
-  html.nd4 #nd4-kopf { display: block; position: sticky; top: 0; z-index: 30; }
+  html.nd4 #nd4-kopf { display: block; position: sticky; top: 0; z-index: 13; } /* unter den Fenstern (20) und dem Höck-Modus (25) */
 }
 .nd4-top { height: 56px; display: flex; align-items: center; gap: 20px; padding: 0 max(24px, env(safe-area-inset-right, 0px)) 0 max(24px, env(safe-area-inset-left, 0px)); background: var(--side); color: var(--side-ink); }
 .nd4-marke { flex: none; display: flex; align-items: center; gap: 10px; border: 0; background: none; padding: 0; cursor: pointer; color: inherit; min-width: 0; }
@@ -2414,7 +2414,7 @@ html.nd4 .preview-bar { background: var(--tint); color: var(--ink-2); border-bot
   <nav class="bnav" id="bnav" aria-label="Schnellnavigation"></nav>
   <button class="fab" id="qnote" type="button" aria-label="Schnell-Notiz" title="Schnell-Notiz" hidden>+</button>
 </div>
-<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 21:51","test":true};</script>
+<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 21:58","test":true};</script>
 <script>
 // Datenanbindung. Bei Google (google.script.run vorhanden) läuft alles über api() in Code.gs,
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:

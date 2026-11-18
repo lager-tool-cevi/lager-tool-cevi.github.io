@@ -62,7 +62,7 @@ html.nd4 #nd4-kopf { display: none; }
   html.nd4 .app { display: block; }
   html.nd4 .side { display: none !important; }
   html.nd4 .content { min-width: 0; }
-  html.nd4 #nd4-kopf { display: block; position: sticky; top: 0; z-index: 30; }
+  html.nd4 #nd4-kopf { display: block; position: sticky; top: 0; z-index: 13; } /* unter den Fenstern (20) und dem Höck-Modus (25) */
 }
 .nd4-top { height: 56px; display: flex; align-items: center; gap: 20px; padding: 0 max(24px, env(safe-area-inset-right, 0px)) 0 max(24px, env(safe-area-inset-left, 0px)); background: var(--side); color: var(--side-ink); }
 .nd4-marke { flex: none; display: flex; align-items: center; gap: 10px; border: 0; background: none; padding: 0; cursor: pointer; color: inherit; min-width: 0; }
