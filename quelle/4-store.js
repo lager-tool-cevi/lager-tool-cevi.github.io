@@ -2,9 +2,9 @@
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:
 // Anmeldung als Team (nur Name) oder Lagerleitung (Name + Passwort), Admin mit Admin-Passwort.
 window.LaleiStore = (() => {
-  const SHORT = ["tasks", "config", "journal", "hoecks", "people", "kids", "att", "plan", "info", "eval", "assets", "trash", "rooms", "todos", "feedback", "attreq", "daypage", "presence", "media", "board", "swap", "trips", "groups", "count", "shop", "log", "versions"];
-  const TEAM_READ = ["config", "people", "kids", "plan", "rooms", "info", "att", "attreq", "todos", "feedback", "hoecks", "board", "swap", "trips", "groups", "count", "media"];
-  const NO_LOG = ["presence", "count", "todos", "feedback", "attreq", "swap", "log", "media", "versions"];
+  const SHORT = ["tasks", "config", "journal", "hoecks", "people", "kids", "att", "plan", "info", "eval", "assets", "trash", "rooms", "todos", "feedback", "attreq", "daypage", "presence", "media", "board", "swap", "trips", "groups", "count", "shop", "log", "versions", "react"];
+  const TEAM_READ = ["config", "people", "kids", "plan", "rooms", "info", "att", "attreq", "todos", "feedback", "hoecks", "board", "swap", "trips", "groups", "count", "media", "react"];
+  const NO_LOG = ["presence", "count", "todos", "feedback", "attreq", "swap", "log", "media", "versions", "react"];
   const TOKEN_DAYS = 60;
   const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
   const isGas = typeof google !== "undefined" && google.script && google.script.run;
@@ -35,7 +35,8 @@ window.LaleiStore = (() => {
       if (c === "feedback" && sess.role !== "team") { for (const [id, d] of Object.entries(src)) out.feedback[id] = d.anon ? { ...d, person: "", name: "Anonym" } : d; continue; }
       if (sess.role === "lalei" || sess.role === "lesen" || sess.role === "admin") { out[c] = src; continue; }
       if (!TEAM_READ.includes(c)) continue;
-      if (c === "board") { const t = today(); for (const [id, b] of Object.entries(src)) if ((!b.from || b.from <= t) && (!b.until || b.until >= t)) out.board[id] = b; continue; }
+      if (c === "board") { const t = today(); for (const [id, b] of Object.entries(src)) if ((!b.from || b.from <= t) && (!b.until || b.until >= t) && (!b.to || !b.to.length || b.to.includes(sess.person))) out.board[id] = b; continue; }
+      if (c === "info") { for (const [id, d] of Object.entries(src)) out.info[id] = { ...d, sections: (d.sections || []).filter((s) => !s.lalei) }; continue; }
       if (c === "swap") { for (const [id, d] of Object.entries(src)) if (d.person === sess.person) out.swap[id] = d; continue; }
       if (c === "count") { for (const [id, d] of Object.entries(src)) out.count[id] = { checked: d.checked || {}, resetAt: d.resetAt || "" }; continue; }
       if (c === "media") { for (const [id, d] of Object.entries(src)) if (d.team) out.media[id] = d; continue; }
@@ -60,6 +61,7 @@ window.LaleiStore = (() => {
     if (sess.role === "lesen") throw new Error("NUR_LESEN");
     // Team
     if (["feedback", "attreq", "swap"].includes(coll) && o.op === "set" && !current && o.data && o.data.person === sess.person) return;
+    if (coll === "react" && String(o.id).split("~")[1] === sess.person && (o.op === "delete" || (o.op === "set" && o.data && o.data.person === sess.person))) return;
     if (coll === "count" && o.id === "main" && o.op !== "delete" && Object.keys(o.data || {}).every((k) => ["checked", "at", "by", "resetAt", "resetBy"].includes(k))) return;
     if (coll === "att" && o.id === "p_" + sess.person && (o.op === "set" || o.op === "update")) {
       const have = (current && current.slots) || {}; const want = (o.data && o.data.slots) || {};

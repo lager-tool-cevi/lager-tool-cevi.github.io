@@ -1154,6 +1154,52 @@ tr.task.selected td { background: color-mix(in srgb, var(--accent) 7%, transpare
 .hm-foot { display: flex; justify-content: center; gap: var(--sp-2); padding: var(--sp-3) var(--sp-4) calc(var(--sp-3) + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); background: var(--surface); }
 @media (max-width: 600px) { .hm-title { font-size: 20px; } .hm-main { padding: var(--sp-3); } .hm-main textarea { font-size: 16px; } }
 
+/* ===== Etappe 3 ===== */
+
+/* Glocke */
+.bell { position: relative; margin-left: auto; flex: none; width: 38px; height: 38px; border-radius: 50%; border: 0; background: transparent; color: var(--side-ink); cursor: pointer; display: grid; place-items: center; transition: background var(--t); }
+.bell:hover, .bell:focus-visible { background: rgb(255 255 255 / 0.1); }
+.bell svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.bell .count { position: absolute; top: 2px; right: 0; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--late); color: #fff; font-size: 11px; font-weight: 600; line-height: 18px; text-align: center; }
+.bell-list { display: flex; flex-direction: column; max-height: 60vh; overflow-y: auto; margin: 0 calc(var(--sp-2) * -1); }
+.bell-row { display: flex; align-items: flex-start; gap: var(--sp-3); padding: 10px var(--sp-2); border: 0; border-bottom: 1px solid var(--line); background: none; color: var(--ink); text-align: left; cursor: pointer; font: inherit; font-size: 14px; border-radius: var(--r-sm, 6px); transition: background var(--t); }
+.bell-row:hover { background: var(--hover); }
+.bell-row.unread { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.bell-row.unread .bell-t::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 6px; vertical-align: middle; }
+.bell-ico { flex: none; width: 22px; text-align: center; }
+.bell-t { flex: 1; min-width: 0; line-height: 1.4; }
+.bell-at { flex: none; font-size: 12px; }
+
+/* Reaktionen */
+.reacts { display: flex; flex-wrap: wrap; gap: 6px; }
+.react { display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); cursor: pointer; font: inherit; font-size: 15px; transition: border-color var(--t), background var(--t), opacity var(--t); }
+.react span { font-size: 12.5px; color: var(--ink-2, var(--ink)); font-weight: 600; }
+.react.empty { opacity: 0.45; }
+.board-item:hover .react.empty, .react.empty:focus-visible { opacity: 0.85; }
+.react.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+.react:disabled { cursor: default; }
+@media (hover: none) { .react.empty { opacity: 0.7; } }
+
+/* Schichtplan: Mindestbesetzung */
+.pc.short { background: color-mix(in srgb, var(--wait) 9%, transparent); }
+.min-badge { display: inline-block; font-size: 11px; font-weight: 600; color: var(--wait); border: 1px solid currentColor; border-radius: 999px; padding: 0 6px; line-height: 17px; }
+.min-in { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); flex: none; }
+.list-edit .r .min-in input { flex: 0 0 52px; width: 52px; }
+@media (max-width: 700px) { .svc-row-edit { flex-wrap: wrap; } .svc-row-edit [data-svc], .svc-row-edit .svc-desc-in { flex: 1 1 100%; } }
+
+/* Pausen und Notfall-Liste */
+.pz-list, .nf-list { display: flex; flex-direction: column; gap: 6px; }
+.nf-row select { flex: 1; min-width: 0; height: 32px; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--surface); color: var(--ink); padding: 0 6px; }
+.nf-row input[type="tel"] { flex: 0 0 150px; }
+@media (max-width: 700px) { .pz-row, .nf-row { flex-wrap: wrap; } .pz-row input:first-child, .nf-row input:first-child { flex: 1 1 100%; } .list-edit .pz-row input[type="date"] { flex: 1 1 120px; } }
+
+/* Wer ist heute da */
+.heute-da { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line); }
+
+/* Feedback zum Tool (Admin) */
+.tf-row.unread { border-left: 3px solid var(--accent); padding-left: 10px; }
+#tool-fb { margin-left: auto; margin-right: 10px; }
+
 
 /* =====================================================================
    Gestaltungsregeln (Grundgerüst): Abstände 4/8/16/24/32, wenige Schriftgrössen,
@@ -1291,15 +1337,15 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px var(--accent-s
   <nav class="bnav" id="bnav" aria-label="Schnellnavigation"></nav>
   <button class="fab" id="qnote" type="button" aria-label="Schnell-Notiz" title="Schnell-Notiz" hidden>+</button>
 </div>
-<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 07:56","test":true};</script>
+<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 08:12","test":true};</script>
 <script>
 // Datenanbindung. Bei Google (google.script.run vorhanden) läuft alles über api() in Code.gs,
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:
 // Anmeldung als Team (nur Name) oder Lagerleitung (Name + Passwort), Admin mit Admin-Passwort.
 window.LaleiStore = (() => {
-  const SHORT = ["tasks", "config", "journal", "hoecks", "people", "kids", "att", "plan", "info", "eval", "assets", "trash", "rooms", "todos", "feedback", "attreq", "daypage", "presence", "media", "board", "swap", "trips", "groups", "count", "shop", "log", "versions"];
-  const TEAM_READ = ["config", "people", "kids", "plan", "rooms", "info", "att", "attreq", "todos", "feedback", "hoecks", "board", "swap", "trips", "groups", "count", "media"];
-  const NO_LOG = ["presence", "count", "todos", "feedback", "attreq", "swap", "log", "media", "versions"];
+  const SHORT = ["tasks", "config", "journal", "hoecks", "people", "kids", "att", "plan", "info", "eval", "assets", "trash", "rooms", "todos", "feedback", "attreq", "daypage", "presence", "media", "board", "swap", "trips", "groups", "count", "shop", "log", "versions", "react"];
+  const TEAM_READ = ["config", "people", "kids", "plan", "rooms", "info", "att", "attreq", "todos", "feedback", "hoecks", "board", "swap", "trips", "groups", "count", "media", "react"];
+  const NO_LOG = ["presence", "count", "todos", "feedback", "attreq", "swap", "log", "media", "versions", "react"];
   const TOKEN_DAYS = 60;
   const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
   const isGas = typeof google !== "undefined" && google.script && google.script.run;
@@ -1330,7 +1376,8 @@ window.LaleiStore = (() => {
       if (c === "feedback" && sess.role !== "team") { for (const [id, d] of Object.entries(src)) out.feedback[id] = d.anon ? { ...d, person: "", name: "Anonym" } : d; continue; }
       if (sess.role === "lalei" || sess.role === "lesen" || sess.role === "admin") { out[c] = src; continue; }
       if (!TEAM_READ.includes(c)) continue;
-      if (c === "board") { const t = today(); for (const [id, b] of Object.entries(src)) if ((!b.from || b.from <= t) && (!b.until || b.until >= t)) out.board[id] = b; continue; }
+      if (c === "board") { const t = today(); for (const [id, b] of Object.entries(src)) if ((!b.from || b.from <= t) && (!b.until || b.until >= t) && (!b.to || !b.to.length || b.to.includes(sess.person))) out.board[id] = b; continue; }
+      if (c === "info") { for (const [id, d] of Object.entries(src)) out.info[id] = { ...d, sections: (d.sections || []).filter((s) => !s.lalei) }; continue; }
       if (c === "swap") { for (const [id, d] of Object.entries(src)) if (d.person === sess.person) out.swap[id] = d; continue; }
       if (c === "count") { for (const [id, d] of Object.entries(src)) out.count[id] = { checked: d.checked || {}, resetAt: d.resetAt || "" }; continue; }
       if (c === "media") { for (const [id, d] of Object.entries(src)) if (d.team) out.media[id] = d; continue; }
@@ -1355,6 +1402,7 @@ window.LaleiStore = (() => {
     if (sess.role === "lesen") throw new Error("NUR_LESEN");
     // Team
     if (["feedback", "attreq", "swap"].includes(coll) && o.op === "set" && !current && o.data && o.data.person === sess.person) return;
+    if (coll === "react" && String(o.id).split("~")[1] === sess.person && (o.op === "delete" || (o.op === "set" && o.data && o.data.person === sess.person))) return;
     if (coll === "count" && o.id === "main" && o.op !== "delete" && Object.keys(o.data || {}).every((k) => ["checked", "at", "by", "resetAt", "resetBy"].includes(k))) return;
     if (coll === "att" && o.id === "p_" + sess.person && (o.op === "set" || o.op === "update")) {
       const have = (current && current.slots) || {}; const want = (o.data && o.data.slots) || {};
@@ -2297,7 +2345,7 @@ window.LaleiStore = (() => {
       const weeks = []; for (let w = new Date(w0); w <= w1; w = new Date(w.getTime() + 7 * DAY)) weeks.push(new Date(w));
       const nowW = iso(monday(today()));
       const wk = weeks.map((w) => { const wi = iso(w); const we = iso(new Date(w.getTime() + 6 * DAY)); const m = ms.find((x) => x.date >= wi && x.date <= we);
-        return { w, wi, we, m, pause: d.pauseFrom && d.pauseTo && d.pauseFrom <= we && d.pauseTo >= wi, camp: d.prep && d.end && d.prep <= we && d.end >= wi, now: wi === nowW }; });
+        return { w, wi, we, m, pause: inPause(wi, we), camp: d.prep && d.end && d.prep <= we && d.end >= wi, now: wi === nowW }; });
       const months = []; for (const k of wk) { const key = `${k.w.getFullYear()}-${k.w.getMonth()}`; if (!months.length || months[months.length - 1].key !== key) months.push({ key, label: `${MONTHS[k.w.getMonth()]} ${k.w.getFullYear()}`, n: 0 }); months[months.length - 1].n++; }
       const cls = (k) => [k.m ? "msw" : "", k.now ? "now" : "", k.pause ? "pause" : "", k.camp ? "camp" : ""].join(" ");
       const head = `<tr><th class="rowh" rowspan="2"></th>${months.map((m) => `<th class="mo" colspan="${m.n}">${m.n > 1 ? m.label : ""}</th>`).join("")}</tr><tr>${wk.map((k) => `<th class="wk ${k.m ? "msw" : ""} ${k.now ? "now" : ""}" title="Woche ab ${fmtFull(k.wi)}">${k.w.getDate()}</th>`).join("")}</tr>`;
@@ -2485,7 +2533,7 @@ window.LaleiStore = (() => {
       if (!ds.length) { $("#plan-body").innerHTML = `<section class="card"><div class="empty"><b>Noch keine Lagertage</b>Lege zuerst unter «Lager einrichten › Tage & Tageszeiten» die Tage fest.<br><br><button class="btn primary" data-goto="settings">Zu «Lager einrichten»</button></div></section>`; return; }
       const absentDay = (name, dayId) => { const p = state.peopleDocs.find((x) => displayName(x) === name); if (!p) return false; const s = attDoc("p_" + p._id); return dayparts().every((_, i) => s[dayId + "|" + i] === "F"); };
       $("#plan-body").innerHTML = `<section class="card"><div class="table-wrap"><table class="plan-table"><thead><tr><th>Dienst</th>${ds.map((d) => `<th>${esc(d.label)}${d.date ? `<div class="muted" style="font-weight:400;text-transform:none;letter-spacing:0">${fmtFull(d.date)}</div>` : ""}</th>`).join("")}</tr></thead><tbody>
-        ${plan.services.map((s) => `<tr><td><b style="font-weight:600">${esc(s.name)}</b></td>${ds.map((d) => { const names = (plan.cells || {})[d.id + "|" + s.id] || []; return `<td class="pc" data-plan="${esc(s.id)}|${esc(d.id)}" tabindex="0" role="button" aria-label="${esc(s.name)} am ${esc(d.label)} einteilen"><div class="chipset">${names.map((n) => `<span class="pchip-s ${absentDay(n, d.id) ? "warn" : ""}" title="${absentDay(n, d.id) ? "laut Anwesenheit an diesem Tag abwesend" : ""}">${av(n)}${esc(n)}</span>`).join("") || '<span class="add-hint">+ einteilen</span>'}</div></td>`; }).join("")}</tr>`).join("")}
+        ${plan.services.map((s) => `<tr><td><b style="font-weight:600">${esc(s.name)}</b></td>${ds.map((d) => { const names = (plan.cells || {})[d.id + "|" + s.id] || []; const kurz = (s.min || 0) > names.length; return `<td class="pc ${kurz ? "short" : ""}" ${kurz ? `title="Mindestens ${s.min} Personen nötig"` : ""} data-plan="${esc(s.id)}|${esc(d.id)}" tabindex="0" role="button" aria-label="${esc(s.name)} am ${esc(d.label)} einteilen"><div class="chipset">${names.map((n) => `<span class="pchip-s ${absentDay(n, d.id) ? "warn" : ""}" title="${absentDay(n, d.id) ? "laut Anwesenheit an diesem Tag abwesend" : ""}">${av(n)}${esc(n)}</span>`).join("") || '<span class="add-hint">+ einteilen</span>'}${kurz ? `<span class="min-badge">${names.length}/${s.min}</span>` : ""}</div></td>`; }).join("")}</tr>`).join("")}
         </tbody></table></div></section>
         <section class="card"><div class="card-head"><h2>Dienste</h2><span class="saved"></span></div><div class="card-body"><div class="list-edit">${plan.services.map((s, i) => `<div class="r"><input data-svc="${i}" value="${esc(s.name)}" aria-label="Dienst"><button class="btn small ghost" data-svc-rm="${i}" aria-label="Dienst entfernen">✕</button></div>`).join("")}
           <form class="r" id="svc-add"><input id="svc-new" placeholder="Neuer Dienst, z.B. Ämtli-Kontrolle"><button class="btn small">+ Dienst</button></form></div></div></section>`;
@@ -2513,7 +2561,7 @@ window.LaleiStore = (() => {
     shell: () => `${pageHead("Infos &amp; Links", "Wichtiges für alle: Lagerhaus, Notfall, Kontakte, Links und Dokumente", `<div class="btn-group"><button class="btn primary" data-info-add>+ Abschnitt</button>${menu([['data-export="infos"', "Als Word"]])}</div>`)}<div id="info-body"></div>`,
     update() {
       const secs = (state.info || {}).sections || [];
-      $("#info-body").innerHTML = `<div class="info-grid">${secs.map((s) => `<section class="card info-sec ${s.emergency ? "emergency" : ""}"><div class="card-head"><h2>${esc(s.title || "Ohne Titel")}</h2><button class="link" data-info-edit="${esc(s.id)}">Bearbeiten</button></div><div class="card-body">${s.text ? `<div class="rich">${rich(s.text)}</div>` : ""}${fileList(s.images)}${linksView(s.links)}${!s.text && !(s.links || []).length && !(s.images || []).length ? '<span class="muted">Noch leer.</span>' : ""}</div></section>`).join("") || `<section class="card"><div class="empty">Noch keine Infos. Mit «+ Abschnitt» beginnen.</div></section>`}</div>
+      $("#info-body").innerHTML = `<div class="info-grid">${secs.map((s) => `<section class="card info-sec ${s.emergency ? "emergency" : ""}"><div class="card-head"><h2>${esc(s.title || "Ohne Titel")}${s.lalei ? ' <span class="tag plain" style="font-size:11px;vertical-align:middle">nur LaLei</span>' : ""}</h2><button class="link" data-info-edit="${esc(s.id)}">Bearbeiten</button></div><div class="card-body">${s.text ? `<div class="rich">${rich(s.text)}</div>` : ""}${fileList(s.images)}${linksView(s.links)}${!s.text && !(s.links || []).length && !(s.images || []).length ? '<span class="muted">Noch leer.</span>' : ""}</div></section>`).join("") || `<section class="card"><div class="empty">Noch keine Infos. Mit «+ Abschnitt» beginnen.</div></section>`}</div>
         <section class="card"><div class="card-head"><h2>Dokumente pro Ressort</h2><span class="muted">Links zu SharePoint, Drive usw. Es öffnet sich immer die aktuelle Version.</span></div>
         <div class="table-wrap"><table><tbody>${ressorts().map((r) => `<tr><td style="width:180px;vertical-align:top"><b style="font-weight:600">${esc(r.name)}</b></td><td>${linksView(r.links) || '<span class="muted" style="font-size:13px">Noch keine Dokumente</span>'}</td><td style="width:110px;text-align:right;vertical-align:top"><button class="link" data-ress-links="${esc(r.id)}">Bearbeiten</button></td></tr>`).join("")}</tbody></table></div></section>`;
     },
@@ -2539,7 +2587,7 @@ window.LaleiStore = (() => {
       const L = lagerDoc(); const d = cfg().dates || {};
       const df = (k, label) => `<label class="field"><span>${label}</span><input type="date" data-cfg="dates.${k}" value="${esc(d[k] || "")}"></label>`;
       $("#set-lager").innerHTML = `<div class="form-grid"><label class="field"><span>Titel</span><input data-lager="title" value="${esc(L.title || "")}"></label><label class="field"><span>Abteilung</span><input data-lager="abteilung" value="${esc(L.abteilung || "")}"></label></div>
-        <div class="dates-grid" style="margin-top:14px">${df("firstSession", "Erster Höck")}${df("pauseFrom", "Pause von")}${df("pauseTo", "Pause bis")}${df("prep", "Leitervorbereitung")}${df("start", "Lager von")}${df("end", "Lager bis")}</div>
+        <div class="dates-grid" style="margin-top:14px">${df("firstSession", "Erster Höck")}${df("prep", "Leitervorbereitung")}${df("start", "Lager von")}${df("end", "Lager bis")}</div>
         <div class="field" style="margin-top:16px"><span>Logo (erscheint klein rechts in der Kopfzeile der Word-Dokumente)</span>
           <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">${lagerLogo() ? `<img src="data:image/png;base64,${lagerLogo().png}" alt="Logo" style="height:40px;width:auto;border:1px solid var(--line);border-radius:6px;padding:4px;background:#fff">` : '<span class="muted" style="font-size:13px">Noch kein Logo</span>'}
           <label class="btn small" style="cursor:pointer">Logo hochladen<input type="file" accept="image/png,image/jpeg,image/webp" data-logo hidden></label>${lagerLogo() ? '<button class="btn small ghost danger" data-logo-rm>Entfernen</button>' : ""}</div></div>`;
@@ -3244,7 +3292,7 @@ window.LaleiStore = (() => {
     } else if (ed.type === "idea") {
       body = `${f("title", "Traktandum", "text", 'placeholder="z.B. Elternabend vor dem Lager?"')}${ta("text", "Beschreibung", "Worum geht es? Was soll entschieden werden?", 4)}${mentionHint()}<div class="form-grid">${sel("by", "Eingebracht von", personOptions(d.by, "–"))}${f("forDate", "Für Höck am (optional)", "date")}${sel("status", "Status", ["Offen", "Besprochen"].map((s) => `<option ${s === d.status ? "selected" : ""}>${s}</option>`).join(""))}</div>`;
     } else if (ed.type === "info") {
-      body = `${f("title", "Titel", "text", 'placeholder="z.B. Lagerhaus"')}<label class="toggle"><input type="checkbox" data-fb="emergency" ${d.emergency ? "checked" : ""}> Notfall-Infos (erscheinen im Lager-Modus auf der Übersicht)</label>${ta("text", "Text", "Adressen, Telefonnummern, Abläufe … Links werden automatisch anklickbar.", 8)}<div class="field"><span>Bilder (z.B. Hausplan, Anfahrt)</span>${(d.images || []).map((im, i) => `<div class="link-row">🖼 <span>${esc(im.name)}</span><button type="button" class="x" data-img-rm="${i}" aria-label="Bild entfernen">✕</button></div>`).join("")}<label class="btn small" style="align-self:flex-start;cursor:pointer">Bild hinzufügen<input type="file" accept="image/*" data-info-img hidden></label></div><div class="field"><span>Links &amp; Dokumente</span>${linksEditor("info", d.links || [])}</div>`;
+      body = `${f("title", "Titel", "text", 'placeholder="z.B. Lagerhaus"')}<label class="toggle"><input type="checkbox" data-fb="emergency" ${d.emergency ? "checked" : ""}> Notfall-Infos (erscheinen im Lager-Modus auf der Übersicht)</label><label class="toggle"><input type="checkbox" data-fb="lalei" ${d.lalei ? "checked" : ""}> Nur für die Lagerleitung (das Team sieht diesen Abschnitt nicht)</label>${ta("text", "Text", "Adressen, Telefonnummern, Abläufe … Links werden automatisch anklickbar.", 8)}<div class="field"><span>Bilder (z.B. Hausplan, Anfahrt)</span>${(d.images || []).map((im, i) => `<div class="link-row">🖼 <span>${esc(im.name)}</span><button type="button" class="x" data-img-rm="${i}" aria-label="Bild entfernen">✕</button></div>`).join("")}<label class="btn small" style="align-self:flex-start;cursor:pointer">Bild hinzufügen<input type="file" accept="image/*" data-info-img hidden></label></div><div class="field"><span>Links &amp; Dokumente</span>${linksEditor("info", d.links || [])}</div>`;
     } else if (ed.type === "ressLinks") {
       body = `<p class="muted" style="margin:0">Links zu Dokumenten im SharePoint, Google Drive usw. Wer klickt, öffnet immer die aktuelle Version, sofern er dort Zugriff hat. Im SharePoint: «…» › «Link kopieren».</p>${linksEditor("ress", d.links || [])}`;
     } else if (ed.type === "planCell") {
@@ -3314,7 +3362,7 @@ window.LaleiStore = (() => {
     if (ed.type === "ressLinks") { await writeConfig({ ressorts: { [d.rid]: { links: d.links || [] } } }); toast("Gespeichert"); closeDrawer(); return; }
     if (ed.type === "info") {
       if (!d.title) { $('[data-f="title"]').focus(); toast("Bitte einen Titel eingeben."); return; }
-      const secs = ((state.info || {}).sections || []).slice(); const sec = { id: ed.id || "s" + uid(), title: d.title, text: d.text || "", links: d.links || [], images: d.images || [], emergency: !!d.emergency };
+      const secs = ((state.info || {}).sections || []).slice(); const sec = { id: ed.id || "s" + uid(), title: d.title, text: d.text || "", links: d.links || [], images: d.images || [], emergency: !!d.emergency, ...(d.lalei ? { lalei: true } : {}) };
       const i = secs.findIndex((s) => s.id === sec.id); if (i >= 0) secs[i] = sec; else secs.push(sec);
       await saveInfo(secs); toast("Gespeichert"); closeDrawer(); return;
     }
@@ -3958,7 +4006,7 @@ window.LaleiStore = (() => {
   views.tinfos = {
     shell: () => `${pageHead("Infos &amp; Links", "Wichtiges für alle")}<div id="tinfo-body"></div>`,
     update() {
-      const secs = (state.info || {}).sections || [];
+      const secs = ((state.info || {}).sections || []).filter((s) => !s.lalei);
       $("#tinfo-body").innerHTML = `<div class="info-grid">${secs.map((s) => `<section class="card info-sec ${s.emergency ? "emergency" : ""}"><div class="card-head"><h2>${esc(s.title || "Ohne Titel")}</h2></div><div class="card-body">${s.text ? `<div class="rich">${rich(s.text)}</div>` : ""}${fileList(s.images)}${linksView(s.links)}</div></section>`).join("") || `<section class="card"><div class="empty">Noch keine Infos.</div></section>`}</div>
         ${ressorts().some((r) => (r.links || []).length) ? `<section class="card"><div class="card-head"><h2>Dokumente pro Ressort</h2></div><div class="table-wrap"><table><tbody>${ressorts().filter((r) => (r.links || []).length).map((r) => `<tr><td style="width:180px;vertical-align:top"><b style="font-weight:600">${esc(r.name)}</b></td><td>${linksView(r.links)}</td></tr>`).join("")}</tbody></table></div></section>` : ""}`;
     },
@@ -4077,7 +4125,7 @@ window.LaleiStore = (() => {
   views.day = {
     shell: () => { const ds = days(); const i = ds.findIndex((x) => x.id === state.dayId); const d = ds[i] || {};
       return `${pageHead(esc(d.label || "Tag"), d.date ? `${WD_LONG[parse(d.date).getDay()]}, ${fmtFull(d.date)}` : "", `<div class="btn-group"><button class="btn" data-goto="days">← Alle Tage</button><button class="btn" data-day-open="${esc((ds[i - 1] || {}).id || "")}" ${i > 0 ? "" : "disabled"} aria-label="Vorheriger Tag">‹</button><button class="btn" data-day-open="${esc((ds[i + 1] || {}).id || "")}" ${i < ds.length - 1 ? "" : "disabled"} aria-label="Nächster Tag">›</button><button class="btn primary" data-day-docx>Als Word</button></div>`)}
-      <div class="day-top"><section class="card"><div class="card-head"><h2>Programm</h2><label class="btn small" style="cursor:pointer">Bild hochladen<input type="file" accept="image/*" data-day-img hidden></label></div><div class="card-body" id="day-imgs"></div></section>
+      <div class="day-top"><section class="card"><div class="card-head"><h2>Programm</h2><label class="btn small" style="cursor:pointer">Bild hinzufügen<input type="file" accept="image/*" data-day-img hidden></label></div><div class="card-body" id="day-imgs"></div></section>
       <section class="card"><div class="card-head"><h2>Automatisch</h2><span class="muted">aus Schichtplan und Anwesenheit</span></div><div class="card-body" id="day-auto"></div></section></div>
       <div class="block-grid" id="day-blocks"></div>
       <form class="card card-body" data-block-add style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input class="input" style="flex:1;min-width:200px" placeholder="Eigener Block, z.B. Material, Wetter, Elterninfo" aria-label="Neuer Block"><button class="btn small">+ Block</button></form>`; },
@@ -4312,11 +4360,12 @@ window.LaleiStore = (() => {
   const boardText = (b) => `${b.important ? "❗ " : ""}*${b.title || "Mitteilung"}*\n\n${noAt(b.text || "")}${appLink() ? `\n\n👉 ${appLink()}` : ""}`;
   function boardCard(b) {
     const t = iso(today()); const lalei = isLaLei();
-    const tags = [b.pinned ? '<span class="tag plain">📌 angeheftet</span>' : "", b.important ? '<span class="tag late">wichtig</span>' : "", lalei && b.from && b.from > t ? `<span class="tag next">erscheint am ${fmtFull(b.from)}</span>` : "", lalei && b.until && b.until < t ? '<span class="tag plain">abgelaufen</span>' : "", lalei && b.until && b.until >= t ? `<span class="muted" style="font-size:12px">bis ${fmtFull(b.until)}</span>` : "", state.prevSeen && ts(b.createdAt) > state.prevSeen && b.by !== me() ? '<span class="tag next">neu</span>' : ""].join("");
+    const tags = [b.pinned ? '<span class="tag plain">📌 angeheftet</span>' : "", b.important ? '<span class="tag late">wichtig</span>' : "", lalei && b.from && b.from > t ? `<span class="tag next">erscheint am ${fmtFull(b.from)}</span>` : "", lalei && b.until && b.until < t ? '<span class="tag plain">abgelaufen</span>' : "", lalei && b.until && b.until >= t ? `<span class="muted" style="font-size:12px">bis ${fmtFull(b.until)}</span>` : "", state.prevSeen && ts(b.createdAt) > state.prevSeen && b.by !== me() ? '<span class="tag next">neu</span>' : "", lalei && (b.to || []).length ? `<span class="tag plain" title="Nur diese Personen sehen die Mitteilung">an ${esc((b.to || []).map((id) => { const p = state.peopleDocs.find((x) => x._id === id); return p ? displayName(p) : "?"; }).join(", "))}</span>` : ""].join("");
     const qs = state.feedback.filter((f) => f.boardId === b._id && (lalei || f.person === myId()));
     return `<article class="card board-item ${b.important ? "important" : ""}"><div class="card-body stack" style="gap:8px">
       <div class="entry-top"><h3>${esc(b.title || "Mitteilung")}</h3>${tags}</div>
       ${b.text ? `<div class="rich">${rich(b.text)}</div>` : ""}${fileList(b.files)}
+      ${reactBar(b)}
       <div class="board-foot"><span class="muted">${esc(b.by || "")} · ${fmtFull((b.from || b.createdAt || "").slice(0, 10))}</span>
         ${lalei ? `<span class="btn-group"><button class="btn small" data-board-copy="${esc(b._id)}">Für WhatsApp kopieren</button><button class="btn small" data-board-edit="${esc(b._id)}">Bearbeiten</button></span>` : `<button class="btn small" data-board-ask="${esc(b._id)}">Frage dazu stellen</button>`}</div>
       ${qs.length ? `<div class="board-qs">${qs.map((q) => `<div class="board-q"><b>${esc(lalei ? q.name : "Deine Frage")}:</b> ${esc(q.text)}${q.reply ? `<div class="reply"><b>Antwort:</b> ${rich(q.reply)}</div>` : lalei ? ' <button class="link" data-goto="inbox">im Eingang beantworten</button>' : ' <span class="muted">(noch keine Antwort)</span>'}</div>`).join("")}</div>` : ""}
@@ -4333,13 +4382,16 @@ window.LaleiStore = (() => {
   };
   function openBoardEditor(id) {
     const src = id ? byId(state.board, id) : null;
-    const d = src ? JSON.parse(JSON.stringify(src)) : { title: "", text: "", important: false, pinned: false, from: "", until: "", files: [] };
+    const d = src ? JSON.parse(JSON.stringify(src)) : { title: "", text: "", important: false, pinned: false, from: "", until: "", files: [], to: [] };
+    d.to = d.to || [];
     let sure = false;
     const o = modal("", "wide-modal");
     const draw = () => {
       o.querySelector(".modal").innerHTML = `<div class="lg-head"><span class="eyebrow">Pinnwand</span><h2>${src ? "Mitteilung bearbeiten" : "Neue Mitteilung"}</h2></div>
         <label class="field"><span>Titel</span><input data-bf="title" value="${esc(d.title)}" placeholder="z.B. Anwesenheit bis 1. März eintragen"></label>
         <label class="field"><span>Text</span><textarea data-bf="text" rows="6" data-mention>${esc(d.text)}</textarea></label>
+        <div class="field"><span>An</span><div class="seg" role="radiogroup" aria-label="Empfänger"><button type="button" data-bf-all="1" aria-pressed="${!d.to.length && !d._sel}">Ganzes Team</button><button type="button" data-bf-all="0" aria-pressed="${!!d.to.length || !!d._sel}">Ausgewählte Personen</button></div>
+          ${d.to.length || d._sel ? `<div class="present">${peopleSorted().map((p) => `<button type="button" data-bf-to="${esc(p._id)}" aria-pressed="${d.to.includes(p._id)}">${av(displayName(p))}${esc(displayName(p))}</button>`).join("")}</div><span class="hint">Nur diese Personen sehen die Mitteilung (dazu immer die Lagerleitung).</span>` : ""}</div>
         <div class="form-grid"><label class="toggle"><input type="checkbox" data-bf-c="important" ${d.important ? "checked" : ""}> Wichtig (wird hervorgehoben)</label><label class="toggle"><input type="checkbox" data-bf-c="pinned" ${d.pinned ? "checked" : ""}> Oben anheften</label></div>
         <div class="form-grid"><label class="field"><span>Erscheint ab (leer = sofort)</span><input type="date" data-bf="from" value="${esc(d.from)}"></label><label class="field"><span>Verschwindet nach (leer = nie)</span><input type="date" data-bf="until" value="${esc(d.until)}"></label></div>
         <div class="field"><span>Bilder und Dateien</span>${(d.files || []).map((f, i) => `<div class="link-row">${f.image ? "🖼" : "📄"} <span>${esc(f.name)}</span><button type="button" class="x" data-bf-rm="${i}" aria-label="Entfernen">✕</button></div>`).join("")}<label class="btn small" style="align-self:flex-start;cursor:pointer">Bild oder PDF hinzufügen<input type="file" accept="image/*,application/pdf" data-bf-file hidden></label></div>
@@ -4353,10 +4405,13 @@ window.LaleiStore = (() => {
     o.onclick = async (e) => {
       if (e.target === o || e.target.closest("[data-bf-close]")) return closeDrawer();
       const rm = e.target.closest("[data-bf-rm]"); if (rm) { d.files.splice(+rm.dataset.bfRm, 1); return draw(); }
+      const al = e.target.closest("[data-bf-all]"); if (al) { if (al.dataset.bfAll === "1") { d.to = []; d._sel = false; } else d._sel = true; return draw(); }
+      const bt = e.target.closest("[data-bf-to]"); if (bt) { const pid = bt.dataset.bfTo; d.to = d.to.includes(pid) ? d.to.filter((x) => x !== pid) : [...d.to, pid]; return draw(); }
       if (e.target.closest("[data-bf-del]")) { if (!sure) { sure = true; return draw(); } try { await state.db.doc("board/" + id).delete(); closeDrawer(); toast("Mitteilung gelöscht"); } catch (err) { handleWriteError(err); } return; }
       if (!e.target.closest("[data-bf-save]")) return;
       if (!d.title.trim()) return toast("Bitte einen Titel eingeben.");
-      const data = { ...d, title: d.title.trim(), by: src ? src.by : me(), createdAt: src ? src.createdAt : nowStamp(), updatedAt: nowStamp(), updatedBy: me() }; delete data._id;
+      if (d._sel && !d.to.length) return toast("Bitte mindestens eine Person wählen oder «Ganzes Team».");
+      const data = { ...d, title: d.title.trim(), by: src ? src.by : me(), createdAt: src ? src.createdAt : nowStamp(), updatedAt: nowStamp(), updatedBy: me() }; delete data._id; delete data._sel;
       try { await state.db.doc("board/" + (id || state.db.newId())).set(data); closeDrawer(); toast("Gespeichert"); } catch (err) { handleWriteError(err); }
     };
     draw();
@@ -4448,7 +4503,7 @@ window.LaleiStore = (() => {
       renderTodos(); renderPack();
       const hints = teamHints();
       $("#home-hints").innerHTML = hints.length ? `<section class="card hints"><div class="card-head"><h2>Hinweise</h2></div><div class="card-body stack" style="gap:6px">${hints.map((h) => `<div class="hint-row ${h.cls}">${h.html}${h.go ? ` <button class="link" data-goto="${h.go}">ansehen</button>` : h.tab ? ` <button class="link" data-ptab="home|${h.tab}">ansehen</button>` : ""}</div>`).join("")}</div></section>` : "";
-      const bl = boardSorted(state.board.filter(boardActive));
+      const bl = boardSorted(state.board.filter((b) => boardActive(b) && boardFor(b)));
       $("#home-board").innerHTML = bl.length ? `<div class="sec-label">Mitteilungen der Lagerleitung</div>${bl.map(boardCard).join("")}` : "";
       const a = myAssignments();
       $("#home-mine").innerHTML = `<div class="mine-grid">
@@ -6120,6 +6175,238 @@ window.LaleiStore = (() => {
     };
   });
 
+  // =====================================================================
+  // Etappe 3: Glocke (Mitteilungen, Erwähnungen, Deadlines), Feedback zum Tool, Pinnwand an Auswahl
+  // und Reaktionen, Pausen, eigene Notfall-Liste, «Wer ist heute da», «Tag 3 von 7», Mindestbesetzung,
+  // Tour für die Lagerleitung
+  // =====================================================================
+  NEUES.unshift({ id: "2026-11-etappe3", titel: "Neu: Glocke, Pinnwand und Lager", punkte: [
+    "Die <b>Glocke</b> 🔔 oben zeigt, was neu ist: Mitteilungen, Erwähnungen, dir zugeteilte Aufgaben und bald fällige Deadlines.",
+    "<b>Feedback zum Tool</b> geht direkt an die Verantwortlichen des Tools (Einstellungen oder unten links).",
+    "Mitteilungen auf der Pinnwand gehen ans ganze Team oder an <b>ausgewählte Personen</b>. Alle können mit einem Emoji <b>reagieren</b>.",
+    "Infos-Abschnitte können <b>nur für die Lagerleitung</b> sichtbar sein.",
+    "<b>Mehrere Pausen</b> im Zeitplan, eine eigene <b>Notfall-Liste</b>, <b>Mindestbesetzung</b> pro Dienst und im Lager «Wer ist heute da» und «Tag 3 von 7».",
+  ] });
+  Object.assign(ERR, { TEXT_FEHLT: "Bitte einen Text eingeben." });
+
+  // ---------- Pinnwand: an wen? ----------
+  function boardFor(b) { return isLaLei() || !(b.to || []).length || b.to.includes(myId()); }
+
+  // ---------- Reaktionen ----------
+  const EMOJIS = ["👍", "❤️", "😂", "🎉", "👀"];
+  state.react = state.react || [];
+  function reactBar(b) {
+    const list = (state.react || []).filter((r) => r.board === b._id); const mine = list.find((r) => r.person === myId());
+    const darf = !isReadOnly() && !state.asTeam && !isClosed() && myId();
+    const counts = EMOJIS.map((e) => [e, list.filter((r) => r.emoji === e)]).filter(([, l]) => l.length || darf);
+    if (!counts.length) return "";
+    return `<div class="reacts" role="group" aria-label="Reaktionen">${counts.map(([e, l]) => `<button type="button" class="react ${mine && mine.emoji === e ? "on" : ""} ${l.length ? "" : "empty"}" ${darf ? `data-react="${esc(b._id)}|${e}"` : "disabled"} title="${esc(l.map((r) => r.name).join(", ") || "Reagieren")}" aria-pressed="${!!(mine && mine.emoji === e)}">${e}${l.length ? `<span>${l.length}</span>` : ""}</button>`).join("")}</div>`;
+  }
+  document.addEventListener("click", async (e) => {
+    const b = e.target.closest && e.target.closest("[data-react]"); if (!b) return;
+    const [board, emoji] = b.dataset.react.split("|"); const id = `${board}~${myId()}`; const mine = (state.react || []).find((r) => r._id === id);
+    try { if (mine && mine.emoji === emoji) await state.db.batch([{ op: "delete", coll: "react", id }]); else await state.db.batch([{ op: "set", coll: "react", id, data: { board, person: myId(), name: me(), emoji, at: nowStamp() } }]); }
+    catch (err) { toast(STORE.isGas && /BERECHTIGUNG|KEINE/.test(String(err && err.message)) ? "Reaktionen gehen erst, wenn die neue Code.gs eingesetzt ist." : errMsg(err)); }
+  });
+
+  // ---------- Glocke ----------
+  const bellKey = () => `lalei-glocke-${state.lagerId}-${myId()}`;
+  const bellSeen = () => { try { return JSON.parse(store.get(bellKey()) || "null") || { at: Date.now() - 7 * DAY, keys: {} }; } catch { return { at: 0, keys: {} }; } };
+  function bellItems() {
+    const n = me(); if (!n || !state.lagerId) return [];
+    const seen = bellSeen(); const since = seen.at; const out = [];
+    const neu = (x) => ts(x.updatedAt || x.createdAt) > since && (x.updatedBy || x.by || x.author || "") !== n;
+    for (const b of state.board || []) if (boardActive(b) && boardFor(b) && ts(b.createdAt) > since && b.by !== n) out.push({ key: "b" + b._id, at: b.createdAt, ico: "📌", text: `Neue Mitteilung: <b>${esc(b.title || "")}</b>`, attr: `data-bell-go="${isLaLei() ? "board" : "home"}"` });
+    if (isLaLei()) {
+      const t0 = iso(today()), lim = addDays(t0, 3);
+      for (const t of state.tasks.values()) {
+        if (t.status === "Erledigt") continue;
+        if (t.owner === n && neu(t)) { const last = (t.log || []).slice(-1)[0] || {}; out.push({ key: "t" + t._id + t.updatedAt, at: t.updatedAt, ico: "☑", text: /Verantwortlich|übernimmt|erfasst/.test(last.text || "") ? `${esc(t.updatedBy)} hat dir <b>${esc(t.title)}</b> zugeteilt` : `${esc(t.updatedBy)} hat deine Aufgabe <b>${esc(t.title)}</b> geändert`, attr: `data-open="${esc(t._id)}"` }); }
+        else if (neu(t) && [t.note, ...(t.log || []).filter((l) => ts(l.at) > since).map((l) => l.text)].some((x) => String(x || "").split("\n").some(mentionsMe))) out.push({ key: "tm" + t._id + t.updatedAt, at: t.updatedAt, ico: "@", text: `${esc(t.updatedBy)} hat dich bei <b>${esc(t.title)}</b> erwähnt`, attr: `data-open="${esc(t._id)}"` });
+        if ((t.owner === n || t.support === n) && t.deadline && !t.ongoing && t.deadline <= lim) out.push({ key: "d" + t._id + t.deadline, at: t.deadline, ico: t.deadline < t0 ? "⚠️" : "⏰", text: `${t.deadline < t0 ? "Überfällig" : t.deadline === t0 ? "Heute fällig" : "Fällig am " + fmt(t.deadline)}: <b>${esc(t.title)}</b>`, attr: `data-open="${esc(t._id)}"`, due: true });
+      }
+      for (const e of state.journal) if (neu(e) && entryText(e).split("\n").some(mentionsMe)) out.push({ key: "m" + e._id + e.updatedAt, at: e.updatedAt || e.createdAt, ico: "@", text: `${esc(e.updatedBy || e.author || e.by || "Jemand")} hat dich erwähnt: <b>${esc(e.title || e.topic || "")}</b>`, attr: `data-open-entry="${esc(e._id)}"` });
+      for (const h of state.hoecks) if (neu(h) && String(h.note || "").split("\n").some(mentionsMe)) out.push({ key: "h" + h._id + h.updatedAt, at: h.updatedAt, ico: "@", text: `Erwähnt beim Höck <b>${esc(h.title || "")}</b>`, attr: `data-open-hoeck="${esc(h._id)}"` });
+      const ib = inboxCount(); if (ib) out.push({ key: "i" + ib + "-" + iso(today()), at: nowStamp(), ico: "📥", text: `${ib} ${ib === 1 ? "neuer Eintrag" : "neue Einträge"} im Eingang`, attr: 'data-bell-go="inbox"', sticky: true });
+    } else {
+      for (const f of state.feedback || []) if (f.person === myId() && f.reply && ts(f.repliedAt) > since) out.push({ key: "f" + f._id + f.repliedAt, at: f.repliedAt, ico: "💬", text: `Die Lagerleitung hat auf «${esc(String(f.text || "").slice(0, 40))}» geantwortet`, attr: 'data-bell-tab="home|fb"' });
+    }
+    const tf = STORE.toolFb ? STORE.toolFb() : 0; if (tf) out.push({ key: "tf" + tf, at: nowStamp(), ico: "🛠", text: `${tf} ${tf === 1 ? "neue Rückmeldung" : "neue Rückmeldungen"} zum Tool (im Admin)`, attr: "data-bell-admin", sticky: true });
+    return out.map((x) => ({ ...x, unread: x.due || x.sticky ? !seen.keys[x.key] : true })).sort((a, b) => (b.unread ? 1 : 0) - (a.unread ? 1 : 0) || String(b.at).localeCompare(String(a.at)));
+  }
+  function bellPaint() {
+    let b = $("#bell"); const brand = $(".side .brand");
+    if (!b && brand) { brand.insertAdjacentHTML("beforeend", `<button class="bell" id="bell" type="button" aria-label="Mitteilungen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="count" id="bell-count" hidden></span></button>`); b = $("#bell"); }
+    if (!b) return; const n = bellItems().filter((x) => x.unread).length; const c = $("#bell-count"); c.hidden = !n; c.textContent = n > 9 ? "9+" : n;
+    b.setAttribute("aria-label", n ? `${n} neue Mitteilungen` : "Mitteilungen");
+  }
+  function bellOpen() {
+    const items = bellItems();
+    const o = modal(`<div class="lg-head"><span class="eyebrow">Glocke</span><h2>Was ist neu für dich</h2></div>
+      ${items.length ? `<div class="bell-list">${items.map((x) => `<button type="button" class="bell-row ${x.unread ? "unread" : ""}" ${x.attr}><span class="bell-ico" aria-hidden="true">${x.ico}</span><span class="bell-t">${x.text}</span>${x.due ? "" : `<span class="muted bell-at">${/^\d{4}-\d\d-\d\dT/.test(String(x.at)) ? esc(stampFmt(x.at)) : ""}</span>`}</button>`).join("")}</div>`
+        : '<div class="empty"><b>Alles gesehen</b>Neue Mitteilungen, Erwähnungen und bald fällige Aufgaben erscheinen hier.</div>'}
+      <p class="hint" style="margin:0">Die Glocke zeigt Neues, solange das Tool offen ist. Nachrichten aufs Handy gibt es nicht.</p>
+      <div class="lg-foot"><span></span><button class="btn" data-bell-close>Schliessen</button></div>`, "bell-modal");
+    store.set(bellKey(), JSON.stringify({ at: Date.now(), keys: Object.fromEntries(items.map((x) => [x.key, 1])) })); bellPaint();
+    o.onclick = (e) => {
+      if (e.target === o || e.target.closest("[data-bell-close]")) return closeDrawer();
+      const r = e.target.closest(".bell-row"); if (!r) return; closeDrawer();
+      if (r.dataset.bellGo) return setView(r.dataset.bellGo);
+      if (r.dataset.bellTab) { const [v, k] = r.dataset.bellTab.split("|"); state.tabs[v] = k; return setView(v); }
+      if (r.hasAttribute("data-bell-admin")) return showAdmin();
+      if (r.dataset.open) return openTask(r.dataset.open);
+      if (r.dataset.openEntry) return openEntry(null, r.dataset.openEntry);
+      if (r.dataset.openHoeck) return openEntry("hoeck", r.dataset.openHoeck);
+    };
+  }
+  document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("#bell")) bellOpen(); });
+
+  // ---------- Seitenleiste: Glocke, «Tag 3 von 7», Feedback zum Tool ----------
+  const renderSideOrig3 = renderSide;
+  renderSide = function () {
+    renderSideOrig3(); bellPaint();
+    if (isCampNow()) { const r = campRange(); const total = daysBetween(parse(r.from), parse(r.to)) + 1; const nr = daysBetween(parse(r.from), today()) + 1;
+      const cd = $("#countdown"); if (cd) cd.innerHTML = `<b>Tag ${nr} von ${total}</b><span>${nr === total ? "Letzter Lagertag" : `noch ${total - nr} ${total - nr === 1 ? "Tag" : "Tage"}`}</span>`; }
+    const sf = $(".side-foot"); if (sf && !$("#tool-fb", sf)) $("#logout", sf).insertAdjacentHTML("beforebegin", `<button class="side-link" id="tool-fb" type="button">Feedback zum Tool</button>`);
+  };
+
+  // ---------- Feedback zum Tool ----------
+  function toolFeedbackOpen() {
+    const o = modal(`<div class="lg-head"><span class="eyebrow">Feedback zum Tool</span><h2>Was können wir besser machen?</h2></div>
+      <p class="muted" style="margin:0">Geht an die Verantwortlichen des Lager-Tools, nicht an die Lagerleitung deines Lagers.</p>
+      <div class="seg" role="radiogroup" aria-label="Art">${["Idee", "Fehler", "Lob", "Frage"].map((k, i) => `<button type="button" data-tf-art="${k}" aria-pressed="${i === 0}">${k}</button>`).join("")}</div>
+      <textarea id="tf-text" rows="5" placeholder="Was ist dir aufgefallen? Wo im Tool?"></textarea>
+      <label class="toggle"><input type="checkbox" id="tf-anon"> Ohne meinen Namen senden</label>
+      <div class="lg-foot"><button class="link" data-tf-no>Abbrechen</button><button class="btn primary" data-tf-go>Senden</button></div>`);
+    let art = "Idee"; setTimeout(() => $("#tf-text", o).focus(), 30);
+    o.onclick = async (e) => {
+      if (e.target === o || e.target.closest("[data-tf-no]")) return closeDrawer();
+      const a = e.target.closest("[data-tf-art]"); if (a) { art = a.dataset.tfArt; o.querySelectorAll("[data-tf-art]").forEach((x) => x.setAttribute("aria-pressed", String(x === a))); return; }
+      if (!e.target.closest("[data-tf-go]")) return; const text = $("#tf-text", o).value.trim(); if (!text) return $("#tf-text", o).focus();
+      const b = e.target.closest("[data-tf-go]"); b.disabled = true;
+      try { await STORE.toolFeedback({ text: `${text}${state.view ? `\n(Seite: ${state.view})` : ""}`, art, anon: $("#tf-anon", o).checked }); closeDrawer(); toast("Danke! Dein Feedback ist angekommen."); }
+      catch (err) { b.disabled = false; toast(/UNBEKANNT|unbekannt|op/i.test(String(err && err.message)) ? "Das geht erst, wenn die neue Code.gs eingesetzt ist." : errMsg(err)); }
+    };
+  }
+  document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("#tool-fb, [data-tool-fb]")) toolFeedbackOpen(); });
+
+  // Admin: Feedback zum Tool lesen, Benachrichtigung einstellen
+  let tfAdmin = null, tfOverview = null;
+  async function tfLoad() { try { tfAdmin = await STORE.admin(adPw, "toolFeedback"); tfOverview = await STORE.admin(adPw, "overview"); } catch { tfAdmin = { items: [], notify: [] }; } tfPaint(); }
+  function tfPaint() {
+    const m = $(".admin-modal"); if (!m || !adPw || !/Angemeldet als Admin/.test(m.textContent)) return;
+    const v = tfAdmin; const items = v ? v.items || [] : []; const notify = v ? v.notify || [] : [];
+    const pers = tfOverview ? tfOverview.lagers.flatMap((l) => l.people.filter((p) => p.funktion !== "Lesen").map((p) => ({ lager: l.id, lt: l.title, person: p.id, name: p.name }))) : [];
+    const html = `<section class="card" id="ad-toolfb"><div class="card-head"><h2>Feedback zum Tool</h2>${items.some((x) => !x.read) ? '<button class="btn small" data-tf-readall>Alle als gelesen</button>' : ""}</div><div class="card-body stack" style="gap:10px">
+      ${!v ? '<span class="muted">Wird geladen …</span>' : items.length ? items.slice(0, 60).map((x) => `<div class="mrow tf-row ${x.read ? "" : "unread"}"><div class="entry-top"><span class="tag plain">${esc(x.art || "Idee")}</span><b>${esc(x.name || "?")}</b><span class="muted" style="font-size:12px">${esc(x.role === "team" ? "Team" : "Lagerleitung")} · ${esc(((tfOverview && tfOverview.lagers.find((l) => l.id === x.lager)) || {}).title || x.lager || "")} · ${esc(stampFmt(x.at))}</span><span style="margin-left:auto;display:flex;gap:6px">${x.read ? "" : `<button class="btn small" data-tf-read="${esc(x.id)}">Gelesen</button>`}<button class="btn small ghost danger" data-tf-rm="${esc(x.id)}">Löschen</button></span></div><div class="rich">${rich(x.text)}</div></div>`).join("") : '<span class="muted">Noch kein Feedback.</span>'}
+      ${v ? `<div class="field"><span>Wer sieht neues Feedback in der Glocke? (im eigenen Lager)</span><div class="present">${pers.map((p) => `<button type="button" data-tf-who="${esc(p.lager)}|${esc(p.person)}" aria-pressed="${notify.some((n) => n.lager === p.lager && n.person === p.person)}">${av(p.name)}${esc(p.name)} <span class="muted" style="font-size:11.5px">${esc(p.lt)}</span></button>`).join("") || '<span class="muted">Keine Lagerleitung erfasst.</span>'}</div></div>` : ""}</div></section>`;
+    const old = $("#ad-toolfb", m); if (old) old.outerHTML = html; else { const ref = $("#ad-vorlagen", m) || [...m.querySelectorAll("section.card")].find((s) => /Wartungshinweis/.test(s.textContent)); if (ref) ref.insertAdjacentHTML("beforebegin", html); }
+    if (!v) tfLoad();
+  }
+  const showAdminOrig3 = showAdmin;
+  showAdmin = function () {
+    tfAdmin = null; tfOverview = null; showAdminOrig3(); const m = $(".admin-modal"); if (!m) return;
+    new MutationObserver(() => { if (!$("#ad-toolfb", m)) tfPaint(); }).observe(m, { childList: true });
+    m.addEventListener("click", async (e) => {
+      const tun = async (fn) => { try { await fn(); } catch (err) { toast(errMsg(err)); } tfAdmin = null; tfPaint(); };
+      const r = e.target.closest("[data-tf-read]"); if (r) return tun(() => STORE.admin(adPw, "toolFeedbackRead", { id: r.dataset.tfRead }));
+      const rm = e.target.closest("[data-tf-rm]"); if (rm) { if (!confirm("Dieses Feedback löschen?")) return; return tun(() => STORE.admin(adPw, "toolFeedbackRead", { id: rm.dataset.tfRm, remove: rm.dataset.tfRm })); }
+      if (e.target.closest("[data-tf-readall]")) return tun(() => STORE.admin(adPw, "toolFeedbackRead", {}));
+      const w = e.target.closest("[data-tf-who]"); if (w) { const [lager, person] = w.dataset.tfWho.split("|"); const cur = (tfAdmin.notify || []).map((x) => ({ lager: x.lager, person: x.person })); const on = cur.some((x) => x.lager === lager && x.person === person);
+        const next = on ? cur.filter((x) => !(x.lager === lager && x.person === person)) : [...cur, { lager, person }]; return tun(() => STORE.admin(adPw, "setNotify", { personen: next })); }
+    });
+  };
+
+  // ---------- Pausen (mehrere, selbst benannt) ----------
+  function pausen() { const c = cfg(); if (Array.isArray(c.pausen)) return c.pausen; const d = c.dates || {}; return d.pauseFrom && d.pauseTo ? [{ id: "p1", label: "Pause", from: d.pauseFrom, to: d.pauseTo }] : []; }
+  function inPause(wi, we) { return pausen().some((p) => p.from && p.to && p.from <= we && p.to >= wi); }
+  const savePausen = (arr) => writeConfig({ pausen: arr, dates: { pauseFrom: "", pauseTo: "" } });
+
+  // ---------- Notfall-Liste (eigene Funktionen) ----------
+  const securityPeopleOrig = securityPeople;
+  securityPeople = function () {
+    const list = cfg().notfall; if (!Array.isArray(list) || !list.length) return securityPeopleOrig();
+    return list.filter((x) => x.name || x.tel).map((x) => { const p = state.peopleDocs.find((y) => displayName(y) === x.name); return { name: x.name || "", role: x.fn || "", id: p ? p._id : "", tel: x.tel || (p ? p.telefon || "" : "") }; });
+  };
+  const saveNotfall = (arr) => writeConfig({ notfall: arr });
+
+  const setUpdateOrig3 = views.settings.update;
+  views.settings.update = function () {
+    setUpdateOrig3(); const ro = isReadOnly() || isClosed();
+    const dg = $("#set-lager .dates-grid"); document.querySelectorAll("#set-lager .pz-field").forEach((x) => x.remove());
+    if (dg) dg.insertAdjacentHTML("afterend", `<div class="field pz-field" style="margin-top:14px"><span>Pausen (z.B. Sommerferien, erscheinen im Zeitplan)</span><div class="list-edit pz-list">${pausen().map((p, i) => `<div class="r pz-row"><input data-pz="${i}|label" value="${esc(p.label || "")}" placeholder="Bezeichnung" aria-label="Bezeichnung"><input type="date" data-pz="${i}|from" value="${esc(p.from || "")}" aria-label="Pause von"><input type="date" data-pz="${i}|to" value="${esc(p.to || "")}" aria-label="Pause bis"><button class="btn small ghost" data-pz-rm="${i}" aria-label="Pause entfernen">✕</button></div>`).join("")}<button class="btn small" data-pz-add style="justify-self:start" ${ro ? "disabled" : ""}>+ Pause</button></div></div>`);
+    const sos = $("#set-sos"); if (!sos) return; const list = Array.isArray(cfg().notfall) ? cfg().notfall : [];
+    sos.innerHTML = `<p class="hint" style="margin:0 0 10px">Diese Liste erscheint beim roten Notfall-Knopf, auch für das Team. Ihr bestimmt selbst, welche Funktionen und Personen drauf sind. ${list.length ? "" : "Solange die Liste leer ist, stehen dort Leitung und Stellvertretung von «Sicherheit» aus der Ressortverteilung."}</p>
+      <div class="list-edit nf-list">${list.map((x, i) => `<div class="r nf-row"><input data-nf="${i}|fn" value="${esc(x.fn || "")}" placeholder="Funktion, z.B. Sanität" aria-label="Funktion"><select data-nf="${i}|name" aria-label="Verantwortlich">${personOptions(x.name, "Person wählen")}</select><input type="tel" data-nf="${i}|tel" value="${esc(x.tel || "")}" placeholder="Telefon" aria-label="Telefon"><button class="btn small ghost" data-nf-rm="${i}" aria-label="Zeile entfernen">✕</button></div>`).join("")}</div>
+      <div class="btn-group" style="margin-top:10px"><button class="btn small" data-nf-add ${ro ? "disabled" : ""}>+ Zeile</button><button class="btn small" data-nf-ress ${ro ? "disabled" : ""}>Aus Ressortverteilung übernehmen</button></div>`;
+  };
+  view.addEventListener("change", (e) => {
+    const t = e.target;
+    if (t.dataset.pz) { const [i, k] = t.dataset.pz.split("|"); const arr = pausen().map((x) => ({ ...x })); arr[+i][k] = t.value.trim(); return savePausen(arr); }
+    if (t.dataset.nf) { const [i, k] = t.dataset.nf.split("|"); const arr = (cfg().notfall || []).map((x) => ({ ...x })); arr[+i][k] = t.value.trim();
+      if (k === "name" && !arr[+i].tel) { const p = state.peopleDocs.find((y) => displayName(y) === t.value); if (p && p.telefon) arr[+i].tel = p.telefon; } return saveNotfall(arr); }
+    if (t.dataset.svcMin !== undefined) { const arr = planDoc().services.map((s) => ({ ...s })); const v = Math.max(0, Math.min(20, parseInt(t.value, 10) || 0)); if (v) arr[+t.dataset.svcMin].min = v; else delete arr[+t.dataset.svcMin].min; return savePlan({ services: arr }); }
+  });
+  view.addEventListener("click", (e) => {
+    if (e.target.closest("[data-pz-add]")) return savePausen([...pausen(), { id: "p" + uid(), label: "", from: "", to: "" }]);
+    const pr = e.target.closest("[data-pz-rm]"); if (pr) return savePausen(pausen().filter((_, i) => i !== +pr.dataset.pzRm));
+    if (e.target.closest("[data-nf-add]")) return saveNotfall([...(cfg().notfall || []), { fn: "", name: "", tel: "" }]);
+    const nr = e.target.closest("[data-nf-rm]"); if (nr) return saveNotfall((cfg().notfall || []).filter((_, i) => i !== +nr.dataset.nfRm));
+    if (e.target.closest("[data-nf-ress]")) {
+      const add = securityPeopleOrig().map((s) => ({ fn: s.role, name: s.name, tel: s.tel || "" })); const cur = cfg().notfall || [];
+      const neu = add.filter((a) => !cur.some((c) => c.name === a.name && c.fn === a.fn));
+      if (!neu.length) return toast(add.length ? "Alle aus der Ressortverteilung stehen schon drauf." : "Bei «Sicherheit» ist in der Ressortverteilung noch niemand eingeteilt.");
+      saveNotfall([...cur, ...neu]).then(() => toast(`${neu.length} übernommen`));
+    }
+  });
+
+  // ---------- Schichtplan: Mindestbesetzung ----------
+  const planUpdateOrig3 = views.plan.update;
+  views.plan.update = function () {
+    planUpdateOrig3(); const svcs = planDoc().services;
+    document.querySelectorAll("#plan-body [data-svc]").forEach((inp) => { const i = +inp.dataset.svc; const row = inp.closest(".r"); if (!row || $("[data-svc-min]", row)) return; row.classList.add("svc-row-edit");
+      const x = row.querySelector("[data-svc-rm]"); x.insertAdjacentHTML("beforebegin", `<label class="min-in" title="Mindestbesetzung"><span>mind.</span><input type="number" min="0" max="20" inputmode="numeric" data-svc-min="${i}" value="${(svcs[i] || {}).min || ""}" aria-label="Mindestbesetzung ${esc((svcs[i] || {}).name || "")}"></label>`); });
+    const kurz = []; for (const d of days()) for (const s of svcs) { const n = ((planDoc().cells || {})[d.id + "|" + s.id] || []).length; if ((s.min || 0) > n) kurz.push(`${s.name} am ${d.label}`); }
+    if (kurz.length) $("#plan-body").insertAdjacentHTML("afterbegin", `<div class="conflict-note">${kurz.length} ${kurz.length === 1 ? "Dienst ist" : "Dienste sind"} noch zu knapp besetzt: ${esc(kurz.slice(0, 6).join(", "))}${kurz.length > 6 ? " …" : ""}</div>`);
+  };
+
+  // ---------- Lager-Modus: wer ist heute da ----------
+  function heuteDa(dayId) {
+    const dps = dayparts(); const da = [], teil = [], weg = [], offen = [];
+    for (const p of peopleSorted()) { const s = attDoc("p_" + p._id); const v = dps.map((_, i) => s[dayId + "|" + i] || "O"); const n = displayName(p);
+      if (v.every((x) => x === "A")) da.push(n); else if (v.some((x) => x === "A")) teil.push(`${n} (${dps.filter((_, i) => v[i] === "A").join(", ")})`); else if (v.every((x) => x === "F")) weg.push(n); else offen.push(n); }
+    return { da, teil, weg, offen };
+  }
+  const ovUpdateOrig3 = views.overview.update;
+  views.overview.update = function () {
+    ovUpdateOrig3(); const card = $("#ov-today .today"); const ds = days(); if (!card || !ds.length) return;
+    const sel = ds.find((d) => d.id === state.todayDay) || ds.find((d) => d.date === iso(today())) || ds[0]; const h = heuteDa(sel.id);
+    const chips = (l, cls = "") => l.map((n) => `<span class="pchip-s ${cls}">${esc(n)}</span>`).join("");
+    card.insertAdjacentHTML("beforeend", `<div class="card-body heute-da"><span class="eyebrow">Wer ist heute da</span>
+      <div class="chipset">${chips(h.da) || '<span class="muted" style="font-size:13px">Niemand ganz da.</span>'}</div>
+      ${h.teil.length ? `<span class="muted" style="font-size:12.5px">Teilweise:</span><div class="chipset">${chips(h.teil)}</div>` : ""}
+      ${h.weg.length ? `<span class="muted" style="font-size:12.5px">Nicht da: ${esc(h.weg.join(", "))}</span>` : ""}${h.offen.length ? `<span class="muted" style="font-size:12.5px">Noch offen: ${esc(h.offen.join(", "))}</span>` : ""}</div>`);
+  };
+
+  // ---------- Tour für die Lagerleitung (einmal) ----------
+  function laleiTour(force) {
+    if (!isLaLei() || state.asTeam || (!force && $(".overlay"))) return;
+    const key = `lalei-tour-lalei-${state.lagerId}-${myId()}`; if (!force && store.get(key)) return; store.set(key, "1");
+    const steps = [["Übersicht", "Stand der Planung, nächster Meilenstein, was fällig ist und der Lager-Check «Sind wir bereit?»."], ["Aufgaben", "Alle Aufgaben aller Ressorts als Liste oder Kanban. Verantwortlich ist automatisch die Ressortleitung. Mit «Auswählen» änderst du mehrere auf einmal, «Ansichten» merkt sich deine Filter."], ["Protokoll", "Höcks planen, Traktanden sammeln und protokollieren. Im Höck-Modus geht ihr ein Traktandum nach dem anderen durch. Mit @Name, @alle oder @Ressort erwähnst du jemanden."], ["Pinnwand und Eingang", "Mitteilungen ans ganze Team oder an ausgewählte Personen. Fragen, Ideen und Anfragen aus dem Team landen im Eingang."], ["Lager einrichten", "Daten, Pausen, Team, Ressortverteilung, Meilensteine, Tage, Notfall-Liste und Zugang fürs Team."], ["Glocke und Notfall", "Die Glocke oben zeigt Neues für dich und bald fällige Aufgaben. Der rote Knopf «Notfall» zeigt die Notfall-Liste und die Lageradresse."]];
+    let i = 0; const o = modal("", "tour-modal");
+    const draw = () => { o.querySelector(".modal").innerHTML = `<div class="lg-head"><span class="eyebrow">Kurze Tour · ${i + 1} von ${steps.length}</span><h2>${steps[i][0]}</h2></div><p style="margin:0">${steps[i][1]}</p><div class="tour-dots">${steps.map((_, j) => `<i class="${j === i ? "on" : ""}"></i>`).join("")}</div><div class="lg-foot"><button class="link" data-tour-end>Überspringen</button><span class="btn-group">${i ? '<button class="btn" data-tour-back>Zurück</button>' : ""}<button class="btn primary" data-tour-next>${i < steps.length - 1 ? "Weiter" : "Los geht's"}</button></span></div>`; };
+    o.onclick = (e) => { if (e.target.closest("[data-tour-end]") || (e.target.closest("[data-tour-next]") && i === steps.length - 1)) return closeDrawer(); if (e.target.closest("[data-tour-next]")) { i++; draw(); } if (e.target.closest("[data-tour-back]")) { i--; draw(); } };
+    draw();
+  }
+  const ovUpdateTour = views.overview.update;
+  views.overview.update = function () { ovUpdateTour(); setTimeout(() => laleiTour(false), 1500); };
+  document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("[data-lalei-tour]")) laleiTour(true); });
+  const prefsUpdateOrig3 = views.prefs.update;
+  views.prefs.update = function () {
+    prefsUpdateOrig3(); const b = $("#prefs-body"); if (!b || $("#prefs-extra3", b)) return;
+    b.insertAdjacentHTML("beforeend", `<section class="card" id="prefs-extra3"><div class="card-head"><h2>Hilfe und Feedback</h2></div><div class="card-body stack" style="gap:10px">${isLaLei() ? '<button class="btn" data-lalei-tour style="align-self:flex-start">Tour nochmals ansehen</button>' : ""}<button class="btn" data-tool-fb style="align-self:flex-start">Feedback zum Tool senden</button></div></section>`);
+  };
+
   // ---------- boot ----------
   state.jTab = store.get("lalei-jtab") || "all";
   try { state.tabs = JSON.parse(store.get("lalei-tabs") || "{}") || {}; } catch { state.tabs = {}; }
@@ -6156,7 +6443,7 @@ window.LaleiStore = (() => {
     on("attreq", (snap) => { state.attreq = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
     on("daypage", (snap) => { state.daypages = new Map(snap.docs.map((d) => [d.id, d.data()])); });
     on("presence", (snap) => { state.presence = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
-    for (const c of ["board", "swap", "trips", "groups", "versions"]) on(c, (snap) => { state[c] = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
+    for (const c of ["board", "swap", "trips", "groups", "versions", "react"]) on(c, (snap) => { state[c] = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
     for (const c of ["count", "shop", "log", "media"]) on(c, () => {});
     STORE.onLoggedOut((id) => { if (state.lagerId === id) { toast("Bitte melde dich neu an."); showStart(); showLogin(id); } });
     const last = store.get("lalei-lager");

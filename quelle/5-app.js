@@ -582,7 +582,7 @@
       const weeks = []; for (let w = new Date(w0); w <= w1; w = new Date(w.getTime() + 7 * DAY)) weeks.push(new Date(w));
       const nowW = iso(monday(today()));
       const wk = weeks.map((w) => { const wi = iso(w); const we = iso(new Date(w.getTime() + 6 * DAY)); const m = ms.find((x) => x.date >= wi && x.date <= we);
-        return { w, wi, we, m, pause: d.pauseFrom && d.pauseTo && d.pauseFrom <= we && d.pauseTo >= wi, camp: d.prep && d.end && d.prep <= we && d.end >= wi, now: wi === nowW }; });
+        return { w, wi, we, m, pause: inPause(wi, we), camp: d.prep && d.end && d.prep <= we && d.end >= wi, now: wi === nowW }; });
       const months = []; for (const k of wk) { const key = `${k.w.getFullYear()}-${k.w.getMonth()}`; if (!months.length || months[months.length - 1].key !== key) months.push({ key, label: `${MONTHS[k.w.getMonth()]} ${k.w.getFullYear()}`, n: 0 }); months[months.length - 1].n++; }
       const cls = (k) => [k.m ? "msw" : "", k.now ? "now" : "", k.pause ? "pause" : "", k.camp ? "camp" : ""].join(" ");
       const head = `<tr><th class="rowh" rowspan="2"></th>${months.map((m) => `<th class="mo" colspan="${m.n}">${m.n > 1 ? m.label : ""}</th>`).join("")}</tr><tr>${wk.map((k) => `<th class="wk ${k.m ? "msw" : ""} ${k.now ? "now" : ""}" title="Woche ab ${fmtFull(k.wi)}">${k.w.getDate()}</th>`).join("")}</tr>`;
@@ -770,7 +770,7 @@
       if (!ds.length) { $("#plan-body").innerHTML = `<section class="card"><div class="empty"><b>Noch keine Lagertage</b>Lege zuerst unter «Lager einrichten › Tage & Tageszeiten» die Tage fest.<br><br><button class="btn primary" data-goto="settings">Zu «Lager einrichten»</button></div></section>`; return; }
       const absentDay = (name, dayId) => { const p = state.peopleDocs.find((x) => displayName(x) === name); if (!p) return false; const s = attDoc("p_" + p._id); return dayparts().every((_, i) => s[dayId + "|" + i] === "F"); };
       $("#plan-body").innerHTML = `<section class="card"><div class="table-wrap"><table class="plan-table"><thead><tr><th>Dienst</th>${ds.map((d) => `<th>${esc(d.label)}${d.date ? `<div class="muted" style="font-weight:400;text-transform:none;letter-spacing:0">${fmtFull(d.date)}</div>` : ""}</th>`).join("")}</tr></thead><tbody>
-        ${plan.services.map((s) => `<tr><td><b style="font-weight:600">${esc(s.name)}</b></td>${ds.map((d) => { const names = (plan.cells || {})[d.id + "|" + s.id] || []; return `<td class="pc" data-plan="${esc(s.id)}|${esc(d.id)}" tabindex="0" role="button" aria-label="${esc(s.name)} am ${esc(d.label)} einteilen"><div class="chipset">${names.map((n) => `<span class="pchip-s ${absentDay(n, d.id) ? "warn" : ""}" title="${absentDay(n, d.id) ? "laut Anwesenheit an diesem Tag abwesend" : ""}">${av(n)}${esc(n)}</span>`).join("") || '<span class="add-hint">+ einteilen</span>'}</div></td>`; }).join("")}</tr>`).join("")}
+        ${plan.services.map((s) => `<tr><td><b style="font-weight:600">${esc(s.name)}</b></td>${ds.map((d) => { const names = (plan.cells || {})[d.id + "|" + s.id] || []; const kurz = (s.min || 0) > names.length; return `<td class="pc ${kurz ? "short" : ""}" ${kurz ? `title="Mindestens ${s.min} Personen nötig"` : ""} data-plan="${esc(s.id)}|${esc(d.id)}" tabindex="0" role="button" aria-label="${esc(s.name)} am ${esc(d.label)} einteilen"><div class="chipset">${names.map((n) => `<span class="pchip-s ${absentDay(n, d.id) ? "warn" : ""}" title="${absentDay(n, d.id) ? "laut Anwesenheit an diesem Tag abwesend" : ""}">${av(n)}${esc(n)}</span>`).join("") || '<span class="add-hint">+ einteilen</span>'}${kurz ? `<span class="min-badge">${names.length}/${s.min}</span>` : ""}</div></td>`; }).join("")}</tr>`).join("")}
         </tbody></table></div></section>
         <section class="card"><div class="card-head"><h2>Dienste</h2><span class="saved"></span></div><div class="card-body"><div class="list-edit">${plan.services.map((s, i) => `<div class="r"><input data-svc="${i}" value="${esc(s.name)}" aria-label="Dienst"><button class="btn small ghost" data-svc-rm="${i}" aria-label="Dienst entfernen">✕</button></div>`).join("")}
           <form class="r" id="svc-add"><input id="svc-new" placeholder="Neuer Dienst, z.B. Ämtli-Kontrolle"><button class="btn small">+ Dienst</button></form></div></div></section>`;
@@ -798,7 +798,7 @@
     shell: () => `${pageHead("Infos &amp; Links", "Wichtiges für alle: Lagerhaus, Notfall, Kontakte, Links und Dokumente", `<div class="btn-group"><button class="btn primary" data-info-add>+ Abschnitt</button>${menu([['data-export="infos"', "Als Word"]])}</div>`)}<div id="info-body"></div>`,
     update() {
       const secs = (state.info || {}).sections || [];
-      $("#info-body").innerHTML = `<div class="info-grid">${secs.map((s) => `<section class="card info-sec ${s.emergency ? "emergency" : ""}"><div class="card-head"><h2>${esc(s.title || "Ohne Titel")}</h2><button class="link" data-info-edit="${esc(s.id)}">Bearbeiten</button></div><div class="card-body">${s.text ? `<div class="rich">${rich(s.text)}</div>` : ""}${fileList(s.images)}${linksView(s.links)}${!s.text && !(s.links || []).length && !(s.images || []).length ? '<span class="muted">Noch leer.</span>' : ""}</div></section>`).join("") || `<section class="card"><div class="empty">Noch keine Infos. Mit «+ Abschnitt» beginnen.</div></section>`}</div>
+      $("#info-body").innerHTML = `<div class="info-grid">${secs.map((s) => `<section class="card info-sec ${s.emergency ? "emergency" : ""}"><div class="card-head"><h2>${esc(s.title || "Ohne Titel")}${s.lalei ? ' <span class="tag plain" style="font-size:11px;vertical-align:middle">nur LaLei</span>' : ""}</h2><button class="link" data-info-edit="${esc(s.id)}">Bearbeiten</button></div><div class="card-body">${s.text ? `<div class="rich">${rich(s.text)}</div>` : ""}${fileList(s.images)}${linksView(s.links)}${!s.text && !(s.links || []).length && !(s.images || []).length ? '<span class="muted">Noch leer.</span>' : ""}</div></section>`).join("") || `<section class="card"><div class="empty">Noch keine Infos. Mit «+ Abschnitt» beginnen.</div></section>`}</div>
         <section class="card"><div class="card-head"><h2>Dokumente pro Ressort</h2><span class="muted">Links zu SharePoint, Drive usw. Es öffnet sich immer die aktuelle Version.</span></div>
         <div class="table-wrap"><table><tbody>${ressorts().map((r) => `<tr><td style="width:180px;vertical-align:top"><b style="font-weight:600">${esc(r.name)}</b></td><td>${linksView(r.links) || '<span class="muted" style="font-size:13px">Noch keine Dokumente</span>'}</td><td style="width:110px;text-align:right;vertical-align:top"><button class="link" data-ress-links="${esc(r.id)}">Bearbeiten</button></td></tr>`).join("")}</tbody></table></div></section>`;
     },
@@ -824,7 +824,7 @@
       const L = lagerDoc(); const d = cfg().dates || {};
       const df = (k, label) => `<label class="field"><span>${label}</span><input type="date" data-cfg="dates.${k}" value="${esc(d[k] || "")}"></label>`;
       $("#set-lager").innerHTML = `<div class="form-grid"><label class="field"><span>Titel</span><input data-lager="title" value="${esc(L.title || "")}"></label><label class="field"><span>Abteilung</span><input data-lager="abteilung" value="${esc(L.abteilung || "")}"></label></div>
-        <div class="dates-grid" style="margin-top:14px">${df("firstSession", "Erster Höck")}${df("pauseFrom", "Pause von")}${df("pauseTo", "Pause bis")}${df("prep", "Leitervorbereitung")}${df("start", "Lager von")}${df("end", "Lager bis")}</div>
+        <div class="dates-grid" style="margin-top:14px">${df("firstSession", "Erster Höck")}${df("prep", "Leitervorbereitung")}${df("start", "Lager von")}${df("end", "Lager bis")}</div>
         <div class="field" style="margin-top:16px"><span>Logo (erscheint klein rechts in der Kopfzeile der Word-Dokumente)</span>
           <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">${lagerLogo() ? `<img src="data:image/png;base64,${lagerLogo().png}" alt="Logo" style="height:40px;width:auto;border:1px solid var(--line);border-radius:6px;padding:4px;background:#fff">` : '<span class="muted" style="font-size:13px">Noch kein Logo</span>'}
           <label class="btn small" style="cursor:pointer">Logo hochladen<input type="file" accept="image/png,image/jpeg,image/webp" data-logo hidden></label>${lagerLogo() ? '<button class="btn small ghost danger" data-logo-rm>Entfernen</button>' : ""}</div></div>`;
@@ -1529,7 +1529,7 @@
     } else if (ed.type === "idea") {
       body = `${f("title", "Traktandum", "text", 'placeholder="z.B. Elternabend vor dem Lager?"')}${ta("text", "Beschreibung", "Worum geht es? Was soll entschieden werden?", 4)}${mentionHint()}<div class="form-grid">${sel("by", "Eingebracht von", personOptions(d.by, "–"))}${f("forDate", "Für Höck am (optional)", "date")}${sel("status", "Status", ["Offen", "Besprochen"].map((s) => `<option ${s === d.status ? "selected" : ""}>${s}</option>`).join(""))}</div>`;
     } else if (ed.type === "info") {
-      body = `${f("title", "Titel", "text", 'placeholder="z.B. Lagerhaus"')}<label class="toggle"><input type="checkbox" data-fb="emergency" ${d.emergency ? "checked" : ""}> Notfall-Infos (erscheinen im Lager-Modus auf der Übersicht)</label>${ta("text", "Text", "Adressen, Telefonnummern, Abläufe … Links werden automatisch anklickbar.", 8)}<div class="field"><span>Bilder (z.B. Hausplan, Anfahrt)</span>${(d.images || []).map((im, i) => `<div class="link-row">🖼 <span>${esc(im.name)}</span><button type="button" class="x" data-img-rm="${i}" aria-label="Bild entfernen">✕</button></div>`).join("")}<label class="btn small" style="align-self:flex-start;cursor:pointer">Bild hinzufügen<input type="file" accept="image/*" data-info-img hidden></label></div><div class="field"><span>Links &amp; Dokumente</span>${linksEditor("info", d.links || [])}</div>`;
+      body = `${f("title", "Titel", "text", 'placeholder="z.B. Lagerhaus"')}<label class="toggle"><input type="checkbox" data-fb="emergency" ${d.emergency ? "checked" : ""}> Notfall-Infos (erscheinen im Lager-Modus auf der Übersicht)</label><label class="toggle"><input type="checkbox" data-fb="lalei" ${d.lalei ? "checked" : ""}> Nur für die Lagerleitung (das Team sieht diesen Abschnitt nicht)</label>${ta("text", "Text", "Adressen, Telefonnummern, Abläufe … Links werden automatisch anklickbar.", 8)}<div class="field"><span>Bilder (z.B. Hausplan, Anfahrt)</span>${(d.images || []).map((im, i) => `<div class="link-row">🖼 <span>${esc(im.name)}</span><button type="button" class="x" data-img-rm="${i}" aria-label="Bild entfernen">✕</button></div>`).join("")}<label class="btn small" style="align-self:flex-start;cursor:pointer">Bild hinzufügen<input type="file" accept="image/*" data-info-img hidden></label></div><div class="field"><span>Links &amp; Dokumente</span>${linksEditor("info", d.links || [])}</div>`;
     } else if (ed.type === "ressLinks") {
       body = `<p class="muted" style="margin:0">Links zu Dokumenten im SharePoint, Google Drive usw. Wer klickt, öffnet immer die aktuelle Version, sofern er dort Zugriff hat. Im SharePoint: «…» › «Link kopieren».</p>${linksEditor("ress", d.links || [])}`;
     } else if (ed.type === "planCell") {
@@ -1599,7 +1599,7 @@
     if (ed.type === "ressLinks") { await writeConfig({ ressorts: { [d.rid]: { links: d.links || [] } } }); toast("Gespeichert"); closeDrawer(); return; }
     if (ed.type === "info") {
       if (!d.title) { $('[data-f="title"]').focus(); toast("Bitte einen Titel eingeben."); return; }
-      const secs = ((state.info || {}).sections || []).slice(); const sec = { id: ed.id || "s" + uid(), title: d.title, text: d.text || "", links: d.links || [], images: d.images || [], emergency: !!d.emergency };
+      const secs = ((state.info || {}).sections || []).slice(); const sec = { id: ed.id || "s" + uid(), title: d.title, text: d.text || "", links: d.links || [], images: d.images || [], emergency: !!d.emergency, ...(d.lalei ? { lalei: true } : {}) };
       const i = secs.findIndex((s) => s.id === sec.id); if (i >= 0) secs[i] = sec; else secs.push(sec);
       await saveInfo(secs); toast("Gespeichert"); closeDrawer(); return;
     }
@@ -2243,7 +2243,7 @@
   views.tinfos = {
     shell: () => `${pageHead("Infos &amp; Links", "Wichtiges für alle")}<div id="tinfo-body"></div>`,
     update() {
-      const secs = (state.info || {}).sections || [];
+      const secs = ((state.info || {}).sections || []).filter((s) => !s.lalei);
       $("#tinfo-body").innerHTML = `<div class="info-grid">${secs.map((s) => `<section class="card info-sec ${s.emergency ? "emergency" : ""}"><div class="card-head"><h2>${esc(s.title || "Ohne Titel")}</h2></div><div class="card-body">${s.text ? `<div class="rich">${rich(s.text)}</div>` : ""}${fileList(s.images)}${linksView(s.links)}</div></section>`).join("") || `<section class="card"><div class="empty">Noch keine Infos.</div></section>`}</div>
         ${ressorts().some((r) => (r.links || []).length) ? `<section class="card"><div class="card-head"><h2>Dokumente pro Ressort</h2></div><div class="table-wrap"><table><tbody>${ressorts().filter((r) => (r.links || []).length).map((r) => `<tr><td style="width:180px;vertical-align:top"><b style="font-weight:600">${esc(r.name)}</b></td><td>${linksView(r.links)}</td></tr>`).join("")}</tbody></table></div></section>` : ""}`;
     },
@@ -2362,7 +2362,7 @@
   views.day = {
     shell: () => { const ds = days(); const i = ds.findIndex((x) => x.id === state.dayId); const d = ds[i] || {};
       return `${pageHead(esc(d.label || "Tag"), d.date ? `${WD_LONG[parse(d.date).getDay()]}, ${fmtFull(d.date)}` : "", `<div class="btn-group"><button class="btn" data-goto="days">← Alle Tage</button><button class="btn" data-day-open="${esc((ds[i - 1] || {}).id || "")}" ${i > 0 ? "" : "disabled"} aria-label="Vorheriger Tag">‹</button><button class="btn" data-day-open="${esc((ds[i + 1] || {}).id || "")}" ${i < ds.length - 1 ? "" : "disabled"} aria-label="Nächster Tag">›</button><button class="btn primary" data-day-docx>Als Word</button></div>`)}
-      <div class="day-top"><section class="card"><div class="card-head"><h2>Programm</h2><label class="btn small" style="cursor:pointer">Bild hochladen<input type="file" accept="image/*" data-day-img hidden></label></div><div class="card-body" id="day-imgs"></div></section>
+      <div class="day-top"><section class="card"><div class="card-head"><h2>Programm</h2><label class="btn small" style="cursor:pointer">Bild hinzufügen<input type="file" accept="image/*" data-day-img hidden></label></div><div class="card-body" id="day-imgs"></div></section>
       <section class="card"><div class="card-head"><h2>Automatisch</h2><span class="muted">aus Schichtplan und Anwesenheit</span></div><div class="card-body" id="day-auto"></div></section></div>
       <div class="block-grid" id="day-blocks"></div>
       <form class="card card-body" data-block-add style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input class="input" style="flex:1;min-width:200px" placeholder="Eigener Block, z.B. Material, Wetter, Elterninfo" aria-label="Neuer Block"><button class="btn small">+ Block</button></form>`; },
@@ -2529,7 +2529,7 @@
     on("attreq", (snap) => { state.attreq = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
     on("daypage", (snap) => { state.daypages = new Map(snap.docs.map((d) => [d.id, d.data()])); });
     on("presence", (snap) => { state.presence = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
-    for (const c of ["board", "swap", "trips", "groups", "versions"]) on(c, (snap) => { state[c] = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
+    for (const c of ["board", "swap", "trips", "groups", "versions", "react"]) on(c, (snap) => { state[c] = snap.docs.map((d) => ({ ...d.data(), _id: d.id })); });
     for (const c of ["count", "shop", "log", "media"]) on(c, () => {});
     STORE.onLoggedOut((id) => { if (state.lagerId === id) { toast("Bitte melde dich neu an."); showStart(); showLogin(id); } });
     const last = store.get("lalei-lager");

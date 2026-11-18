@@ -102,11 +102,12 @@
   const boardText = (b) => `${b.important ? "❗ " : ""}*${b.title || "Mitteilung"}*\n\n${noAt(b.text || "")}${appLink() ? `\n\n👉 ${appLink()}` : ""}`;
   function boardCard(b) {
     const t = iso(today()); const lalei = isLaLei();
-    const tags = [b.pinned ? '<span class="tag plain">📌 angeheftet</span>' : "", b.important ? '<span class="tag late">wichtig</span>' : "", lalei && b.from && b.from > t ? `<span class="tag next">erscheint am ${fmtFull(b.from)}</span>` : "", lalei && b.until && b.until < t ? '<span class="tag plain">abgelaufen</span>' : "", lalei && b.until && b.until >= t ? `<span class="muted" style="font-size:12px">bis ${fmtFull(b.until)}</span>` : "", state.prevSeen && ts(b.createdAt) > state.prevSeen && b.by !== me() ? '<span class="tag next">neu</span>' : ""].join("");
+    const tags = [b.pinned ? '<span class="tag plain">📌 angeheftet</span>' : "", b.important ? '<span class="tag late">wichtig</span>' : "", lalei && b.from && b.from > t ? `<span class="tag next">erscheint am ${fmtFull(b.from)}</span>` : "", lalei && b.until && b.until < t ? '<span class="tag plain">abgelaufen</span>' : "", lalei && b.until && b.until >= t ? `<span class="muted" style="font-size:12px">bis ${fmtFull(b.until)}</span>` : "", state.prevSeen && ts(b.createdAt) > state.prevSeen && b.by !== me() ? '<span class="tag next">neu</span>' : "", lalei && (b.to || []).length ? `<span class="tag plain" title="Nur diese Personen sehen die Mitteilung">an ${esc((b.to || []).map((id) => { const p = state.peopleDocs.find((x) => x._id === id); return p ? displayName(p) : "?"; }).join(", "))}</span>` : ""].join("");
     const qs = state.feedback.filter((f) => f.boardId === b._id && (lalei || f.person === myId()));
     return `<article class="card board-item ${b.important ? "important" : ""}"><div class="card-body stack" style="gap:8px">
       <div class="entry-top"><h3>${esc(b.title || "Mitteilung")}</h3>${tags}</div>
       ${b.text ? `<div class="rich">${rich(b.text)}</div>` : ""}${fileList(b.files)}
+      ${reactBar(b)}
       <div class="board-foot"><span class="muted">${esc(b.by || "")} · ${fmtFull((b.from || b.createdAt || "").slice(0, 10))}</span>
         ${lalei ? `<span class="btn-group"><button class="btn small" data-board-copy="${esc(b._id)}">Für WhatsApp kopieren</button><button class="btn small" data-board-edit="${esc(b._id)}">Bearbeiten</button></span>` : `<button class="btn small" data-board-ask="${esc(b._id)}">Frage dazu stellen</button>`}</div>
       ${qs.length ? `<div class="board-qs">${qs.map((q) => `<div class="board-q"><b>${esc(lalei ? q.name : "Deine Frage")}:</b> ${esc(q.text)}${q.reply ? `<div class="reply"><b>Antwort:</b> ${rich(q.reply)}</div>` : lalei ? ' <button class="link" data-goto="inbox">im Eingang beantworten</button>' : ' <span class="muted">(noch keine Antwort)</span>'}</div>`).join("")}</div>` : ""}
@@ -123,13 +124,16 @@
   };
   function openBoardEditor(id) {
     const src = id ? byId(state.board, id) : null;
-    const d = src ? JSON.parse(JSON.stringify(src)) : { title: "", text: "", important: false, pinned: false, from: "", until: "", files: [] };
+    const d = src ? JSON.parse(JSON.stringify(src)) : { title: "", text: "", important: false, pinned: false, from: "", until: "", files: [], to: [] };
+    d.to = d.to || [];
     let sure = false;
     const o = modal("", "wide-modal");
     const draw = () => {
       o.querySelector(".modal").innerHTML = `<div class="lg-head"><span class="eyebrow">Pinnwand</span><h2>${src ? "Mitteilung bearbeiten" : "Neue Mitteilung"}</h2></div>
         <label class="field"><span>Titel</span><input data-bf="title" value="${esc(d.title)}" placeholder="z.B. Anwesenheit bis 1. März eintragen"></label>
         <label class="field"><span>Text</span><textarea data-bf="text" rows="6" data-mention>${esc(d.text)}</textarea></label>
+        <div class="field"><span>An</span><div class="seg" role="radiogroup" aria-label="Empfänger"><button type="button" data-bf-all="1" aria-pressed="${!d.to.length && !d._sel}">Ganzes Team</button><button type="button" data-bf-all="0" aria-pressed="${!!d.to.length || !!d._sel}">Ausgewählte Personen</button></div>
+          ${d.to.length || d._sel ? `<div class="present">${peopleSorted().map((p) => `<button type="button" data-bf-to="${esc(p._id)}" aria-pressed="${d.to.includes(p._id)}">${av(displayName(p))}${esc(displayName(p))}</button>`).join("")}</div><span class="hint">Nur diese Personen sehen die Mitteilung (dazu immer die Lagerleitung).</span>` : ""}</div>
         <div class="form-grid"><label class="toggle"><input type="checkbox" data-bf-c="important" ${d.important ? "checked" : ""}> Wichtig (wird hervorgehoben)</label><label class="toggle"><input type="checkbox" data-bf-c="pinned" ${d.pinned ? "checked" : ""}> Oben anheften</label></div>
         <div class="form-grid"><label class="field"><span>Erscheint ab (leer = sofort)</span><input type="date" data-bf="from" value="${esc(d.from)}"></label><label class="field"><span>Verschwindet nach (leer = nie)</span><input type="date" data-bf="until" value="${esc(d.until)}"></label></div>
         <div class="field"><span>Bilder und Dateien</span>${(d.files || []).map((f, i) => `<div class="link-row">${f.image ? "🖼" : "📄"} <span>${esc(f.name)}</span><button type="button" class="x" data-bf-rm="${i}" aria-label="Entfernen">✕</button></div>`).join("")}<label class="btn small" style="align-self:flex-start;cursor:pointer">Bild oder PDF hinzufügen<input type="file" accept="image/*,application/pdf" data-bf-file hidden></label></div>
@@ -143,10 +147,13 @@
     o.onclick = async (e) => {
       if (e.target === o || e.target.closest("[data-bf-close]")) return closeDrawer();
       const rm = e.target.closest("[data-bf-rm]"); if (rm) { d.files.splice(+rm.dataset.bfRm, 1); return draw(); }
+      const al = e.target.closest("[data-bf-all]"); if (al) { if (al.dataset.bfAll === "1") { d.to = []; d._sel = false; } else d._sel = true; return draw(); }
+      const bt = e.target.closest("[data-bf-to]"); if (bt) { const pid = bt.dataset.bfTo; d.to = d.to.includes(pid) ? d.to.filter((x) => x !== pid) : [...d.to, pid]; return draw(); }
       if (e.target.closest("[data-bf-del]")) { if (!sure) { sure = true; return draw(); } try { await state.db.doc("board/" + id).delete(); closeDrawer(); toast("Mitteilung gelöscht"); } catch (err) { handleWriteError(err); } return; }
       if (!e.target.closest("[data-bf-save]")) return;
       if (!d.title.trim()) return toast("Bitte einen Titel eingeben.");
-      const data = { ...d, title: d.title.trim(), by: src ? src.by : me(), createdAt: src ? src.createdAt : nowStamp(), updatedAt: nowStamp(), updatedBy: me() }; delete data._id;
+      if (d._sel && !d.to.length) return toast("Bitte mindestens eine Person wählen oder «Ganzes Team».");
+      const data = { ...d, title: d.title.trim(), by: src ? src.by : me(), createdAt: src ? src.createdAt : nowStamp(), updatedAt: nowStamp(), updatedBy: me() }; delete data._id; delete data._sel;
       try { await state.db.doc("board/" + (id || state.db.newId())).set(data); closeDrawer(); toast("Gespeichert"); } catch (err) { handleWriteError(err); }
     };
     draw();
@@ -238,7 +245,7 @@
       renderTodos(); renderPack();
       const hints = teamHints();
       $("#home-hints").innerHTML = hints.length ? `<section class="card hints"><div class="card-head"><h2>Hinweise</h2></div><div class="card-body stack" style="gap:6px">${hints.map((h) => `<div class="hint-row ${h.cls}">${h.html}${h.go ? ` <button class="link" data-goto="${h.go}">ansehen</button>` : h.tab ? ` <button class="link" data-ptab="home|${h.tab}">ansehen</button>` : ""}</div>`).join("")}</div></section>` : "";
-      const bl = boardSorted(state.board.filter(boardActive));
+      const bl = boardSorted(state.board.filter((b) => boardActive(b) && boardFor(b)));
       $("#home-board").innerHTML = bl.length ? `<div class="sec-label">Mitteilungen der Lagerleitung</div>${bl.map(boardCard).join("")}` : "";
       const a = myAssignments();
       $("#home-mine").innerHTML = `<div class="mine-grid">

@@ -1,0 +1,45 @@
+/* ===== Etappe 3 ===== */
+
+/* Glocke */
+.bell { position: relative; margin-left: auto; flex: none; width: 38px; height: 38px; border-radius: 50%; border: 0; background: transparent; color: var(--side-ink); cursor: pointer; display: grid; place-items: center; transition: background var(--t); }
+.bell:hover, .bell:focus-visible { background: rgb(255 255 255 / 0.1); }
+.bell svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.bell .count { position: absolute; top: 2px; right: 0; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--late); color: #fff; font-size: 11px; font-weight: 600; line-height: 18px; text-align: center; }
+.bell-list { display: flex; flex-direction: column; max-height: 60vh; overflow-y: auto; margin: 0 calc(var(--sp-2) * -1); }
+.bell-row { display: flex; align-items: flex-start; gap: var(--sp-3); padding: 10px var(--sp-2); border: 0; border-bottom: 1px solid var(--line); background: none; color: var(--ink); text-align: left; cursor: pointer; font: inherit; font-size: 14px; border-radius: var(--r-sm, 6px); transition: background var(--t); }
+.bell-row:hover { background: var(--hover); }
+.bell-row.unread { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.bell-row.unread .bell-t::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 6px; vertical-align: middle; }
+.bell-ico { flex: none; width: 22px; text-align: center; }
+.bell-t { flex: 1; min-width: 0; line-height: 1.4; }
+.bell-at { flex: none; font-size: 12px; }
+
+/* Reaktionen */
+.reacts { display: flex; flex-wrap: wrap; gap: 6px; }
+.react { display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); cursor: pointer; font: inherit; font-size: 15px; transition: border-color var(--t), background var(--t), opacity var(--t); }
+.react span { font-size: 12.5px; color: var(--ink-2, var(--ink)); font-weight: 600; }
+.react.empty { opacity: 0.45; }
+.board-item:hover .react.empty, .react.empty:focus-visible { opacity: 0.85; }
+.react.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+.react:disabled { cursor: default; }
+@media (hover: none) { .react.empty { opacity: 0.7; } }
+
+/* Schichtplan: Mindestbesetzung */
+.pc.short { background: color-mix(in srgb, var(--wait) 9%, transparent); }
+.min-badge { display: inline-block; font-size: 11px; font-weight: 600; color: var(--wait); border: 1px solid currentColor; border-radius: 999px; padding: 0 6px; line-height: 17px; }
+.min-in { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); flex: none; }
+.list-edit .r .min-in input { flex: 0 0 52px; width: 52px; }
+@media (max-width: 700px) { .svc-row-edit { flex-wrap: wrap; } .svc-row-edit [data-svc], .svc-row-edit .svc-desc-in { flex: 1 1 100%; } }
+
+/* Pausen und Notfall-Liste */
+.pz-list, .nf-list { display: flex; flex-direction: column; gap: 6px; }
+.nf-row select { flex: 1; min-width: 0; height: 32px; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--surface); color: var(--ink); padding: 0 6px; }
+.nf-row input[type="tel"] { flex: 0 0 150px; }
+@media (max-width: 700px) { .pz-row, .nf-row { flex-wrap: wrap; } .pz-row input:first-child, .nf-row input:first-child { flex: 1 1 100%; } .list-edit .pz-row input[type="date"] { flex: 1 1 120px; } }
+
+/* Wer ist heute da */
+.heute-da { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line); }
+
+/* Feedback zum Tool (Admin) */
+.tf-row.unread { border-left: 3px solid var(--accent); padding-left: 10px; }
+#tool-fb { margin-left: auto; margin-right: 10px; }

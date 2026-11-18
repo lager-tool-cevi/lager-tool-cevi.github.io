@@ -21,9 +21,9 @@ const WEBSITE = 'https://jajakingge.github.io/lager-tool/';
 const DATEN_BLATT = '_daten';
 const MAX_ZELLE = 49000; // Google Sheets erlaubt höchstens 50'000 Zeichen pro Zelle
 const TOKEN_TAGE = 60;
-const SHORT = ['tasks', 'config', 'journal', 'hoecks', 'people', 'kids', 'att', 'plan', 'info', 'eval', 'assets', 'trash', 'rooms', 'todos', 'feedback', 'attreq', 'daypage', 'presence', 'media', 'board', 'swap', 'trips', 'groups', 'count', 'shop', 'log', 'versions'];
-const TEAM_READ = ['config', 'people', 'kids', 'plan', 'rooms', 'info', 'att', 'attreq', 'todos', 'feedback', 'hoecks', 'board', 'swap', 'trips', 'groups', 'count', 'media'];
-const NO_LOG = ['presence', 'count', 'todos', 'feedback', 'attreq', 'swap', 'log', 'media', 'versions'];
+const SHORT = ['tasks', 'config', 'journal', 'hoecks', 'people', 'kids', 'att', 'plan', 'info', 'eval', 'assets', 'trash', 'rooms', 'todos', 'feedback', 'attreq', 'daypage', 'presence', 'media', 'board', 'swap', 'trips', 'groups', 'count', 'shop', 'log', 'versions', 'react'];
+const TEAM_READ = ['config', 'people', 'kids', 'plan', 'rooms', 'info', 'att', 'attreq', 'todos', 'feedback', 'hoecks', 'board', 'swap', 'trips', 'groups', 'count', 'media', 'react'];
+const NO_LOG = ['presence', 'count', 'todos', 'feedback', 'attreq', 'swap', 'log', 'media', 'versions', 'react'];
 
 // ---------------------------------------------------------------------------
 // Web-App
@@ -380,7 +380,8 @@ function filterFuer_(sess, colls) {
       if (c === 'att') { if (id === 'p_' + sess.person) out.att[id] = d; }
       else if (c === 'attreq' || c === 'feedback' || c === 'swap') { if (d.person === sess.person) out[c][id] = d; }
       else if (c === 'hoecks') { if ((d.kind || 'LaLei') === 'Team') out.hoecks[id] = { kind: 'Team', date: d.date || '', time: d.time || '', title: d.title || '', place: d.place || '' }; }
-      else if (c === 'board') { if ((!d.from || d.from <= t) && (!d.until || d.until >= t)) out.board[id] = d; }
+      else if (c === 'board') { if ((!d.from || d.from <= t) && (!d.until || d.until >= t) && (!d.to || !d.to.length || d.to.indexOf(sess.person) >= 0)) out.board[id] = d; }
+      else if (c === 'info') { const m = JSON.parse(JSON.stringify(d)); if (m.sections) m.sections = m.sections.filter(function (s) { return !s.lalei; }); out.info[id] = m; }
       else if (c === 'count') out.count[id] = { checked: d.checked || {}, resetAt: d.resetAt || '' };
       else if (c === 'kids') out.kids[id] = { vorname: d.vorname || '', nachname: d.nachname || '', stufe: d.stufe || '' };
       else if (c === 'config') { if (id === 'main') { const m = JSON.parse(JSON.stringify(d)); delete m.mail; delete m.prevTips; out.config.main = m; } }
@@ -400,6 +401,7 @@ function pruefeSchreiben_(sess, o, aktuell) {
   if (sess.role === 'lesen') throw new Error('NUR_LESEN');
   const data = o.data || {};
   if (['feedback', 'attreq', 'swap'].indexOf(coll) >= 0 && o.op === 'set' && !aktuell && data.person === sess.person) return;
+  if (coll === 'react' && String(o.id).split('~')[1] === sess.person && (o.op === 'delete' || (o.op === 'set' && data.person === sess.person))) return;
   if (coll === 'count' && o.id === 'main' && o.op !== 'delete' && Object.keys(data).every(function (k) { return ['checked', 'at', 'by', 'resetAt', 'resetBy'].indexOf(k) >= 0; })) return;
   if (coll === 'att' && o.id === 'p_' + sess.person && (o.op === 'set' || o.op === 'update')) {
     if (Object.keys(data).some(function (k) { return k !== 'slots'; })) throw new Error('KEINE_BERECHTIGUNG');
