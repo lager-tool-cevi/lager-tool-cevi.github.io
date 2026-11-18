@@ -3,6 +3,10 @@
 <head>
 <base target="_top">
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
 <title>Lager-Tool</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
@@ -1117,7 +1121,8 @@ tr.task.selected td { background: color-mix(in srgb, var(--accent) 7%, transpare
 .quiet-card .hint-row.plain { font-size: 13.5px; }
 
 /* Erwähnungen */
-.mention.group { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.mention.group { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); }
+.mention.group.me { background: var(--accent); color: var(--accent-ink, #fff); }
 .av-group { background: var(--line); font-size: 12px; }
 .ment-line { display: flex; align-items: flex-start; gap: var(--sp-3); margin-top: 4px; }
 .ment-line .rich { flex: 1; min-width: 0; }
@@ -1397,6 +1402,127 @@ button.tl-it { cursor: pointer; }
   select.owner, select.status { appearance: none; border: 0; background: none; padding: 0; }
 }
 
+/* ===== Handy wie eine App (bis 760 px) ===== */
+.appbar { display: none; }
+@media (max-width: 760px) {
+  html, body { overscroll-behavior-y: none; }
+  body { -webkit-tap-highlight-color: transparent; }
+  .app { display: block; }
+  /* Seitenleiste ganz weg: Navigation läuft über die Tab-Leiste und «Mehr» */
+  .side { display: none !important; }
+
+  /* Kopfleiste */
+  .appbar { display: flex; align-items: center; gap: 2px; position: sticky; top: 0; z-index: 14; min-height: 56px; padding: env(safe-area-inset-top, 0px) max(6px, env(safe-area-inset-right, 0px)) 0 max(12px, env(safe-area-inset-left, 0px));
+    background: color-mix(in srgb, var(--surface) 88%, transparent); -webkit-backdrop-filter: saturate(1.6) blur(14px); backdrop-filter: saturate(1.6) blur(14px); border-bottom: 1px solid var(--line); }
+  body.app-zurueck .appbar { padding-left: max(2px, env(safe-area-inset-left, 0px)); }
+  .ab-title { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.2; padding-left: 4px; }
+  .ab-title b { font-size: 17px; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink); }
+  .ab-title span { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ab-title span:empty { display: none; }
+  .ab-btn { position: relative; flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: var(--ink); display: grid; place-items: center; cursor: pointer; transition: background var(--t); }
+  .ab-btn:active { background: var(--hover); }
+  .ab-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  .ab-back svg { width: 26px; height: 26px; stroke-width: 2.2; color: var(--accent); }
+  .ab-sos { color: var(--late); }
+  .ab-btn .count { position: absolute; top: 6px; right: 5px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--late); color: #fff; font-size: 10.5px; font-weight: 700; line-height: 17px; text-align: center; }
+
+  /* Inhalt */
+  .page { padding: 12px max(12px, env(safe-area-inset-right, 0px)) calc(100px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)) !important; gap: 12px; }
+  .back-link, .help-btn, .help-box { display: none !important; }
+  .page-head { gap: 8px; margin-bottom: 4px; flex-wrap: wrap; align-items: center; }
+  .page-head > div:first-child:has(h1) { display: none; }
+  .page-head:not(:has(.btn, details)) { display: none; }
+  .page-head { justify-content: flex-end; margin-bottom: -4px; }
+  .page-head .btn-group, .page-head > .btn, .page-head > details { margin-left: auto; }
+  .page-head .btn { min-height: 34px !important; padding: 4px 12px; font-size: 13.5px; border-radius: 999px; }
+  .card { border-radius: 14px; }
+  .card-head { padding: 12px 14px; }
+  .card-head h2 { font-size: 15.5px; }
+  .card-body { padding: 12px 14px; }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px; }
+  .kpi .v { font-size: 22px; }
+  .grid-2, .info-grid, .today-grid, .mine-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .toolbar { flex-wrap: wrap; gap: 8px; }
+  .toolbar input[type="search"], #f-q, #doc-q { flex: 1 1 140px; width: auto; min-width: 0; }
+  .toolbar { padding: 10px 12px; }
+  .task-tools { padding-block: 0 8px !important; gap: 6px; }
+  .task-tools .info { flex: 1 1 100%; font-size: 12.5px; order: 10; }
+  .task-tools #f-reset { display: none; }
+  .task-tools .view-seg { margin-left: 0; }
+  .task-tools .btn, .task-tools .view-seg button, .task-tools summary.btn { min-height: 34px !important; padding: 4px 12px; font-size: 13.5px; }
+  .filters[open] { flex-basis: 100%; }
+  .quick-add { padding: 8px; }
+  .quick-add input { font-size: 15px; }
+  .quick-add { flex-wrap: wrap; }
+
+  /* Reiter als wischbare Chips */
+  .page-tabs { position: sticky !important; top: calc(56px + env(safe-area-inset-top, 0px)); z-index: 6; margin: 0 -12px; padding: 8px 12px; border-radius: 0; border: 0; box-shadow: none; background: color-mix(in srgb, var(--bg) 92%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); gap: 6px; border-bottom: 0; }
+  .page-tabs button { min-height: 34px !important; padding: 6px 14px !important; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); box-shadow: none !important; font-size: 14px; color: var(--ink-2, var(--ink)); }
+  .page-tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink, #fff); }
+  .page-tabs .n { background: color-mix(in srgb, currentColor 18%, transparent); color: inherit; }
+
+  /* Aufgaben als Karten-Liste */
+  .ttable thead { display: none; }
+  .ttable tr.task { padding: 12px 14px; }
+  .ttable .t-title { font-size: 15px; }
+  .ttable tr.grp td { padding: 10px 14px; }
+
+  /* Tab-Leiste unten */
+  .bnav { background: color-mix(in srgb, var(--surface) 92%, transparent) !important; -webkit-backdrop-filter: saturate(1.6) blur(14px); backdrop-filter: saturate(1.6) blur(14px); border-top: 1px solid var(--line); box-shadow: none !important; padding: 4px 6px calc(4px + env(safe-area-inset-bottom, 0px)) !important; }
+  .bnav button { color: var(--muted) !important; background: none !important; font-size: 11px !important; font-weight: 500; position: relative; gap: 2px !important; min-height: 52px !important; }
+  .bnav button svg { width: 24px !important; height: 24px !important; padding: 3px 14px; box-sizing: content-box; border-radius: 999px; transition: background var(--t); }
+  .bnav button[aria-selected="true"] { color: var(--accent) !important; font-weight: 650; }
+  .bnav button[aria-selected="true"] svg { background: var(--accent-soft); }
+  .bnav button.dot::after { content: ""; position: absolute; top: 6px; left: calc(50% + 10px); width: 8px; height: 8px; border-radius: 50%; background: var(--late); }
+  body.nav-open .side .nav { display: none !important; }
+
+  /* Plus-Knopf über der Tab-Leiste */
+  .fab { right: 16px !important; bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important; width: 56px !important; height: 56px !important; border-radius: 18px !important; box-shadow: 0 6px 20px rgb(0 0 0 / 0.25) !important; }
+
+  /* «Mehr»-Blatt */
+  .mehr-blatt { gap: 14px !important; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)) !important; }
+  .mehr-kopf { display: flex; align-items: center; gap: 12px; }
+  .mehr-kopf .av { width: 42px; height: 42px; font-size: 15px; }
+  .mehr-kopf > div { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .mehr-kopf b { font-size: 17px; }
+  .mehr-kopf .muted { font-size: 13px; }
+  .mehr-cd { font-size: 13px; color: var(--muted); background: var(--subtle, var(--hover)); border-radius: 10px; padding: 8px 12px; }
+  .mehr-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .mehr-k { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 4px 10px; border: 0; border-radius: 14px; background: var(--subtle, var(--hover)); color: var(--ink); font: inherit; font-size: 11.5px; line-height: 1.2; text-align: center; cursor: pointer; min-height: 78px; }
+  .mehr-k svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; color: var(--accent); }
+  .mehr-k.on { background: var(--accent-soft); box-shadow: inset 0 0 0 1.5px var(--accent); }
+  .mehr-k:active { transform: scale(0.97); }
+  .mehr-k i { position: absolute; top: 6px; right: 8px; font-style: normal; font-size: 10.5px; font-weight: 700; background: var(--late); color: #fff; border-radius: 999px; min-width: 17px; height: 17px; line-height: 17px; padding: 0 4px; }
+  .mehr-liste { display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; background: var(--subtle, var(--hover)); }
+  .mehr-z { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border: 0; border-bottom: 1px solid var(--line); background: none; color: var(--ink); font: inherit; font-size: 15px; text-align: left; cursor: pointer; }
+  .mehr-z:last-child { border-bottom: 0; }
+  .mehr-z svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; color: var(--muted); }
+  .mehr-z.sos-z { color: var(--late); font-weight: 600; } .mehr-z.sos-z svg { color: var(--late); }
+  .mehr-sync { font-size: 12px; text-align: center; }
+
+  /* Fenster: Blatt mit Griff, Kopf klebt */
+  .overlay:not(.center) .drawer .drawer-head { position: sticky; top: 0; }
+  .drawer-head h2 { font-size: 18px; }
+  .drawer-foot { gap: 8px; }
+  .drawer-foot > span { width: 100%; justify-content: flex-end; }
+  .drawer-foot .btn.primary { flex: 1; }
+  .modal .lg-foot { position: sticky; bottom: calc(-1 * var(--sp-4, 16px)); background: var(--surface); padding-top: 8px; }
+
+  /* Diverses */
+  .toast { bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important; max-width: calc(100vw - 32px); border-radius: 12px; }
+  .bulk-bar { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+  .preview-bar { font-size: 11.5px; padding: 4px 10px; }
+  .title-img { margin: -12px -12px 12px; border-radius: 0; height: 130px; }
+  .asteam-banner, .closed-banner, .uebung-bar { font-size: 13px; }
+  .kanban { grid-auto-columns: 82%; scroll-snap-type: x mandatory; padding: 8px 0; }
+  .kb-col { scroll-snap-align: start; }
+  .cmdk { padding: calc(10px + env(safe-area-inset-top, 0px)) 8px 8px; }
+  .cmdk-in { max-height: 80vh; }
+}
+@media (max-width: 380px) { .mehr-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Als App installiert: kein Browser-Rahmen, Statusleiste beachten */
+@media (display-mode: standalone) and (max-width: 760px) { .appbar { padding-top: max(env(safe-area-inset-top, 0px), 6px); } }
+
 
 /* =====================================================================
    Gestaltungsregeln (Grundgerüst): Abstände 4/8/16/24/32, wenige Schriftgrössen,
@@ -1534,7 +1660,7 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px var(--accent-s
   <nav class="bnav" id="bnav" aria-label="Schnellnavigation"></nav>
   <button class="fab" id="qnote" type="button" aria-label="Schnell-Notiz" title="Schnell-Notiz" hidden>+</button>
 </div>
-<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 08:24","test":false};</script>
+<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 12:55","test":false};</script>
 <script>
 // Datenanbindung. Bei Google (google.script.run vorhanden) läuft alles über api() in Code.gs,
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:
@@ -7005,6 +7131,90 @@ window.LaleiStore = (() => {
       } catch (err) { msg.textContent = errMsg(err); b.disabled = false; }
     });
   };
+
+  // =====================================================================
+  // Handy wie eine App: schmale Kopfleiste (Zurück, Seitentitel, Suche, Glocke, Notfall),
+  // Tab-Leiste unten, «Mehr» als Blatt mit allen Seiten als Kacheln
+  // =====================================================================
+  const istHandy = () => window.matchMedia("(max-width: 760px)").matches;
+  const ICO = {
+    back: '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>',
+    search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
+    bell: '<svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>',
+    sos: '<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+  };
+  (() => {
+    const app = $("#app"); if (!app || $("#appbar")) return;
+    app.insertAdjacentHTML("afterbegin", `<header class="appbar" id="appbar">
+      <button class="ab-btn ab-back" id="ab-back" type="button" aria-label="Zurück" hidden>${ICO.back}</button>
+      <div class="ab-title"><b id="ab-title">Lager-Tool</b><span id="ab-sub"></span></div>
+      <button class="ab-btn" id="ab-search" type="button" aria-label="Suchen">${ICO.search}</button>
+      <button class="ab-btn" id="ab-bell" type="button" aria-label="Mitteilungen">${ICO.bell}<span class="count" id="ab-bell-n" hidden></span></button>
+      <button class="ab-btn ab-sos" id="ab-sos" type="button" aria-label="Notfall">${ICO.sos}</button></header>`);
+    const m = document.querySelector('meta[name="theme-color"]'); if (!m) document.head.insertAdjacentHTML("beforeend", '<meta name="theme-color" content="#ffffff">');
+  })();
+  function appbarPaint() {
+    const t = $("#ab-title"); if (!t || !state.lagerId) return;
+    const h1 = $("#view .page-head h1"); const titel = h1 ? [...h1.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim() : "";
+    const nav = $(`#tabs button[data-view="${state.view}"]`);
+    t.textContent = titel || (nav ? nav.textContent.trim() : "") || lagerDoc().title || "Lager-Tool";
+    const sub = $("#ab-sub"); const r = isCampNow() ? (() => { const c = campRange(); return `Tag ${daysBetween(parse(c.from), today()) + 1} von ${daysBetween(parse(c.from), parse(c.to)) + 1}`; })() : "";
+    const lt = lagerDoc().title || ""; sub.textContent = [t.textContent === lt ? (isLaLei() ? "Übersicht" : "") : lt, r].filter(Boolean).join(" · ");
+    const wurzel = [...document.querySelectorAll("#bnav [data-view]")].map((b) => b.dataset.view);
+    const zurueck = typeof navDepth === "number" && navDepth > 0 && !wurzel.includes(state.view); $("#ab-back").hidden = !zurueck;
+    const n = bellItems().filter((x) => x.unread).length; const c = $("#ab-bell-n"); c.hidden = !n; c.textContent = n > 9 ? "9+" : n;
+    document.body.classList.toggle("app-zurueck", zurueck);
+  }
+  const renderSideOrig5 = renderSide;
+  renderSide = function () { renderSideOrig5(); appbarPaint(); };
+  const renderOrig5 = render;
+  render = function () { renderOrig5(); appbarPaint(); };
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest && e.target.closest(".appbar .ab-btn"); if (!b) return;
+    if (b.id === "ab-back") return history.back();
+    if (b.id === "ab-search") return cmdk();
+    if (b.id === "ab-bell") return bellOpen();
+    if (b.id === "ab-sos") return showSos();
+  });
+
+  // ---------- «Mehr»: alle Seiten als Kacheln, Konto, Notfall ----------
+  function mehrBlatt() {
+    const kacheln = [...document.querySelectorAll("#tabs button[data-view]")].filter((b) => !b.hidden && !["help", "prefs", "trash"].includes(b.dataset.view));
+    const extra = [...document.querySelectorAll("#tabs button[data-view]")].filter((b) => !b.hidden && ["prefs", "help", "trash"].includes(b.dataset.view));
+    const cd = $("#countdown"); const cdTxt = cd ? cd.innerHTML.replace(/<br\s*\/?>/g, " ").replace(/<\/(b|span|div)>/g, " · ").replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").replace(/(\s·\s*)+/g, " · ").replace(/^ · | · $/g, "").replace(/\s·\s*$/, "").trim() : "";
+    const o = modal(`<div class="mehr-kopf">${av(me() || "?")}<div><b>${esc(me() || "–")}</b><span class="muted">${isReadOnly() ? "Nur lesen" : isLaLei() ? "Lagerleitung" : "Team"} · ${esc(lagerDoc().title || "")}</span></div><button class="btn small ghost" data-mehr-zu aria-label="Schliessen">✕</button></div>
+      ${cdTxt ? `<div class="mehr-cd">${esc(cdTxt)}</div>` : ""}
+      <div class="mehr-grid">${kacheln.map((b) => { const svg = b.querySelector("svg"); const cnt = b.querySelector(".count:not([hidden])"); const label = [...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim();
+        return `<button type="button" class="mehr-k ${b.dataset.view === state.view ? "on" : ""}" data-mehr-view="${esc(b.dataset.view)}">${svg ? svg.outerHTML : ""}<span>${esc(label)}</span>${cnt ? `<i>${esc(cnt.textContent)}</i>` : ""}</button>`; }).join("")}</div>
+      <div class="mehr-liste">
+        <button type="button" class="mehr-z sos-z" data-mehr="sos">${ICO.sos}<span>Notfall</span></button>
+        ${extra.map((b) => `<button type="button" class="mehr-z" data-mehr-view="${esc(b.dataset.view)}">${b.querySelector("svg") ? b.querySelector("svg").outerHTML : ""}<span>${esc([...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim())}</span></button>`).join("")}
+        <button type="button" class="mehr-z" data-mehr="fb">${ICO.search.replace('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>', '<path d="M4 5h16v11H8l-4 4z"/>')}<span>Feedback zum Tool</span></button>
+        ${isLaLei() && !state.asTeam ? `<button type="button" class="mehr-z" data-mehr="team"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>Als Team ansehen</span></button>` : ""}
+        ${state.asTeam ? `<button type="button" class="mehr-z" data-mehr="lalei"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><span>Zurück zur Lagerleitung</span></button>` : ""}
+        <button type="button" class="mehr-z" data-mehr="lager"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V10l7-6 7 6v10"/></svg><span>Anderes Lager</span></button>
+        <button type="button" class="mehr-z" data-mehr="logout"><svg viewBox="0 0 24 24"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg><span>Abmelden</span></button>
+      </div><div class="mehr-sync muted">${esc(($("#sync-state") || {}).textContent || "")}</div>`, "mehr-blatt");
+    o.onclick = (e) => {
+      if (e.target === o || e.target.closest("[data-mehr-zu]")) return closeDrawer();
+      const v = e.target.closest("[data-mehr-view]"); if (v) { closeDrawer(); return setView(v.dataset.mehrView); }
+      const a = e.target.closest("[data-mehr]"); if (!a) return; const k = a.dataset.mehr; closeDrawer();
+      if (k === "sos") return showSos(); if (k === "fb") return toolFeedbackOpen(); if (k === "team") return setAsTeam(true); if (k === "lalei") return setAsTeam(false);
+      if (k === "lager") return $("[data-home]") && $("[data-home]").click(); if (k === "logout") return $("#logout") && $("#logout").click();
+    };
+  }
+  $("#bnav").addEventListener("click", (e) => { const b = e.target.closest("[data-more]"); if (!b || !istHandy()) return; e.stopImmediatePropagation(); document.body.classList.remove("nav-open"); mehrBlatt(); }, true);
+
+  // ---------- Tab-Leiste: Mehr zeigt, ob dort etwas wartet ----------
+  const renderBnavOrig5 = renderBnav;
+  renderBnav = function () {
+    renderBnavOrig5(); const more = $("#bnav [data-more]"); if (!more) return;
+    const unten = [...$("#bnav").querySelectorAll("[data-view]")].map((b) => b.dataset.view);
+    const anderswo = [...document.querySelectorAll("#tabs button[data-view] .count:not([hidden])")].some((c) => !unten.includes(c.closest("button").dataset.view));
+    more.classList.toggle("dot", anderswo);
+    more.setAttribute("aria-selected", String(!unten.includes(state.view)));
+  };
+  window.addEventListener("resize", () => { if (state.lagerId) appbarPaint(); });
 
   // ---------- boot ----------
   state.jTab = store.get("lalei-jtab") || "all";

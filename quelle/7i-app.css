@@ -1,0 +1,120 @@
+/* ===== Handy wie eine App (bis 760 px) ===== */
+.appbar { display: none; }
+@media (max-width: 760px) {
+  html, body { overscroll-behavior-y: none; }
+  body { -webkit-tap-highlight-color: transparent; }
+  .app { display: block; }
+  /* Seitenleiste ganz weg: Navigation läuft über die Tab-Leiste und «Mehr» */
+  .side { display: none !important; }
+
+  /* Kopfleiste */
+  .appbar { display: flex; align-items: center; gap: 2px; position: sticky; top: 0; z-index: 14; min-height: 56px; padding: env(safe-area-inset-top, 0px) max(6px, env(safe-area-inset-right, 0px)) 0 max(12px, env(safe-area-inset-left, 0px));
+    background: color-mix(in srgb, var(--surface) 88%, transparent); -webkit-backdrop-filter: saturate(1.6) blur(14px); backdrop-filter: saturate(1.6) blur(14px); border-bottom: 1px solid var(--line); }
+  body.app-zurueck .appbar { padding-left: max(2px, env(safe-area-inset-left, 0px)); }
+  .ab-title { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.2; padding-left: 4px; }
+  .ab-title b { font-size: 17px; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink); }
+  .ab-title span { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ab-title span:empty { display: none; }
+  .ab-btn { position: relative; flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: var(--ink); display: grid; place-items: center; cursor: pointer; transition: background var(--t); }
+  .ab-btn:active { background: var(--hover); }
+  .ab-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  .ab-back svg { width: 26px; height: 26px; stroke-width: 2.2; color: var(--accent); }
+  .ab-sos { color: var(--late); }
+  .ab-btn .count { position: absolute; top: 6px; right: 5px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--late); color: #fff; font-size: 10.5px; font-weight: 700; line-height: 17px; text-align: center; }
+
+  /* Inhalt */
+  .page { padding: 12px max(12px, env(safe-area-inset-right, 0px)) calc(100px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)) !important; gap: 12px; }
+  .back-link, .help-btn, .help-box { display: none !important; }
+  .page-head { gap: 8px; margin-bottom: 4px; flex-wrap: wrap; align-items: center; }
+  .page-head > div:first-child:has(h1) { display: none; }
+  .page-head:not(:has(.btn, details)) { display: none; }
+  .page-head { justify-content: flex-end; margin-bottom: -4px; }
+  .page-head .btn-group, .page-head > .btn, .page-head > details { margin-left: auto; }
+  .page-head .btn { min-height: 34px !important; padding: 4px 12px; font-size: 13.5px; border-radius: 999px; }
+  .card { border-radius: 14px; }
+  .card-head { padding: 12px 14px; }
+  .card-head h2 { font-size: 15.5px; }
+  .card-body { padding: 12px 14px; }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px; }
+  .kpi .v { font-size: 22px; }
+  .grid-2, .info-grid, .today-grid, .mine-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .toolbar { flex-wrap: wrap; gap: 8px; }
+  .toolbar input[type="search"], #f-q, #doc-q { flex: 1 1 140px; width: auto; min-width: 0; }
+  .toolbar { padding: 10px 12px; }
+  .task-tools { padding-block: 0 8px !important; gap: 6px; }
+  .task-tools .info { flex: 1 1 100%; font-size: 12.5px; order: 10; }
+  .task-tools #f-reset { display: none; }
+  .task-tools .view-seg { margin-left: 0; }
+  .task-tools .btn, .task-tools .view-seg button, .task-tools summary.btn { min-height: 34px !important; padding: 4px 12px; font-size: 13.5px; }
+  .filters[open] { flex-basis: 100%; }
+  .quick-add { padding: 8px; }
+  .quick-add input { font-size: 15px; }
+  .quick-add { flex-wrap: wrap; }
+
+  /* Reiter als wischbare Chips */
+  .page-tabs { position: sticky !important; top: calc(56px + env(safe-area-inset-top, 0px)); z-index: 6; margin: 0 -12px; padding: 8px 12px; border-radius: 0; border: 0; box-shadow: none; background: color-mix(in srgb, var(--bg) 92%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); gap: 6px; border-bottom: 0; }
+  .page-tabs button { min-height: 34px !important; padding: 6px 14px !important; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); box-shadow: none !important; font-size: 14px; color: var(--ink-2, var(--ink)); }
+  .page-tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink, #fff); }
+  .page-tabs .n { background: color-mix(in srgb, currentColor 18%, transparent); color: inherit; }
+
+  /* Aufgaben als Karten-Liste */
+  .ttable thead { display: none; }
+  .ttable tr.task { padding: 12px 14px; }
+  .ttable .t-title { font-size: 15px; }
+  .ttable tr.grp td { padding: 10px 14px; }
+
+  /* Tab-Leiste unten */
+  .bnav { background: color-mix(in srgb, var(--surface) 92%, transparent) !important; -webkit-backdrop-filter: saturate(1.6) blur(14px); backdrop-filter: saturate(1.6) blur(14px); border-top: 1px solid var(--line); box-shadow: none !important; padding: 4px 6px calc(4px + env(safe-area-inset-bottom, 0px)) !important; }
+  .bnav button { color: var(--muted) !important; background: none !important; font-size: 11px !important; font-weight: 500; position: relative; gap: 2px !important; min-height: 52px !important; }
+  .bnav button svg { width: 24px !important; height: 24px !important; padding: 3px 14px; box-sizing: content-box; border-radius: 999px; transition: background var(--t); }
+  .bnav button[aria-selected="true"] { color: var(--accent) !important; font-weight: 650; }
+  .bnav button[aria-selected="true"] svg { background: var(--accent-soft); }
+  .bnav button.dot::after { content: ""; position: absolute; top: 6px; left: calc(50% + 10px); width: 8px; height: 8px; border-radius: 50%; background: var(--late); }
+  body.nav-open .side .nav { display: none !important; }
+
+  /* Plus-Knopf über der Tab-Leiste */
+  .fab { right: 16px !important; bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important; width: 56px !important; height: 56px !important; border-radius: 18px !important; box-shadow: 0 6px 20px rgb(0 0 0 / 0.25) !important; }
+
+  /* «Mehr»-Blatt */
+  .mehr-blatt { gap: 14px !important; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)) !important; }
+  .mehr-kopf { display: flex; align-items: center; gap: 12px; }
+  .mehr-kopf .av { width: 42px; height: 42px; font-size: 15px; }
+  .mehr-kopf > div { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .mehr-kopf b { font-size: 17px; }
+  .mehr-kopf .muted { font-size: 13px; }
+  .mehr-cd { font-size: 13px; color: var(--muted); background: var(--subtle, var(--hover)); border-radius: 10px; padding: 8px 12px; }
+  .mehr-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .mehr-k { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 4px 10px; border: 0; border-radius: 14px; background: var(--subtle, var(--hover)); color: var(--ink); font: inherit; font-size: 11.5px; line-height: 1.2; text-align: center; cursor: pointer; min-height: 78px; }
+  .mehr-k svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; color: var(--accent); }
+  .mehr-k.on { background: var(--accent-soft); box-shadow: inset 0 0 0 1.5px var(--accent); }
+  .mehr-k:active { transform: scale(0.97); }
+  .mehr-k i { position: absolute; top: 6px; right: 8px; font-style: normal; font-size: 10.5px; font-weight: 700; background: var(--late); color: #fff; border-radius: 999px; min-width: 17px; height: 17px; line-height: 17px; padding: 0 4px; }
+  .mehr-liste { display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; background: var(--subtle, var(--hover)); }
+  .mehr-z { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border: 0; border-bottom: 1px solid var(--line); background: none; color: var(--ink); font: inherit; font-size: 15px; text-align: left; cursor: pointer; }
+  .mehr-z:last-child { border-bottom: 0; }
+  .mehr-z svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; color: var(--muted); }
+  .mehr-z.sos-z { color: var(--late); font-weight: 600; } .mehr-z.sos-z svg { color: var(--late); }
+  .mehr-sync { font-size: 12px; text-align: center; }
+
+  /* Fenster: Blatt mit Griff, Kopf klebt */
+  .overlay:not(.center) .drawer .drawer-head { position: sticky; top: 0; }
+  .drawer-head h2 { font-size: 18px; }
+  .drawer-foot { gap: 8px; }
+  .drawer-foot > span { width: 100%; justify-content: flex-end; }
+  .drawer-foot .btn.primary { flex: 1; }
+  .modal .lg-foot { position: sticky; bottom: calc(-1 * var(--sp-4, 16px)); background: var(--surface); padding-top: 8px; }
+
+  /* Diverses */
+  .toast { bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important; max-width: calc(100vw - 32px); border-radius: 12px; }
+  .bulk-bar { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+  .preview-bar { font-size: 11.5px; padding: 4px 10px; }
+  .title-img { margin: -12px -12px 12px; border-radius: 0; height: 130px; }
+  .asteam-banner, .closed-banner, .uebung-bar { font-size: 13px; }
+  .kanban { grid-auto-columns: 82%; scroll-snap-type: x mandatory; padding: 8px 0; }
+  .kb-col { scroll-snap-align: start; }
+  .cmdk { padding: calc(10px + env(safe-area-inset-top, 0px)) 8px 8px; }
+  .cmdk-in { max-height: 80vh; }
+}
+@media (max-width: 380px) { .mehr-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Als App installiert: kein Browser-Rahmen, Statusleiste beachten */
+@media (display-mode: standalone) and (max-width: 760px) { .appbar { padding-top: max(env(safe-area-inset-top, 0px), 6px); } }

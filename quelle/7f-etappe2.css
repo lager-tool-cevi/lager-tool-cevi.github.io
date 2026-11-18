@@ -75,7 +75,8 @@ tr.task.selected td { background: color-mix(in srgb, var(--accent) 7%, transpare
 .quiet-card .hint-row.plain { font-size: 13.5px; }
 
 /* Erwähnungen */
-.mention.group { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.mention.group { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); }
+.mention.group.me { background: var(--accent); color: var(--accent-ink, #fff); }
 .av-group { background: var(--line); font-size: 12px; }
 .ment-line { display: flex; align-items: flex-start; gap: var(--sp-3); margin-top: 4px; }
 .ment-line .rich { flex: 1; min-width: 0; }
