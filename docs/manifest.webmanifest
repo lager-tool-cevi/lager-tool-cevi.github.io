@@ -14,6 +14,11 @@
                       "src":  "icons/icon-512.png"
                   }
               ],
+    "shortcuts":  [
+                      { "name": "Neue Aufgabe", "short_name": "Aufgabe", "url": "./#neu-aufgabe", "icons": [ { "src": "icons/icon-192.png", "sizes": "192x192" } ] },
+                      { "name": "Notfall", "url": "./#notfall", "icons": [ { "src": "icons/icon-192.png", "sizes": "192x192" } ] },
+                      { "name": "Meine Woche", "short_name": "Woche", "url": "./#woche", "icons": [ { "src": "icons/icon-192.png", "sizes": "192x192" } ] }
+                  ],
     "lang":  "de",
     "theme_color":  "#141a3d",
     "display":  "standalone",

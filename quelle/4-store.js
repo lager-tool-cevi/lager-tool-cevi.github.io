@@ -131,6 +131,8 @@ window.LaleiStore = (() => {
         const token = rnd(); sec.tokens[token] = { lager, role: rolle, person, created: Date.now(), ttl: remember === false ? 0.5 : TOKEN_DAYS }; save(); return ok({ token, role: rolle });
       }
       if (op === "logout") { delete sec.tokens[tok]; save(); return {}; }
+      if (op === "pwResetStart") { const per = ((lagerColls(payload.lager).people || {})[payload.person]); if (!per || !["LaLei", "Lesen"].includes(per.funktion)) throw new Error("PERSON_FEHLT"); if (!String(per.email || "").includes("@")) throw new Error("KEINE_EMAIL"); const code = String(100000 + Math.floor(Math.random() * 900000)); sec.pwReset = sec.pwReset || {}; sec.pwReset[payload.lager + "|" + payload.person] = { code, exp: Date.now() + 1800000 }; save(); return { an: per.email.replace(/^(.).*(@.*)$/, "$1…$2"), previewCode: code }; }
+      if (op === "pwResetDone") { const k = payload.lager + "|" + payload.person; const r = (sec.pwReset || {})[k]; if (!r || Date.now() > r.exp) throw new Error("CODE_UNGUELTIG"); if (String(payload.code || "").trim() !== r.code) throw new Error("CODE_FALSCH"); if ((payload.newPw || "").length < 6) throw new Error("PASSWORT_ZU_KURZ"); sec.personPw[k] = await hash(payload.newPw); delete sec.pwReset[k]; save(); return {}; }
       if (op === "forgotAdmin") { const nm = String(payload.name || "").trim().toLowerCase(); const a = sec.admins.find((x) => x.name.toLowerCase() === nm) || (sec.admins.length === 1 ? sec.admins[0] : null); if (!a) throw new Error("ADMIN_UNBEKANNT"); const npw = "Cevi-" + rnd(6); a.h = await hash(npw); save(); return { previewPw: npw, name: a.name }; }
       if (op === "admin") {
         const ich = await adminOk(payload.adminPw); if (!ich) throw new Error("FALSCHES_ADMIN_PASSWORT");
@@ -384,6 +386,8 @@ window.LaleiStore = (() => {
   const roster = (lager) => raw("roster", { lager }).then((r) => r.people);
   const admin = (adminPw, action, extra = {}) => raw("admin", { adminPw, action, ...extra });
   const forgotAdmin = (name) => raw("forgotAdmin", { name });
+  const pwResetStart = (lager, person) => raw("pwResetStart", { lager, person });
+  const pwResetDone = (lager, person, code, newPw) => raw("pwResetDone", { lager, person, code, newPw });
   const changePw = (oldPw, newPw) => call("changePw", { oldPw, newPw });
   const vorlagen = () => call("vorlagen", {});
   const toolFeedback = (d) => call("toolFeedback", d);
@@ -414,7 +418,7 @@ window.LaleiStore = (() => {
   }
   const peek = (coll, id) => { const v = data[coll] && data[coll].get(id); return v ? clone(v) : null; };
   return {
-    syncNow: () => sync(true), ready, setLager, login, logout, roster, admin, forgotAdmin, changePw, vorlagen, toolFeedback, toolFb: () => toolFb, readLager, writeRaw, upload, peek, report,
+    syncNow: () => sync(true), pwResetStart, pwResetDone, ready, setLager, login, logout, roster, admin, forgotAdmin, changePw, vorlagen, toolFeedback, toolFb: () => toolFb, readLager, writeRaw, upload, peek, report,
     isGas: echt, isApi, isTest: !!CONF.test, version: CONF.version || "", isOffline: () => offline, appUrl: () => appUrl, wartung: () => wartung, lastSyncMs: () => lastSyncMs, wartend: () => outbox.length,
     onRejected: (fn) => (onRejected = fn),
     session: () => sess, lager: () => lagerId, onLoggedOut: (fn) => (onLoggedOut = fn),

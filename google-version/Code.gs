@@ -59,6 +59,8 @@ function api(token, op, payload) {
   if (op === 'login') return login_(payload);
   if (op === 'logout') { if (token) props_().deleteProperty('TOK_' + token); return {}; }
   if (op === 'forgotAdmin') return vergessen_(payload);
+  if (op === 'pwResetStart') return pwResetStart_(payload);
+  if (op === 'pwResetDone') return pwResetDone_(payload);
   if (op === 'admin') return admin_(payload);
   if (op === 'report') return fehlerMelden_(payload);
   const sess = sitzung_(token);
@@ -234,6 +236,27 @@ function passwortAendern_(sess, d) {
   if (!passt_(props_().getProperty(key), d.oldPw)) { fail(); throw new Error('FALSCHES_PASSWORT'); }
   if (!d.newPw || String(d.newPw).length < 6) throw new Error('PASSWORT_ZU_KURZ');
   props_().setProperty(key, hash_(d.newPw));
+  return {};
+}
+// Lagerleitung: eigenes Passwort per E-Mail-Code zurücksetzen (Code gilt 30 Minuten)
+function pwResetStart_(d) {
+  const lager = String(d.lager || ''), person = String(d.person || '');
+  const pers = lagerDaten_(lager).people[person]; if (!pers || !istLeitung_(pers)) throw new Error('PERSON_FEHLT');
+  const mail = String(pers.email || '').trim(); if (mail.indexOf('@') < 1) throw new Error('KEINE_EMAIL');
+  const c = CacheService.getScriptCache(); const ck = 'PWR_' + lager + '|' + person; const n = Number(c.get(ck) || 0); if (n >= 3) throw new Error('ZU_VIELE_VERSUCHE'); c.put(ck, String(n + 1), 3600);
+  const code = String(Math.floor(100000 + Math.random() * 900000));
+  props_().setProperty('PWRESET_' + lager + '|' + person, JSON.stringify({ h: sha_('reset|' + code), exp: Date.now() + 30 * 60000, tries: 0 }));
+  const titel = (lagerListe_()[lager] || {}).title || 'Lager';
+  MailApp.sendEmail(mail, 'Lager-Tool: Code zum Zurücksetzen', 'Hallo ' + anzeigeName_(pers) + '\n\nDein Code für «' + titel + '»: ' + code + '\n\nEr gilt 30 Minuten. Hast du das nicht angefordert, kannst du diese Mail ignorieren.\n\n' + (WEBSITE || ''));
+  return { an: mail.replace(/^(.).*(@.*)$/, '$1…$2') };
+}
+function pwResetDone_(d) {
+  const lager = String(d.lager || ''), person = String(d.person || ''); const p = props_(); const key = 'PWRESET_' + lager + '|' + person; const r = parse_(p.getProperty(key));
+  if (!r || Date.now() > r.exp) throw new Error('CODE_UNGUELTIG');
+  if (r.h !== sha_('reset|' + String(d.code || '').trim())) { r.tries = (r.tries || 0) + 1; if (r.tries >= 5) p.deleteProperty(key); else p.setProperty(key, JSON.stringify(r)); throw new Error('CODE_FALSCH'); }
+  if (!d.newPw || String(d.newPw).length < 6) throw new Error('PASSWORT_ZU_KURZ');
+  p.setProperty('PW_' + lager + '|' + person, hash_(d.newPw)); p.deleteProperty(key);
+  abmelden_(function (s) { return s.lager === lager && s.person === person; });
   return {};
 }
 function admins_() { return parse_(props_().getProperty('ADMINS')) || []; }

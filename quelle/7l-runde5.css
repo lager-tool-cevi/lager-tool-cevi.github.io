@@ -115,6 +115,44 @@ tr.drop-vor td, .ag-item.drop-vor, .info-sec.drop-vor { box-shadow: inset 0 3px 
 .vw-n { position: absolute; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); font-size: 13px; opacity: 0.8; }
 @media (max-width: 760px) { .vw-nav { display: none; } }
 
+/* Einkaufsliste */
+.shop-filter { display: flex; justify-content: flex-end; }
+.shop-abt { padding: 12px 0 4px; }
+.shop-mehr { margin-left: auto; font-size: 12px; white-space: nowrap; }
+.shop-wer { font-size: 11px; }
+.shop-detail { margin: 0 0 6px 30px; display: flex; flex-direction: column; gap: 4px; }
+.shop-d { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.shop-d span { flex: 1; } .shop-d select { height: 30px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); max-width: 160px; }
+/* Anwesenheit: Tag antippen */
+.my-att td.nm { cursor: pointer; }
+/* Notfall: Route */
+.sos-route { display: flex; flex-direction: column; color: inherit; text-decoration: none; }
+.sos-route .muted { font-size: 12.5px; }
+/* Untere Leiste wählen */
+.bn-wahl { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; max-height: 55vh; overflow-y: auto; }
+.bn-wahl .mehr-k { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 4px 10px; border: 0; border-radius: 14px; background: var(--subtle, var(--hover)); color: var(--ink); font: inherit; font-size: 11.5px; cursor: pointer; min-height: 74px; }
+.bn-wahl .mehr-k svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; color: var(--accent); }
+.bn-wahl .mehr-k.on { background: var(--accent-soft); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.bn-wahl .mehr-k i { position: absolute; top: 6px; right: 8px; font-style: normal; font-size: 11px; font-weight: 700; background: var(--accent); color: var(--accent-ink, #fff); border-radius: 999px; min-width: 18px; height: 18px; line-height: 18px; }
+/* Ohne Netz */
+.ab-netz { flex: none; font-size: 11.5px; font-weight: 600; color: var(--wait); background: color-mix(in srgb, var(--wait) 14%, transparent); border-radius: 999px; padding: 3px 8px; white-space: nowrap; }
+/* QR */
+.qr-gross { display: grid; place-items: center; min-height: 290px; }
+.qr-gross img { border-radius: 12px; background: #fff; padding: 8px; }
+/* Favoriten */
+.nav button[data-view] { position: relative; }
+.fav-stern { margin-left: auto; opacity: 0; font-size: 13px; color: var(--side-muted); padding: 0 2px; transition: opacity var(--t); }
+.nav button:hover .fav-stern, .fav-stern.an { opacity: 1; }
+.fav-stern.an { color: #f5c542; }
+.nav button .count + .fav-stern { margin-left: 6px; }
+.fav-btn .fav-stern { display: none; }
+@media (max-width: 760px) { .fav-stern, .fav-label, .fav-btn { display: none !important; } }
+/* Passwort anzeigen */
+.pw-wrap { position: relative; display: block; }
+.pw-wrap input { width: 100%; padding-right: 44px; }
+.pw-auge { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 36px; height: 32px; border: 0; background: none; cursor: pointer; font-size: 15px; opacity: 0.5; filter: grayscale(1); }
+.pw-auge.an { opacity: 1; }
+
 /* Plus-Knopf: Ziele */
 .qn-ziele { flex-wrap: wrap; }
 .qn-day { display: flex; gap: 8px; }

@@ -1293,7 +1293,8 @@
       <div><h1 style="font-size:24px;font-weight:600">${list.length ? "Welches Lager?" : "Willkommen"}</h1><p class="muted" style="margin:4px 0 0">${list.length ? "Wähle ein Lager. Danach meldest du dich als Team oder als Lagerleitung an." : "Erstelle das erste Lager (dafür braucht es das Admin-Passwort)."}</p></div>
       ${showForm ? newLagerForm(list) : ""}
       ${(() => { const card = (l) => { const s = saved(l._id); return `<button class="lager-card ${l.end && l.end < t0 ? "past" : ""}" data-open-lager="${esc(l._id)}"><span class="eyebrow">${esc(l.abteilung || "")}</span><h2>${esc(l.title)}</h2><span class="meta">${l.start ? `${fmtFull(l.start)}${l.end ? " – " + fmtFull(l.end) : ""}` : "Datum offen"}</span>${l.closed ? `<span class="tag plain" style="align-self:flex-start">abgeschlossen</span>` : ""}<span class="meta">${l.end && l.end < t0 ? "vorbei" : l.prep || l.start ? "Leitervorbereitung " + countdown(l.prep || l.start) : ""}</span>${s ? `<span class="meta signed">Angemeldet als ${esc(s.name)} · ${s.role === "lalei" ? "Lagerleitung" : "Team"}</span>` : ""}</button>`; };
-        const past = list.filter((l) => l.end && l.end < t0), cur = list.filter((l) => !(l.end && l.end < t0));
+        const grenze = addDays(t0, -35); // erst 5 Wochen nach dem Lager ins Archiv
+        const past = list.filter((l) => l.end && l.end < grenze), cur = list.filter((l) => !(l.end && l.end < grenze));
         return `<div class="lager-grid">${cur.map(card).join("")}</div>${past.length ? `<details class="archive"><summary>Archiv: vergangene Lager (${past.length})</summary><div class="lager-grid">${past.map(card).join("")}</div></details>` : ""}`; })()}`;
   }
   function newLagerForm(list) {
@@ -2041,7 +2042,7 @@
         body = `<div class="lg-who">${av(st.pick.name)}<b>${esc(st.pick.name)}</b></div>
           <form class="stack" style="gap:12px" data-lg-form><label class="field"><span>Dein Passwort</span><input type="password" id="lg-pw" autocomplete="current-password" required></label>
           <button class="btn primary" ${st.busy ? "disabled" : ""}>${st.busy ? "Wird geprüft …" : "Anmelden"}</button></form>
-          <p class="hint wichtig" style="margin:0">Passwort vergessen? Der Admin kann es zurücksetzen (Zahnrad auf der Startseite). Danach meldest du dich wieder mit dem Lagerpasswort an.</p>`;
+          <p class="hint wichtig" style="margin:0">Passwort vergessen? <button type="button" class="link" data-pw-reset="${esc(lagerId)}|${esc(st.pick.id)}|${esc(st.pick.name)}">Code per E-Mail</button>, oder der Admin setzt es zurück.</p>`;
       } else {
         body = `<div class="lg-who">${av(st.pick.name)}<b>${esc(st.pick.name)}</b></div>
           <p style="margin:0">Erste Anmeldung: Gib das <b>Lagerpasswort</b> ein, das du von der Lagerleitung bekommen hast, und lege dein <b>eigenes Passwort</b> fest.</p>
@@ -2459,10 +2460,10 @@
 
   // ---------- mobile Leiste unten ----------
   function renderBnav() {
-    const keys = isLaLei() ? ["start", "tasks", "journal", "days"] : ["home", "myatt", "plan", "infos"];
+    const keys = bnavKeys(isLaLei() ? ["start", "tasks", "journal", "days"] : ["home", "myatt", "plan", "infos"]);
     const label = { start: "Start", overview: "Übersicht", tasks: "Aufgaben", days: "Tage", journal: "Protokoll", home: "Mein Bereich", myatt: "Anwesenheit", plan: "Schichtplan", infos: "Infos" };
-    const html = keys.map((k) => { const src = $(`#tabs button[data-view="${k}"] svg`); return `<button data-view="${k}" aria-selected="${state.view === k}">${src ? src.outerHTML : ""}<span>${label[k]}</span></button>`; }).join("") + `<button data-more><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>Mehr</span></button>`;
-    const el = $("#bnav"); if (el.dataset.k !== role() + state.view) { el.innerHTML = html; el.dataset.k = role() + state.view; }
+    const html = keys.map((k) => { const src = $(`#tabs button[data-view="${k}"] svg`); return `<button data-view="${k}" aria-selected="${state.view === k}">${src ? src.outerHTML : ""}<span>${label[k] || navLabel(k)}</span></button>`; }).join("") + `<button data-more><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>Mehr</span></button>`;
+    const el = $("#bnav"); if (el.dataset.k !== role() + state.view + keys.join()) { el.innerHTML = html; el.dataset.k = role() + state.view + keys.join(); }
   }
 
   // ---------- Klicks und Eingaben der neuen Seiten ----------
