@@ -1605,6 +1605,18 @@ html:has(.overlay), html:has(.cmdk), html:has(.hoeck-mode), body:has(.overlay), 
   body.kb-offen .toast { bottom: calc(var(--kb, 0px) + 12px) !important; }
 }
 
+/* ===== Ruhiger: weniger kleine Zusatzzeilen (Handy und PC) ===== */
+/* Erklär-Hinweise weg, nur wirklich wichtige bleiben */
+.hint:not(.wichtig) { display: none !important; }
+/* Untertitel unter dem Seitentitel weg, ausser wo er Information ist (Ressort, Tag, Protokoll) */
+#view:not([data-v="ress"]):not([data-v="day"]):not([data-v="prot"]) .page-head p { display: none; }
+/* Erklärtexte neben Kartentiteln */
+.card-head .erklaerung { display: none; }
+/* Kennzahlen ohne Erklärzeile */
+.kpi .s { display: none; }
+/* Aufgaben: nur das Nötige unter dem Titel */
+.t-meta { gap: 2px 8px; }
+
 
 /* =====================================================================
    Gestaltungsregeln (Grundgerüst): Abstände 4/8/16/24/32, wenige Schriftgrössen,
@@ -1742,7 +1754,7 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px var(--accent-s
   <nav class="bnav" id="bnav" aria-label="Schnellnavigation"></nav>
   <button class="fab" id="qnote" type="button" aria-label="Schnell-Notiz" title="Schnell-Notiz" hidden>+</button>
 </div>
-<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 13:36","test":false};</script>
+<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 13:37","test":false};</script>
 <script>
 // Datenanbindung. Bei Google (google.script.run vorhanden) läuft alles über api() in Code.gs,
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:
@@ -2519,8 +2531,8 @@ window.LaleiStore = (() => {
     for (const tg of tagsOf(t)) meta.push(`<button class="tagchip" data-tag="${esc(tg)}">${esc(tg)}</button>`);
     if (opts.roleFor) meta.push(t.owner === opts.roleFor ? "Du bist verantwortlich" : "Du unterstützt");
     const ck = t.checklist || []; if (ck.length) meta.push(`☑ ${ck.filter((c) => c.done).length}/${ck.length}`);
-    if ((t.links || []).length) meta.push(`${t.links.length} ${t.links.length === 1 ? "Link" : "Links"}`);
-    if (t.note) meta.push("Bemerkung");
+
+
     if (t.source) meta.push("aus " + esc(t.source.label || "Höck"));
     if ((t.dependsOn || []).length && !done) { const di = depInfo(t); if (di) meta.push(di); }
     return `<tr class="task ${late ? "late" : ""} ${done ? "done" : ""}">
@@ -2850,7 +2862,7 @@ window.LaleiStore = (() => {
       if (!opts.full) return `<article class="entry entry-link" data-prot="${esc(e._id)}" role="button" tabindex="0" aria-label="Protokoll öffnen: ${esc(e.title || "")}">${dateCol(e.date)}<div style="min-width:0">${kopf.replace('</div>', '<span class="prot-go" aria-hidden="true">›</span></div>')}
         <div class="foot"><span class="k muted">Protokoll</span>${person(e.author || "", "Unbekannt")}${editBtn(e)}<button class="link" data-docx="${esc(e._id)}">Als Word herunterladen</button></div></div></article>`;
       return `<article class="entry prot-full">${dateCol(e.date)}<div style="min-width:0"><div class="meeting">
-        <span class="muted" style="font-size:13px">${items.length} Traktanden · ${dec} Entscheide · ${pendenzenOf(e._id).length} Pendenzen · ${(e.present || []).length} anwesend</span>
+
         <div class="att"><span class="k muted">Anwesend</span><span class="avs">${(e.present || []).map((p) => person(p)).join("") || "–"}</span>${absent.length && (e.kind || "LaLei") === "LaLei" ? `<span class="muted">Abwesend: ${esc(absent.filter((p) => peopleBy("LaLei").includes(p)).join(", ") || "–")}</span>` : ""}${e.guests ? `<span class="muted">Gäste: ${esc(e.guests)}</span>` : ""}</div>
         <ol class="trakt">${items.map((it, i) => { const pend = pendenzenOf(e._id, i); return `<li><div style="min-width:0"><b>${esc(it.title || "Ohne Titel")}</b>${it.notes ? `<div class="rich">${rich(it.notes)}</div>` : ""}${it.decision ? `<div class="decision"><span class="eyebrow">Entscheid</span><div class="rich">${rich(it.decision)}</div></div>` : ""}
           ${(it.links || []).length ? `<div style="margin-top:6px">${linksView(it.links)}</div>` : ""}
@@ -4204,12 +4216,12 @@ window.LaleiStore = (() => {
         const list = st.list.filter((p) => (st.role === "lalei" ? p.funktion === "LaLei" || p.funktion === "Lesen" : true)).sort((a, b) => a.name.localeCompare(b.name));
         body = `<p class="muted" style="margin:0">${st.role === "lalei" ? "Wer bist du?" : "Wähle deinen Namen."}</p>
           <div class="name-grid">${list.map((p) => `<button type="button" data-pick="${esc(p.id)}">${av(p.name)}<span>${esc(p.name)}</span></button>`).join("") || `<span class="muted">${st.role === "lalei" ? "Noch niemand in der Lagerleitung erfasst." : "Noch keine Leitenden erfasst. Die Lagerleitung trägt euch unter «Lager einrichten › Team» ein."}</span>`}</div>
-          ${st.role === "team" ? '<p class="hint" style="margin:0">Dein Name fehlt? Melde dich bei der Lagerleitung.</p>' : ""}`;
+          ${st.role === "team" ? '<p class="hint wichtig" style="margin:0">Dein Name fehlt? Melde dich bei der Lagerleitung.</p>' : ""}`;
       } else if (st.pick.hasPw) {
         body = `<div class="lg-who">${av(st.pick.name)}<b>${esc(st.pick.name)}</b></div>
           <form class="stack" style="gap:12px" data-lg-form><label class="field"><span>Dein Passwort</span><input type="password" id="lg-pw" autocomplete="current-password" required></label>
           <button class="btn primary" ${st.busy ? "disabled" : ""}>${st.busy ? "Wird geprüft …" : "Anmelden"}</button></form>
-          <p class="hint" style="margin:0">Passwort vergessen? Der Admin kann es zurücksetzen (Zahnrad auf der Startseite). Danach meldest du dich wieder mit dem Lagerpasswort an.</p>`;
+          <p class="hint wichtig" style="margin:0">Passwort vergessen? Der Admin kann es zurücksetzen (Zahnrad auf der Startseite). Danach meldest du dich wieder mit dem Lagerpasswort an.</p>`;
       } else {
         body = `<div class="lg-who">${av(st.pick.name)}<b>${esc(st.pick.name)}</b></div>
           <p style="margin:0">Erste Anmeldung: Gib das <b>Lagerpasswort</b> ein, das du von der Lagerleitung bekommen hast, und lege dein <b>eigenes Passwort</b> fest.</p>
@@ -4382,7 +4394,7 @@ window.LaleiStore = (() => {
       $("#myatt-body").innerHTML = `<section class="card"><div class="card-head"><div class="att-legend"><span><button class="ac" data-v="A" tabindex="-1">✓</button>anwesend</span><span><button class="ac" data-v="F" tabindex="-1">✕</button>abwesend</span><span><button class="ac" data-v="O" tabindex="-1">?</button>offen</span></div><button class="btn small" data-myatt-all>Alles Offene: anwesend</button></div>
         <div class="att-wrap"><table class="att-table my-att"><thead><tr><th class="nm">Tag</th>${dps.map((dp) => `<th class="dp">${esc(dp)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>
         <div class="card-body stack" style="gap:10px">${n ? `<label class="field"><span>Bemerkung zur Änderung (optional)</span><input id="myatt-note" placeholder="z.B. komme erst Samstagmittag"></label>` : ""}
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn primary" data-myatt-save ${n ? "" : "disabled"}>Speichern${n ? ` (${n})` : ""}</button>${n ? '<button class="btn" data-myatt-reset>Zurücksetzen</button>' : ""}<span class="hint">Leere Felder werden direkt gespeichert. Änderungen an Eingetragenem (Schloss-Symbol) gehen als Anfrage an die Lagerleitung.</span></div></div></section>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn primary" data-myatt-save ${n ? "" : "disabled"}>Speichern${n ? ` (${n})` : ""}</button>${n ? '<button class="btn" data-myatt-reset>Zurücksetzen</button>' : ""}<span class="hint wichtig">Leere Felder werden direkt gespeichert. Änderungen an Eingetragenem (Schloss-Symbol) gehen als Anfrage an die Lagerleitung.</span></div></div></section>
         ${reqs.length ? `<section class="card"><div class="card-head"><h2>Deine Anfragen</h2></div>${reqs.map((r) => `<div class="mrow"><div class="entry-top"><span class="tag plain ${r.status === "Angenommen" ? "ok" : r.status === "Abgelehnt" ? "late" : "next"}">${esc(r.status || "Offen")}</span><span class="muted" style="font-size:12px;margin-left:auto">${stampFmt(r.createdAt)}</span></div><div style="font-size:13.5px">${esc(slotTxt(r.slots))}</div>${r.note ? `<div class="muted" style="font-size:13px">${esc(r.note)}</div>` : ""}${r.reply ? `<div class="reply"><b>Lagerleitung:</b> ${esc(r.reply)}</div>` : ""}</div>`).join("")}</section>` : ""}`;
     },
   };
@@ -5496,7 +5508,7 @@ window.LaleiStore = (() => {
   views.settings.update = function () {
     setUpdateOrig(); fillTabs("settings"); const c = cfg();
     $("#set-lager").insertAdjacentHTML("beforeend", `<div class="form-grid" style="margin-top:16px"><label class="field"><span>Lageradresse (erscheint beim Notfall-Knopf)</span><input data-cfg="adresse" value="${esc(c.adresse || "")}" placeholder="z.B. Pfadiheim Wildhaus, Dorfstrasse 1, 9658 Wildhaus"></label>
-      <div class="field"><span>Lagerort für das Wetter</span><div style="display:flex;gap:6px"><input id="ort-q" class="input" value="${esc((c.ort || {}).name || "")}" placeholder="Ort, z.B. Wildhaus"><button class="btn small" data-ort-find>Suchen</button></div><div id="ort-res" class="hint">${c.ort ? `Gespeichert: ${esc(c.ort.name)} (${c.ort.lat.toFixed(2)}, ${c.ort.lon.toFixed(2)})` : "Für Wetter, Sonnenuntergang und Dämmerung auf den Tagesseiten."}</div></div></div>`);
+      <div class="field"><span>Lagerort für das Wetter</span><div style="display:flex;gap:6px"><input id="ort-q" class="input" value="${esc((c.ort || {}).name || "")}" placeholder="Ort, z.B. Wildhaus"><button class="btn small" data-ort-find>Suchen</button></div><div id="ort-res" class="hint wichtig">${c.ort ? `Gespeichert: ${esc(c.ort.name)} (${c.ort.lat.toFixed(2)}, ${c.ort.lon.toFixed(2)})` : "Für Wetter, Sonnenuntergang und Dämmerung auf den Tagesseiten."}</div></div></div>`);
     $("#set-tpl").innerHTML = `<div class="tpl-grid"><div class="field"><span>Packliste fürs Team</span><span class="muted" style="font-size:13.5px">Die Packliste hat jetzt eine eigene Seite.</span><button class="btn small" data-goto="pack" style="align-self:flex-start">Zur Packliste</button></div>
       <div class="stack" style="gap:18px"><div class="field"><span>Standard-Traktanden (kommen in jede neue Traktandenliste)</span><div class="list-edit">${(c.agendaDefaults || []).map((x, i) => `<div class="r"><input data-ad="${i}" value="${esc(x)}" aria-label="Traktandum"><button class="btn small ghost" data-ad-rm="${i}" aria-label="Entfernen">✕</button></div>`).join("")}<form class="r" data-ad-add><input placeholder="z.B. Rückblick letzte Woche"><button class="btn small">+</button></form></div></div>
       <div class="field"><span>Standard-Blöcke der Tagesseiten (zusätzlich zu To-dos, Zu besprechen, Wichtig, Ideen)</span><div class="list-edit">${(c.dayBlocks || []).map((x, i) => `<div class="r"><input data-db="${i}" value="${esc(x)}" aria-label="Block"><button class="btn small ghost" data-db-rm="${i}" aria-label="Entfernen">✕</button></div>`).join("")}<form class="r" data-db-add><input placeholder="z.B. Material, Wetter-Plan B"><button class="btn small">+</button></form></div><span class="hint">Gilt für Tagesseiten, die noch nicht bearbeitet wurden.</span></div></div></div>`;
@@ -5878,7 +5890,7 @@ window.LaleiStore = (() => {
   const setUpdateOrig1 = views.settings.update;
   views.settings.update = function () {
     setUpdateOrig1(); const c = cfg();
-    $("#set-close").insertAdjacentHTML("beforeend", `<div class="kids-del"><h3>Teilnehmenden-Daten löschen</h3><p class="hint" style="margin:0 0 8px">Nach dem Lager braucht es die Namen der Teilnehmenden nicht mehr. Spätestens 6 Monate nach dem Lager bitte löschen (Datenschutz).${c.kidsDeletedAt ? ` Zuletzt gelöscht am ${esc(fmtFull(c.kidsDeletedAt.slice(0, 10)))}.` : ""}</p><button class="btn ${lagerVorbei(180) && state.kids.length ? "red" : ""}" data-kids-del ${state.kids.length ? "" : "disabled"}>Teilnehmenden-Daten löschen (${state.kids.length})</button></div>`);
+    $("#set-close").insertAdjacentHTML("beforeend", `<div class="kids-del"><h3>Teilnehmenden-Daten löschen</h3><p class="hint wichtig" style="margin:0 0 8px">Nach dem Lager braucht es die Namen der Teilnehmenden nicht mehr. Spätestens 6 Monate nach dem Lager bitte löschen (Datenschutz).${c.kidsDeletedAt ? ` Zuletzt gelöscht am ${esc(fmtFull(c.kidsDeletedAt.slice(0, 10)))}.` : ""}</p><button class="btn ${lagerVorbei(180) && state.kids.length ? "red" : ""}" data-kids-del ${state.kids.length ? "" : "disabled"}>Teilnehmenden-Daten löschen (${state.kids.length})</button></div>`);
   };
   view.addEventListener("click", (e) => { if (e.target.closest("[data-kids-del]")) kidsLoeschen(); });
   const checkItemsOrig = checkItems;
@@ -6118,7 +6130,7 @@ window.LaleiStore = (() => {
   }
   function kanbanHtml(list) {
     const cols = STATUSES.filter((s) => s !== "Erledigt" || curTab("tasks") !== "open");
-    return `<div class="kanban">${cols.map((s) => { const items = list.filter((t) => (t.status || "Offen") === s); return `<div class="kb-col" data-kb-col="${esc(s)}"><div class="kb-head"><span class="kb-dot" data-s="${esc(s)}"></span><b>${esc(s)}</b><span class="muted">${items.length}</span></div><div class="kb-list">${items.slice(0, 120).map((t) => `<div class="kb-card ${isLate(t) ? "late" : ""}" draggable="true" data-kb="${esc(t._id)}" data-open="${esc(t._id)}" tabindex="0"><div class="kb-title">${t.star ? '<span class="star on">★</span>' : ""}${esc(t.title)}</div><div class="kb-meta"><span>${esc(t.ressort)}${t.teil ? " › " + esc(t.teil) : ""}</span>${t.deadline ? `<span class="${isLate(t) ? "late-n" : ""}">${fmt(t.deadline)}</span>` : ""}${t.owner ? av(t.owner) : ""}</div>${depInfo(t)}</div>`).join("") || '<div class="kb-empty">leer</div>'}${items.length > 120 ? `<div class="kb-empty">… und ${items.length - 120} weitere</div>` : ""}</div></div>`; }).join("")}</div><p class="hint" style="padding:0 16px 12px">Karten in eine andere Spalte ziehen ändert den Status. Klick öffnet die Aufgabe.</p>`;
+    return `<div class="kanban">${cols.map((s) => { const items = list.filter((t) => (t.status || "Offen") === s); return `<div class="kb-col" data-kb-col="${esc(s)}"><div class="kb-head"><span class="kb-dot" data-s="${esc(s)}"></span><b>${esc(s)}</b><span class="muted">${items.length}</span></div><div class="kb-list">${items.slice(0, 120).map((t) => `<div class="kb-card ${isLate(t) ? "late" : ""}" draggable="true" data-kb="${esc(t._id)}" data-open="${esc(t._id)}" tabindex="0"><div class="kb-title">${t.star ? '<span class="star on">★</span>' : ""}${esc(t.title)}</div><div class="kb-meta"><span>${esc(t.ressort)}${t.teil ? " › " + esc(t.teil) : ""}</span>${t.deadline ? `<span class="${isLate(t) ? "late-n" : ""}">${fmt(t.deadline)}</span>` : ""}${t.owner ? av(t.owner) : ""}</div>${depInfo(t)}</div>`).join("") || '<div class="kb-empty">leer</div>'}${items.length > 120 ? `<div class="kb-empty">… und ${items.length - 120} weitere</div>` : ""}</div></div>`; }).join("")}</div>`;
   }
   // Leiste für ausgewählte Aufgaben
   function bulkBar() {
@@ -7203,7 +7215,7 @@ window.LaleiStore = (() => {
     const html = `<section class="card" id="ad-uebung"><div class="card-head"><h2>Übungslager</h2>${da ? '<span class="tag ok">vorhanden</span>' : ""}</div><div class="card-body stack" style="gap:10px">
       <p class="hint" style="margin:0">Eine Kopie eines echten Lagers zum Ausprobieren und Üben, ohne Teilnehmende und ohne private Daten. ${da ? "Neu kopieren ersetzt das bisherige Übungslager." : ""}</p>
       <div class="form-grid"><label class="field"><span>Kopie von</span><select id="ub-src" class="input">${lagers.map((l) => `<option value="${esc(l._id)}">${esc(l.title || l._id)}</option>`).join("")}</select></label><label class="field"><span>Lagerpasswort fürs Übungslager</span><input type="password" id="ub-pw" minlength="6" autocomplete="new-password" placeholder="mind. 6 Zeichen"></label></div>
-      <button class="btn small" data-ub-go style="align-self:flex-start">${da ? "Übungslager neu kopieren" : "Übungslager erstellen"}</button><div id="ub-msg" class="hint"></div></div></section>`;
+      <button class="btn small" data-ub-go style="align-self:flex-start">${da ? "Übungslager neu kopieren" : "Übungslager erstellen"}</button><div id="ub-msg" class="hint wichtig"></div></div></section>`;
     const ref = $("#ad-toolfb", m) || $("#ad-vorlagen", m) || [...m.querySelectorAll("section.card")].find((s) => /Wartungshinweis/.test(s.textContent)); if (ref) ref.insertAdjacentHTML("beforebegin", html);
   }
   const showAdminOrig4 = showAdmin;
@@ -7445,6 +7457,21 @@ window.LaleiStore = (() => {
   const setViewOrigProt = setView;
   setView = function (v) { if (v === "prot") store.set("lalei-prot", state.protId || ""); return setViewOrigProt(v); };
   if (!state.protId) state.protId = store.get("lalei-prot") || null;
+
+  // =====================================================================
+  // Ruhiger: Erklärtexte neben Kartentiteln weglassen (kurze Zahlen wie «4 von 6 erledigt» bleiben)
+  // =====================================================================
+  function beruhigen() {
+    const v = $("#view"); if (!v) return; v.dataset.v = state.view || "";
+    v.querySelectorAll(".card-head > span.muted, .card-head > .muted:not(button)").forEach((s) => {
+      const t = s.textContent.trim(); const kurz = t.length <= 24 || /^\d|\bvon\b \d|^seit |^bis |^zuletzt /i.test(t) && t.length <= 40;
+      s.classList.toggle("erklaerung", !kurz);
+    });
+  }
+  const renderOrigRuhig = render;
+  render = function () { renderOrigRuhig(); beruhigen(); };
+  const refreshOrigRuhig = refresh;
+  refresh = function (force) { refreshOrigRuhig(force); beruhigen(); };
 
   // ---------- boot ----------
   state.jTab = store.get("lalei-jtab") || "all";

@@ -367,7 +367,7 @@
     const html = `<section class="card" id="ad-uebung"><div class="card-head"><h2>Übungslager</h2>${da ? '<span class="tag ok">vorhanden</span>' : ""}</div><div class="card-body stack" style="gap:10px">
       <p class="hint" style="margin:0">Eine Kopie eines echten Lagers zum Ausprobieren und Üben, ohne Teilnehmende und ohne private Daten. ${da ? "Neu kopieren ersetzt das bisherige Übungslager." : ""}</p>
       <div class="form-grid"><label class="field"><span>Kopie von</span><select id="ub-src" class="input">${lagers.map((l) => `<option value="${esc(l._id)}">${esc(l.title || l._id)}</option>`).join("")}</select></label><label class="field"><span>Lagerpasswort fürs Übungslager</span><input type="password" id="ub-pw" minlength="6" autocomplete="new-password" placeholder="mind. 6 Zeichen"></label></div>
-      <button class="btn small" data-ub-go style="align-self:flex-start">${da ? "Übungslager neu kopieren" : "Übungslager erstellen"}</button><div id="ub-msg" class="hint"></div></div></section>`;
+      <button class="btn small" data-ub-go style="align-self:flex-start">${da ? "Übungslager neu kopieren" : "Übungslager erstellen"}</button><div id="ub-msg" class="hint wichtig"></div></div></section>`;
     const ref = $("#ad-toolfb", m) || $("#ad-vorlagen", m) || [...m.querySelectorAll("section.card")].find((s) => /Wartungshinweis/.test(s.textContent)); if (ref) ref.insertAdjacentHTML("beforebegin", html);
   }
   const showAdminOrig4 = showAdmin;

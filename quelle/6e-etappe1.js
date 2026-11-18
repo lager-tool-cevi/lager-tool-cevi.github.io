@@ -156,7 +156,7 @@
   const setUpdateOrig1 = views.settings.update;
   views.settings.update = function () {
     setUpdateOrig1(); const c = cfg();
-    $("#set-close").insertAdjacentHTML("beforeend", `<div class="kids-del"><h3>Teilnehmenden-Daten löschen</h3><p class="hint" style="margin:0 0 8px">Nach dem Lager braucht es die Namen der Teilnehmenden nicht mehr. Spätestens 6 Monate nach dem Lager bitte löschen (Datenschutz).${c.kidsDeletedAt ? ` Zuletzt gelöscht am ${esc(fmtFull(c.kidsDeletedAt.slice(0, 10)))}.` : ""}</p><button class="btn ${lagerVorbei(180) && state.kids.length ? "red" : ""}" data-kids-del ${state.kids.length ? "" : "disabled"}>Teilnehmenden-Daten löschen (${state.kids.length})</button></div>`);
+    $("#set-close").insertAdjacentHTML("beforeend", `<div class="kids-del"><h3>Teilnehmenden-Daten löschen</h3><p class="hint wichtig" style="margin:0 0 8px">Nach dem Lager braucht es die Namen der Teilnehmenden nicht mehr. Spätestens 6 Monate nach dem Lager bitte löschen (Datenschutz).${c.kidsDeletedAt ? ` Zuletzt gelöscht am ${esc(fmtFull(c.kidsDeletedAt.slice(0, 10)))}.` : ""}</p><button class="btn ${lagerVorbei(180) && state.kids.length ? "red" : ""}" data-kids-del ${state.kids.length ? "" : "disabled"}>Teilnehmenden-Daten löschen (${state.kids.length})</button></div>`);
   };
   view.addEventListener("click", (e) => { if (e.target.closest("[data-kids-del]")) kidsLoeschen(); });
   const checkItemsOrig = checkItems;

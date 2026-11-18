@@ -349,8 +349,8 @@
     for (const tg of tagsOf(t)) meta.push(`<button class="tagchip" data-tag="${esc(tg)}">${esc(tg)}</button>`);
     if (opts.roleFor) meta.push(t.owner === opts.roleFor ? "Du bist verantwortlich" : "Du unterstützt");
     const ck = t.checklist || []; if (ck.length) meta.push(`☑ ${ck.filter((c) => c.done).length}/${ck.length}`);
-    if ((t.links || []).length) meta.push(`${t.links.length} ${t.links.length === 1 ? "Link" : "Links"}`);
-    if (t.note) meta.push("Bemerkung");
+
+
     if (t.source) meta.push("aus " + esc(t.source.label || "Höck"));
     if ((t.dependsOn || []).length && !done) { const di = depInfo(t); if (di) meta.push(di); }
     return `<tr class="task ${late ? "late" : ""} ${done ? "done" : ""}">
@@ -680,7 +680,7 @@
       if (!opts.full) return `<article class="entry entry-link" data-prot="${esc(e._id)}" role="button" tabindex="0" aria-label="Protokoll öffnen: ${esc(e.title || "")}">${dateCol(e.date)}<div style="min-width:0">${kopf.replace('</div>', '<span class="prot-go" aria-hidden="true">›</span></div>')}
         <div class="foot"><span class="k muted">Protokoll</span>${person(e.author || "", "Unbekannt")}${editBtn(e)}<button class="link" data-docx="${esc(e._id)}">Als Word herunterladen</button></div></div></article>`;
       return `<article class="entry prot-full">${dateCol(e.date)}<div style="min-width:0"><div class="meeting">
-        <span class="muted" style="font-size:13px">${items.length} Traktanden · ${dec} Entscheide · ${pendenzenOf(e._id).length} Pendenzen · ${(e.present || []).length} anwesend</span>
+
         <div class="att"><span class="k muted">Anwesend</span><span class="avs">${(e.present || []).map((p) => person(p)).join("") || "–"}</span>${absent.length && (e.kind || "LaLei") === "LaLei" ? `<span class="muted">Abwesend: ${esc(absent.filter((p) => peopleBy("LaLei").includes(p)).join(", ") || "–")}</span>` : ""}${e.guests ? `<span class="muted">Gäste: ${esc(e.guests)}</span>` : ""}</div>
         <ol class="trakt">${items.map((it, i) => { const pend = pendenzenOf(e._id, i); return `<li><div style="min-width:0"><b>${esc(it.title || "Ohne Titel")}</b>${it.notes ? `<div class="rich">${rich(it.notes)}</div>` : ""}${it.decision ? `<div class="decision"><span class="eyebrow">Entscheid</span><div class="rich">${rich(it.decision)}</div></div>` : ""}
           ${(it.links || []).length ? `<div style="margin-top:6px">${linksView(it.links)}</div>` : ""}
@@ -2034,12 +2034,12 @@
         const list = st.list.filter((p) => (st.role === "lalei" ? p.funktion === "LaLei" || p.funktion === "Lesen" : true)).sort((a, b) => a.name.localeCompare(b.name));
         body = `<p class="muted" style="margin:0">${st.role === "lalei" ? "Wer bist du?" : "Wähle deinen Namen."}</p>
           <div class="name-grid">${list.map((p) => `<button type="button" data-pick="${esc(p.id)}">${av(p.name)}<span>${esc(p.name)}</span></button>`).join("") || `<span class="muted">${st.role === "lalei" ? "Noch niemand in der Lagerleitung erfasst." : "Noch keine Leitenden erfasst. Die Lagerleitung trägt euch unter «Lager einrichten › Team» ein."}</span>`}</div>
-          ${st.role === "team" ? '<p class="hint" style="margin:0">Dein Name fehlt? Melde dich bei der Lagerleitung.</p>' : ""}`;
+          ${st.role === "team" ? '<p class="hint wichtig" style="margin:0">Dein Name fehlt? Melde dich bei der Lagerleitung.</p>' : ""}`;
       } else if (st.pick.hasPw) {
         body = `<div class="lg-who">${av(st.pick.name)}<b>${esc(st.pick.name)}</b></div>
           <form class="stack" style="gap:12px" data-lg-form><label class="field"><span>Dein Passwort</span><input type="password" id="lg-pw" autocomplete="current-password" required></label>
           <button class="btn primary" ${st.busy ? "disabled" : ""}>${st.busy ? "Wird geprüft …" : "Anmelden"}</button></form>
-          <p class="hint" style="margin:0">Passwort vergessen? Der Admin kann es zurücksetzen (Zahnrad auf der Startseite). Danach meldest du dich wieder mit dem Lagerpasswort an.</p>`;
+          <p class="hint wichtig" style="margin:0">Passwort vergessen? Der Admin kann es zurücksetzen (Zahnrad auf der Startseite). Danach meldest du dich wieder mit dem Lagerpasswort an.</p>`;
       } else {
         body = `<div class="lg-who">${av(st.pick.name)}<b>${esc(st.pick.name)}</b></div>
           <p style="margin:0">Erste Anmeldung: Gib das <b>Lagerpasswort</b> ein, das du von der Lagerleitung bekommen hast, und lege dein <b>eigenes Passwort</b> fest.</p>
@@ -2212,7 +2212,7 @@
       $("#myatt-body").innerHTML = `<section class="card"><div class="card-head"><div class="att-legend"><span><button class="ac" data-v="A" tabindex="-1">✓</button>anwesend</span><span><button class="ac" data-v="F" tabindex="-1">✕</button>abwesend</span><span><button class="ac" data-v="O" tabindex="-1">?</button>offen</span></div><button class="btn small" data-myatt-all>Alles Offene: anwesend</button></div>
         <div class="att-wrap"><table class="att-table my-att"><thead><tr><th class="nm">Tag</th>${dps.map((dp) => `<th class="dp">${esc(dp)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>
         <div class="card-body stack" style="gap:10px">${n ? `<label class="field"><span>Bemerkung zur Änderung (optional)</span><input id="myatt-note" placeholder="z.B. komme erst Samstagmittag"></label>` : ""}
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn primary" data-myatt-save ${n ? "" : "disabled"}>Speichern${n ? ` (${n})` : ""}</button>${n ? '<button class="btn" data-myatt-reset>Zurücksetzen</button>' : ""}<span class="hint">Leere Felder werden direkt gespeichert. Änderungen an Eingetragenem (Schloss-Symbol) gehen als Anfrage an die Lagerleitung.</span></div></div></section>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn primary" data-myatt-save ${n ? "" : "disabled"}>Speichern${n ? ` (${n})` : ""}</button>${n ? '<button class="btn" data-myatt-reset>Zurücksetzen</button>' : ""}<span class="hint wichtig">Leere Felder werden direkt gespeichert. Änderungen an Eingetragenem (Schloss-Symbol) gehen als Anfrage an die Lagerleitung.</span></div></div></section>
         ${reqs.length ? `<section class="card"><div class="card-head"><h2>Deine Anfragen</h2></div>${reqs.map((r) => `<div class="mrow"><div class="entry-top"><span class="tag plain ${r.status === "Angenommen" ? "ok" : r.status === "Abgelehnt" ? "late" : "next"}">${esc(r.status || "Offen")}</span><span class="muted" style="font-size:12px;margin-left:auto">${stampFmt(r.createdAt)}</span></div><div style="font-size:13.5px">${esc(slotTxt(r.slots))}</div>${r.note ? `<div class="muted" style="font-size:13px">${esc(r.note)}</div>` : ""}${r.reply ? `<div class="reply"><b>Lagerleitung:</b> ${esc(r.reply)}</div>` : ""}</div>`).join("")}</section>` : ""}`;
     },
   };

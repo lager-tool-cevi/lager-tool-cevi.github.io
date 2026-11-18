@@ -1,0 +1,11 @@
+/* ===== Ruhiger: weniger kleine Zusatzzeilen (Handy und PC) ===== */
+/* Erklär-Hinweise weg, nur wirklich wichtige bleiben */
+.hint:not(.wichtig) { display: none !important; }
+/* Untertitel unter dem Seitentitel weg, ausser wo er Information ist (Ressort, Tag, Protokoll) */
+#view:not([data-v="ress"]):not([data-v="day"]):not([data-v="prot"]) .page-head p { display: none; }
+/* Erklärtexte neben Kartentiteln */
+.card-head .erklaerung { display: none; }
+/* Kennzahlen ohne Erklärzeile */
+.kpi .s { display: none; }
+/* Aufgaben: nur das Nötige unter dem Titel */
+.t-meta { gap: 2px 8px; }
