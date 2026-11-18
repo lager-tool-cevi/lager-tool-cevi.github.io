@@ -1404,6 +1404,12 @@ button.tl-it { cursor: pointer; }
 
 /* ===== Handy wie eine App (bis 760 px) ===== */
 .appbar { display: none; }
+/* Offenes Fenster: Hintergrund bleibt stehen */
+html:has(.overlay), html:has(.cmdk), html:has(.hoeck-mode), body:has(.overlay), body:has(.cmdk), body:has(.hoeck-mode) { overflow: hidden; }
+.overlay, .cmdk { overscroll-behavior: contain; }
+.modal, .drawer-body, .cmdk-list, .bell-list { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.app-steps { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; }
+.share-ico { display: inline-block; border: 1px solid var(--line-strong); border-radius: 5px; padding: 0 5px; font-size: 13px; }
 @media (max-width: 760px) {
   html, body { overscroll-behavior-y: none; }
   body { -webkit-tap-highlight-color: transparent; }
@@ -1486,7 +1492,15 @@ button.tl-it { cursor: pointer; }
   .mehr-kopf > div { flex: 1; display: flex; flex-direction: column; min-width: 0; }
   .mehr-kopf b { font-size: 17px; }
   .mehr-kopf .muted { font-size: 13px; }
-  .mehr-cd { font-size: 13px; color: var(--muted); background: var(--subtle, var(--hover)); border-radius: 10px; padding: 8px 12px; }
+  .overlay.center .modal, .overlay:not(.center) .drawer { animation: lt-sheet 260ms cubic-bezier(.2,.8,.2,1) !important; opacity: 1 !important; }
+  .overlay { background: rgb(0 0 0 / 0.45) !important; }
+  .mehr-blatt { max-height: 88vh !important; max-height: 88dvh !important; overflow-y: auto; }
+  .mehr-konto { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .mehr-konto button { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 2px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); font: inherit; font-size: 12px; cursor: pointer; }
+  .mehr-konto svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; color: var(--muted); }
+  .mehr-konto .sos-z, .mehr-konto .sos-z svg { color: var(--late); }
+  .mehr-q { height: 42px; border: 0; border-radius: 12px; background: var(--subtle, var(--hover)); color: var(--ink); padding: 0 14px; font: inherit; font-size: 16px; width: 100%; }
+  .mehr-leer { text-align: center; font-size: 14px; }
   .mehr-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
   .mehr-k { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 4px 10px; border: 0; border-radius: 14px; background: var(--subtle, var(--hover)); color: var(--ink); font: inherit; font-size: 11.5px; line-height: 1.2; text-align: center; cursor: pointer; min-height: 78px; }
   .mehr-k svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; color: var(--accent); }
@@ -1660,7 +1674,7 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px var(--accent-s
   <nav class="bnav" id="bnav" aria-label="Schnellnavigation"></nav>
   <button class="fab" id="qnote" type="button" aria-label="Schnell-Notiz" title="Schnell-Notiz" hidden>+</button>
 </div>
-<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 12:55","test":false};</script>
+<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 13:08","test":false};</script>
 <script>
 // Datenanbindung. Bei Google (google.script.run vorhanden) läuft alles über api() in Code.gs,
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:
@@ -7179,29 +7193,59 @@ window.LaleiStore = (() => {
 
   // ---------- «Mehr»: alle Seiten als Kacheln, Konto, Notfall ----------
   function mehrBlatt() {
-    const kacheln = [...document.querySelectorAll("#tabs button[data-view]")].filter((b) => !b.hidden && !["help", "prefs", "trash"].includes(b.dataset.view));
-    const extra = [...document.querySelectorAll("#tabs button[data-view]")].filter((b) => !b.hidden && ["prefs", "help", "trash"].includes(b.dataset.view));
-    const cd = $("#countdown"); const cdTxt = cd ? cd.innerHTML.replace(/<br\s*\/?>/g, " ").replace(/<\/(b|span|div)>/g, " · ").replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").replace(/(\s·\s*)+/g, " · ").replace(/^ · | · $/g, "").replace(/\s·\s*$/, "").trim() : "";
+    const txt = (b) => [...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim();
+    const navs = [...document.querySelectorAll("#tabs button[data-view]")].filter((b) => !b.hidden);
+    const kacheln = navs.filter((b) => !["help", "prefs", "trash"].includes(b.dataset.view));
+    const extra = navs.filter((b) => ["prefs", "help", "trash"].includes(b.dataset.view));
+    const svgOf = (b) => (b.querySelector("svg") ? b.querySelector("svg").outerHTML : "");
+    const SV = {
+      fb: '<svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/><path d="M8 9h8M8 12h5"/></svg>',
+      lager: '<svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V10l7-6 7 6v10"/><path d="M10 20v-5h4v5"/></svg>',
+      logout: '<svg viewBox="0 0 24 24"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg>',
+      team: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+      app: '<svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M12 7v7M9 11l3 3 3-3"/></svg>',
+    };
+    const installiert = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
     const o = modal(`<div class="mehr-kopf">${av(me() || "?")}<div><b>${esc(me() || "–")}</b><span class="muted">${isReadOnly() ? "Nur lesen" : isLaLei() ? "Lagerleitung" : "Team"} · ${esc(lagerDoc().title || "")}</span></div><button class="btn small ghost" data-mehr-zu aria-label="Schliessen">✕</button></div>
-      ${cdTxt ? `<div class="mehr-cd">${esc(cdTxt)}</div>` : ""}
-      <div class="mehr-grid">${kacheln.map((b) => { const svg = b.querySelector("svg"); const cnt = b.querySelector(".count:not([hidden])"); const label = [...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim();
-        return `<button type="button" class="mehr-k ${b.dataset.view === state.view ? "on" : ""}" data-mehr-view="${esc(b.dataset.view)}">${svg ? svg.outerHTML : ""}<span>${esc(label)}</span>${cnt ? `<i>${esc(cnt.textContent)}</i>` : ""}</button>`; }).join("")}</div>
+      <div class="mehr-konto">
+        <button type="button" data-mehr="lager">${SV.lager}<span>Alle Lager</span></button>
+        <button type="button" data-mehr="fb">${SV.fb}<span>Feedback</span></button>
+        <button type="button" class="sos-z" data-mehr="sos">${ICO.sos}<span>Notfall</span></button>
+        <button type="button" data-mehr="logout">${SV.logout}<span>Abmelden</span></button>
+      </div>
+      <input type="search" class="mehr-q" placeholder="Seite suchen, z.B. Packliste" aria-label="Seite suchen" autocomplete="off">
+      <div class="mehr-grid">${kacheln.map((b) => { const cnt = b.querySelector(".count:not([hidden])");
+        return `<button type="button" class="mehr-k ${b.dataset.view === state.view ? "on" : ""}" data-mehr-view="${esc(b.dataset.view)}" data-such="${esc(txt(b).toLowerCase())}">${svgOf(b)}<span>${esc(txt(b))}</span>${cnt ? `<i>${esc(cnt.textContent)}</i>` : ""}</button>`; }).join("")}</div>
+      <div class="mehr-leer muted" hidden>Keine Seite gefunden.</div>
       <div class="mehr-liste">
-        <button type="button" class="mehr-z sos-z" data-mehr="sos">${ICO.sos}<span>Notfall</span></button>
-        ${extra.map((b) => `<button type="button" class="mehr-z" data-mehr-view="${esc(b.dataset.view)}">${b.querySelector("svg") ? b.querySelector("svg").outerHTML : ""}<span>${esc([...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim())}</span></button>`).join("")}
-        <button type="button" class="mehr-z" data-mehr="fb">${ICO.search.replace('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>', '<path d="M4 5h16v11H8l-4 4z"/>')}<span>Feedback zum Tool</span></button>
-        ${isLaLei() && !state.asTeam ? `<button type="button" class="mehr-z" data-mehr="team"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>Als Team ansehen</span></button>` : ""}
-        ${state.asTeam ? `<button type="button" class="mehr-z" data-mehr="lalei"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><span>Zurück zur Lagerleitung</span></button>` : ""}
-        <button type="button" class="mehr-z" data-mehr="lager"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V10l7-6 7 6v10"/></svg><span>Anderes Lager</span></button>
-        <button type="button" class="mehr-z" data-mehr="logout"><svg viewBox="0 0 24 24"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg><span>Abmelden</span></button>
+        ${extra.map((b) => `<button type="button" class="mehr-z" data-mehr-view="${esc(b.dataset.view)}" data-such="${esc(txt(b).toLowerCase())}">${svgOf(b)}<span>${esc(txt(b))}</span></button>`).join("")}
+        ${isLaLei() && !state.asTeam ? `<button type="button" class="mehr-z" data-mehr="team" data-such="als team ansehen">${SV.team}<span>Als Team ansehen</span></button>` : ""}
+        ${state.asTeam ? `<button type="button" class="mehr-z" data-mehr="lalei" data-such="zurück zur lagerleitung">${SV.team}<span>Zurück zur Lagerleitung</span></button>` : ""}
+        ${installiert ? "" : `<button type="button" class="mehr-z" data-mehr="app" data-such="als app installieren startbildschirm">${SV.app}<span>Als App installieren</span></button>`}
       </div><div class="mehr-sync muted">${esc(($("#sync-state") || {}).textContent || "")}</div>`, "mehr-blatt");
+    const q = $(".mehr-q", o);
+    q.oninput = () => { const s = q.value.trim().toLowerCase(); let n = 0; o.querySelectorAll("[data-such]").forEach((b) => { const ok = !s || b.dataset.such.includes(s); b.hidden = !ok; if (ok) n++; }); $(".mehr-leer", o).hidden = n > 0; };
+    q.onkeydown = (e) => { if (e.key === "Enter") { const b = o.querySelector("[data-such]:not([hidden])"); if (b) b.click(); } };
     o.onclick = (e) => {
       if (e.target === o || e.target.closest("[data-mehr-zu]")) return closeDrawer();
       const v = e.target.closest("[data-mehr-view]"); if (v) { closeDrawer(); return setView(v.dataset.mehrView); }
-      const a = e.target.closest("[data-mehr]"); if (!a) return; const k = a.dataset.mehr; closeDrawer();
-      if (k === "sos") return showSos(); if (k === "fb") return toolFeedbackOpen(); if (k === "team") return setAsTeam(true); if (k === "lalei") return setAsTeam(false);
+      const a = e.target.closest("[data-mehr]"); if (!a) return; const k = a.dataset.mehr;
+      if (k === "logout" && !confirm("Wirklich abmelden?")) return;
+      closeDrawer();
+      if (k === "sos") return showSos(); if (k === "fb") return toolFeedbackOpen(); if (k === "team") return setAsTeam(true); if (k === "lalei") return setAsTeam(false); if (k === "app") return appInstallieren();
       if (k === "lager") return $("[data-home]") && $("[data-home]").click(); if (k === "logout") return $("#logout") && $("#logout").click();
     };
+  }
+  // ---------- Als App installieren ----------
+  function appInstallieren() {
+    if (typeof installEvent !== "undefined" && installEvent) { installEvent.prompt(); installEvent.userChoice.catch(() => {}).finally(() => { installEvent = null; }); return; }
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent); const safari = ios && !/crios|fxios|edgios/i.test(navigator.userAgent);
+    const o = modal(`<div class="lg-head"><span class="eyebrow">Als App installieren</span><h2>Das Lager-Tool auf den Startbildschirm</h2></div>
+      ${ios ? `<ol class="app-steps"><li>${safari ? "" : "Öffne diese Seite in <b>Safari</b> (bei Chrome auf dem iPhone geht es auch über Teilen). "}Tippe unten auf <b>Teilen</b> <span class="share-ico" aria-hidden="true">⬆︎</span></li><li>Scrolle und wähle <b>«Zum Home-Bildschirm»</b></li><li>Tippe auf <b>«Hinzufügen»</b></li></ol>`
+        : `<ol class="app-steps"><li>Tippe oben rechts auf das Menü <b>⋮</b></li><li>Wähle <b>«App installieren»</b> oder <b>«Zum Startbildschirm hinzufügen»</b></li><li>Bestätige mit <b>«Installieren»</b></li></ol>`}
+      <p class="muted" style="margin:0">Danach öffnet sich das Tool wie eine App: ohne Adressleiste, mit eigenem Symbol und angemeldet.</p>
+      <div class="lg-foot"><span></span><button class="btn primary" data-app-ok>Alles klar</button></div>`);
+    o.onclick = (e) => { if (e.target === o || e.target.closest("[data-app-ok]")) closeDrawer(); };
   }
   $("#bnav").addEventListener("click", (e) => { const b = e.target.closest("[data-more]"); if (!b || !istHandy()) return; e.stopImmediatePropagation(); document.body.classList.remove("nav-open"); mehrBlatt(); }, true);
 

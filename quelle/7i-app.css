@@ -1,5 +1,11 @@
 /* ===== Handy wie eine App (bis 760 px) ===== */
 .appbar { display: none; }
+/* Offenes Fenster: Hintergrund bleibt stehen */
+html:has(.overlay), html:has(.cmdk), html:has(.hoeck-mode), body:has(.overlay), body:has(.cmdk), body:has(.hoeck-mode) { overflow: hidden; }
+.overlay, .cmdk { overscroll-behavior: contain; }
+.modal, .drawer-body, .cmdk-list, .bell-list { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.app-steps { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; }
+.share-ico { display: inline-block; border: 1px solid var(--line-strong); border-radius: 5px; padding: 0 5px; font-size: 13px; }
 @media (max-width: 760px) {
   html, body { overscroll-behavior-y: none; }
   body { -webkit-tap-highlight-color: transparent; }
@@ -82,7 +88,15 @@
   .mehr-kopf > div { flex: 1; display: flex; flex-direction: column; min-width: 0; }
   .mehr-kopf b { font-size: 17px; }
   .mehr-kopf .muted { font-size: 13px; }
-  .mehr-cd { font-size: 13px; color: var(--muted); background: var(--subtle, var(--hover)); border-radius: 10px; padding: 8px 12px; }
+  .overlay.center .modal, .overlay:not(.center) .drawer { animation: lt-sheet 260ms cubic-bezier(.2,.8,.2,1) !important; opacity: 1 !important; }
+  .overlay { background: rgb(0 0 0 / 0.45) !important; }
+  .mehr-blatt { max-height: 88vh !important; max-height: 88dvh !important; overflow-y: auto; }
+  .mehr-konto { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .mehr-konto button { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 2px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); font: inherit; font-size: 12px; cursor: pointer; }
+  .mehr-konto svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; color: var(--muted); }
+  .mehr-konto .sos-z, .mehr-konto .sos-z svg { color: var(--late); }
+  .mehr-q { height: 42px; border: 0; border-radius: 12px; background: var(--subtle, var(--hover)); color: var(--ink); padding: 0 14px; font: inherit; font-size: 16px; width: 100%; }
+  .mehr-leer { text-align: center; font-size: 14px; }
   .mehr-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
   .mehr-k { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 4px 10px; border: 0; border-radius: 14px; background: var(--subtle, var(--hover)); color: var(--ink); font: inherit; font-size: 11.5px; line-height: 1.2; text-align: center; cursor: pointer; min-height: 78px; }
   .mehr-k svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; color: var(--accent); }
