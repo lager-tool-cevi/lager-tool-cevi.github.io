@@ -1,6 +1,6 @@
 // Service Worker: macht das Lager-Tool installierbar und ohne Netz startbar.
 // Seiten kommen immer zuerst frisch aus dem Netz; ohne Netz aus dem Zwischenspeicher.
-const CACHE = "lager-tool-2026-11-18 13:37";
+const CACHE = "lager-tool-2026-11-18 13:53";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png"];
 
 self.addEventListener("install", (e) => {
