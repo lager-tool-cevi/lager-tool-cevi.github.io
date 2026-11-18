@@ -138,7 +138,8 @@
     const btns = o ? o.querySelectorAll("#e-save, #e-save-stay") : []; btns.forEach((b) => (b.disabled = true));
     try {
       const wasNew = !ed.id; const id = ed.id || state.db.newId(); if (wasNew) d.createdAt = nowStamp();
-      await state.db.batch([...(cur ? versionOps(coll, id, cur) : []), { op: "set", coll, id, data: d }]);
+      await state.db.batch([{ op: "set", coll, id, data: d }]);
+      if (cur) { const vo = versionOps(coll, id, cur); if (vo.length) state.db.batch(vo).catch(() => {}); }
       if (ed.type === "meeting") for (const it of d.items) if (it.ideaId) { const idea = state.journal.find((x) => x._id === it.ideaId); if (idea && idea.status !== "Besprochen") await state.db.doc("journal/" + it.ideaId).update({ status: "Besprochen", meetingTitle: `${d.title} (${fmtFull(d.date)})` }); }
       store.set(draftKey(ed.type, ed.id), "");
       const prev = cur ? docOhneId(cur) : null;
