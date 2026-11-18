@@ -1730,7 +1730,7 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px var(--accent-s
   <nav class="bnav" id="bnav" aria-label="Schnellnavigation"></nav>
   <button class="fab" id="qnote" type="button" aria-label="Schnell-Notiz" title="Schnell-Notiz" hidden>+</button>
 </div>
-<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 13:23","test":true};</script>
+<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 13:24","test":true};</script>
 <script>
 // Datenanbindung. Bei Google (google.script.run vorhanden) läuft alles über api() in Code.gs,
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:
@@ -6184,7 +6184,7 @@ window.LaleiStore = (() => {
     "Neuer Status <b>«Nächster Höck»</b>: Die Aufgabe kommt als Traktandum auf die Liste für den nächsten Höck.",
     "Aufgaben als <b>Kanban</b> ansehen, <b>mehrere auswählen</b> und gemeinsam ändern, eigene <b>Ansichten speichern</b>, im Zeitplan <b>ziehen</b>.",
     "Fast alles lässt sich <b>rückgängig</b> machen, frühere <b>Fassungen</b> lassen sich wiederherstellen.",
-    "Im Protokoll: <b>«Speichern»</b> (bleibt offen) und «Speichern &amp; schliessen», zu zweit gleichzeitig schreiben, <b>Diktieren</b> 🎤 und der <b>Höck-Modus</b>.",
+    "Im Protokoll: <b>«Speichern»</b> (bleibt offen) und «Speichern &amp; schliessen», zu zweit gleichzeitig schreiben und der <b>Höck-Modus</b>.",
     "<b>@alle</b>, <b>@LaLei</b> und <b>@Ressort</b> erwähnen. Unter «Meine Aufgaben › Erwähnungen» steht jede Zeile einzeln, mit «Als Aufgabe».",
     "Einen Höck als <b>Outlook-Termin</b> herunterladen.",
   ] });
@@ -6367,6 +6367,7 @@ window.LaleiStore = (() => {
   // ---------- Diktieren ----------
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   function addDictate(root) {
+    return; // Diktieren auf Wunsch entfernt
     if (!SR || isReadOnly()) return;
     root.querySelectorAll(".drawer textarea, .hoeck-mode textarea").forEach((t) => {
       if (t.nextElementSibling && t.nextElementSibling.matches("[data-dictate]")) return;

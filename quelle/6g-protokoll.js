@@ -8,7 +8,7 @@
     "Neuer Status <b>«Nächster Höck»</b>: Die Aufgabe kommt als Traktandum auf die Liste für den nächsten Höck.",
     "Aufgaben als <b>Kanban</b> ansehen, <b>mehrere auswählen</b> und gemeinsam ändern, eigene <b>Ansichten speichern</b>, im Zeitplan <b>ziehen</b>.",
     "Fast alles lässt sich <b>rückgängig</b> machen, frühere <b>Fassungen</b> lassen sich wiederherstellen.",
-    "Im Protokoll: <b>«Speichern»</b> (bleibt offen) und «Speichern &amp; schliessen», zu zweit gleichzeitig schreiben, <b>Diktieren</b> 🎤 und der <b>Höck-Modus</b>.",
+    "Im Protokoll: <b>«Speichern»</b> (bleibt offen) und «Speichern &amp; schliessen», zu zweit gleichzeitig schreiben und der <b>Höck-Modus</b>.",
     "<b>@alle</b>, <b>@LaLei</b> und <b>@Ressort</b> erwähnen. Unter «Meine Aufgaben › Erwähnungen» steht jede Zeile einzeln, mit «Als Aufgabe».",
     "Einen Höck als <b>Outlook-Termin</b> herunterladen.",
   ] });
@@ -191,6 +191,7 @@
   // ---------- Diktieren ----------
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   function addDictate(root) {
+    return; // Diktieren auf Wunsch entfernt
     if (!SR || isReadOnly()) return;
     root.querySelectorAll(".drawer textarea, .hoeck-mode textarea").forEach((t) => {
       if (t.nextElementSibling && t.nextElementSibling.matches("[data-dictate]")) return;
