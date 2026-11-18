@@ -1,5 +1,16 @@
 /* ===== Startseite ===== */
-.start-home { display: flex; flex-direction: column; gap: 12px; max-width: 760px; }
+.start-home { display: flex; flex-direction: column; gap: 12px; }
+@media (min-width: 900px) {
+  .start-home { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  .start-home > .st-hero, .start-home > .st-akt { grid-column: 1 / -1; }
+  .start-home > .st-hero { flex-direction: row; align-items: center; gap: 24px; padding: 20px 24px; }
+  .start-home > .st-hero .title-img { display: none; }
+  .start-home .st-zeit { flex: 1; }
+  .start-home .st-stand { flex: 0 1 460px; width: 460px; }
+  .start-home > .st-akt { grid-template-columns: repeat(4, minmax(0, 220px)); }
+  .start-home > .st-akt button { flex-direction: row; justify-content: center; min-height: 48px; font-size: 14px; gap: 8px; }
+}
+@media (min-width: 1400px) { .start-home { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .st-hero { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 65%, #000)); color: #fff; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
 .st-hero .title-img { margin: -16px -16px 0; border-radius: 0; height: 120px; }
 .st-zeit { display: flex; flex-direction: column; } .st-zeit b { font-size: 26px; line-height: 1.15; } .st-zeit span { opacity: 0.85; font-size: 14px; }
