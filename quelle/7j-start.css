@@ -30,6 +30,14 @@
 .st-links button:first-child { border-top: 0; } .st-links button span { color: var(--muted); font-size: 20px; }
 .st-card .card-head { padding-bottom: 8px; }
 
+/* Protokoll-Liste: Karte öffnet das Protokoll */
+.entry-link { cursor: pointer; transition: background var(--t); border-radius: var(--r-sm, 8px); }
+.entry-link:hover { background: var(--hover); }
+.entry-link .entry-top { align-items: center; }
+.prot-go { margin-left: auto; color: var(--muted); font-size: 22px; line-height: 1; padding-left: 8px; }
+.prot-card .entry { border-bottom: 0; }
+.prot-back { margin-bottom: 4px; }
+@media (max-width: 760px) { .prot-back { display: none !important; } }
 .neu-scroll { max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
 
 /* ===== Tastatur am Handy ===== */

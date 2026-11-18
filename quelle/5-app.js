@@ -675,15 +675,19 @@
     if (ty === "meeting") {
       const items = e.items || []; const dec = items.filter((i) => (i.decision || "").trim()).length;
       const absent = people().filter((p) => !(e.present || []).includes(p));
-      return `<article class="entry">${dateCol(e.date)}<div style="min-width:0"><details class="meeting" ${opts.open ? "open" : ""}>
-        <summary><div class="entry-top">${nd}<span class="tag plain ${HK[e.kind || "LaLei"].cls}">${HK[e.kind || "LaLei"].label}</span><h3>${esc(e.title || HK[e.kind || "LaLei"].label)}</h3></div><span class="muted" style="font-size:13px">${items.length} Traktanden · ${dec} Entscheide · ${pendenzenOf(e._id).length} Pendenzen · ${(e.present || []).length} anwesend</span></summary>
+      const kopf = `<div class="entry-top">${nd}<span class="tag plain ${HK[e.kind || "LaLei"].cls}">${HK[e.kind || "LaLei"].label}</span><h3>${esc(e.title || HK[e.kind || "LaLei"].label)}</h3></div>`;
+      // In der Liste nur die Karte; ein Tipp öffnet das ganze Protokoll als eigene Seite
+      if (!opts.full) return `<article class="entry entry-link" data-prot="${esc(e._id)}" role="button" tabindex="0" aria-label="Protokoll öffnen: ${esc(e.title || "")}">${dateCol(e.date)}<div style="min-width:0">${kopf.replace('</div>', '<span class="prot-go" aria-hidden="true">›</span></div>')}
+        <div class="foot"><span class="k muted">Protokoll</span>${person(e.author || "", "Unbekannt")}${editBtn(e)}<button class="link" data-docx="${esc(e._id)}">Als Word herunterladen</button></div></div></article>`;
+      return `<article class="entry prot-full">${dateCol(e.date)}<div style="min-width:0"><div class="meeting">
+        <span class="muted" style="font-size:13px">${items.length} Traktanden · ${dec} Entscheide · ${pendenzenOf(e._id).length} Pendenzen · ${(e.present || []).length} anwesend</span>
         <div class="att"><span class="k muted">Anwesend</span><span class="avs">${(e.present || []).map((p) => person(p)).join("") || "–"}</span>${absent.length && (e.kind || "LaLei") === "LaLei" ? `<span class="muted">Abwesend: ${esc(absent.filter((p) => peopleBy("LaLei").includes(p)).join(", ") || "–")}</span>` : ""}${e.guests ? `<span class="muted">Gäste: ${esc(e.guests)}</span>` : ""}</div>
         <ol class="trakt">${items.map((it, i) => { const pend = pendenzenOf(e._id, i); return `<li><div style="min-width:0"><b>${esc(it.title || "Ohne Titel")}</b>${it.notes ? `<div class="rich">${rich(it.notes)}</div>` : ""}${it.decision ? `<div class="decision"><span class="eyebrow">Entscheid</span><div class="rich">${rich(it.decision)}</div></div>` : ""}
           ${(it.links || []).length ? `<div style="margin-top:6px">${linksView(it.links)}</div>` : ""}
           <div class="pend">${pend.map((t) => `<div class="row"><span class="tag ${t.status === "Erledigt" ? "ok" : isLate(t) ? "late" : ""}">${esc(t.status)}</span><button class="link" data-open="${esc(t._id)}">${esc(t.title)}</button><span class="muted">${t.owner ? "· " + esc(t.owner) : ""}${t.deadline ? " · bis " + fmt(t.deadline) : ""}</span></div>`).join("")}
           <div class="row"><button class="link" data-pend="${esc(e._id)}|${i}" style="font-size:12.5px">+ Pendenz als Aufgabe erfassen</button></div></div></div></li>`; }).join("")}</ol>
         ${e.next ? `<div class="kv" style="margin-top:14px"><span class="k">Nächster Höck</span><b>${fmtFull(e.next)}</b></div>` : ""}
-      </details><div class="foot"><span class="k muted">Protokoll</span>${person(e.author || "", "Unbekannt")}${editBtn(e)}<button class="link" data-docx="${esc(e._id)}">Als Word herunterladen</button></div></div></article>`;
+      </div><div class="foot"><span class="k muted">Protokoll</span>${person(e.author || "", "Unbekannt")}</div></div></article>`;
     }
     if (ty === "contact") return `<article class="entry">${dateCol(e.date)}<div style="min-width:0"><div class="entry-top">${nd}<span class="tag plain type-contact">Kontakt</span><h3>${esc(e.topic || "Kontakt")}</h3>${e.status === "Nachfassen" ? `<span class="tag late">Nachfassen</span>` : ""}</div>
       <div class="kv"><span><span class="k">Mit</span> <b>${esc(e.contactName || "–")}</b>${e.role ? ` (${esc(e.role)})` : ""}</span><span><span class="k">via</span> ${esc(e.channel || "–")}</span><span class="who"><span class="k">durch</span> ${person(e.by || "", "–")}</span></div>
@@ -716,7 +720,7 @@
         return;
       }
       const list = sortEntries(tab === "all" ? all : all.filter((e) => typeOf(e) === tab)); const firstMeeting = list.find((e) => typeOf(e) === "meeting");
-      body.innerHTML = list.length ? list.map((e) => entryCard(e, { open: e === firstMeeting })).join("") : `<div class="empty"><b>Noch keine Einträge</b>${tab === "all" ? "Erstelle eine Traktandenliste, trage Traktanden ein oder erfasse ein Höck-Protokoll, eine Notiz oder einen externen Kontakt." : J_TYPES[tab].empty}</div>`;
+      body.innerHTML = list.length ? list.map((e) => entryCard(e)).join("") : `<div class="empty"><b>Noch keine Einträge</b>${tab === "all" ? "Erstelle eine Traktandenliste, trage Traktanden ein oder erfasse ein Höck-Protokoll, eine Notiz oder einen externen Kontakt." : J_TYPES[tab].empty}</div>`;
     },
   };
 

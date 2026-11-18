@@ -29,14 +29,14 @@
     // Leiste unten: kein Pfeil. Tagesseite: zu den Tagen. Alles andere: zur Startseite.
     const wurzel = [...document.querySelectorAll("#bnav [data-view]")].map((b) => b.dataset.view);
     const home = isLaLei() ? "start" : "home";
-    const ziel = state.view === "day" ? "days" : "mehr";
+    const ziel = state.view === "day" ? "days" : state.view === "prot" ? "journal" : "mehr";
     const zurueck = !wurzel.includes(state.view) && state.view !== home; const bb = $("#ab-back"); bb.hidden = !zurueck; bb.dataset.ziel = ziel;
     const nl = (z) => { const b = $(`#tabs button[data-view="${z}"]`); return b ? [...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim() : ""; };
     $("#ab-back-l").textContent = ziel === "mehr" ? "Mehr" : nl(ziel) || "Zurück"; bb.setAttribute("aria-label", "Zurück zu " + $("#ab-back-l").textContent);
     const n = bellItems().filter((x) => x.unread).length; const c = $("#ab-bell-n"); c.hidden = !n; c.textContent = n > 9 ? "9+" : n;
     document.body.classList.toggle("app-zurueck", zurueck);
-    const more = $("#bnav [data-more]"); if (more) more.setAttribute("aria-selected", String(!wurzel.includes(state.view)));
-    document.querySelectorAll("#bnav [data-view]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === (state.view === "day" ? "days" : state.view))));
+    const more = $("#bnav [data-more]"); if (more) more.setAttribute("aria-selected", String(!wurzel.includes(state.view) && !["day", "prot"].includes(state.view)));
+    document.querySelectorAll("#bnav [data-view]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === ({ day: "days", prot: "journal" }[state.view] || state.view))));
   }
   const renderSideOrig5 = renderSide;
   renderSide = function () { renderSideOrig5(); appbarPaint(); };

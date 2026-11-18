@@ -1572,6 +1572,14 @@ html:has(.overlay), html:has(.cmdk), html:has(.hoeck-mode), body:has(.overlay), 
 .st-links button:first-child { border-top: 0; } .st-links button span { color: var(--muted); font-size: 20px; }
 .st-card .card-head { padding-bottom: 8px; }
 
+/* Protokoll-Liste: Karte öffnet das Protokoll */
+.entry-link { cursor: pointer; transition: background var(--t); border-radius: var(--r-sm, 8px); }
+.entry-link:hover { background: var(--hover); }
+.entry-link .entry-top { align-items: center; }
+.prot-go { margin-left: auto; color: var(--muted); font-size: 22px; line-height: 1; padding-left: 8px; }
+.prot-card .entry { border-bottom: 0; }
+.prot-back { margin-bottom: 4px; }
+@media (max-width: 760px) { .prot-back { display: none !important; } }
 .neu-scroll { max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
 
 /* ===== Tastatur am Handy ===== */
@@ -1734,7 +1742,7 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px var(--accent-s
   <nav class="bnav" id="bnav" aria-label="Schnellnavigation"></nav>
   <button class="fab" id="qnote" type="button" aria-label="Schnell-Notiz" title="Schnell-Notiz" hidden>+</button>
 </div>
-<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 13:33","test":false};</script>
+<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 13:36","test":false};</script>
 <script>
 // Datenanbindung. Bei Google (google.script.run vorhanden) läuft alles über api() in Code.gs,
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:
@@ -2837,15 +2845,19 @@ window.LaleiStore = (() => {
     if (ty === "meeting") {
       const items = e.items || []; const dec = items.filter((i) => (i.decision || "").trim()).length;
       const absent = people().filter((p) => !(e.present || []).includes(p));
-      return `<article class="entry">${dateCol(e.date)}<div style="min-width:0"><details class="meeting" ${opts.open ? "open" : ""}>
-        <summary><div class="entry-top">${nd}<span class="tag plain ${HK[e.kind || "LaLei"].cls}">${HK[e.kind || "LaLei"].label}</span><h3>${esc(e.title || HK[e.kind || "LaLei"].label)}</h3></div><span class="muted" style="font-size:13px">${items.length} Traktanden · ${dec} Entscheide · ${pendenzenOf(e._id).length} Pendenzen · ${(e.present || []).length} anwesend</span></summary>
+      const kopf = `<div class="entry-top">${nd}<span class="tag plain ${HK[e.kind || "LaLei"].cls}">${HK[e.kind || "LaLei"].label}</span><h3>${esc(e.title || HK[e.kind || "LaLei"].label)}</h3></div>`;
+      // In der Liste nur die Karte; ein Tipp öffnet das ganze Protokoll als eigene Seite
+      if (!opts.full) return `<article class="entry entry-link" data-prot="${esc(e._id)}" role="button" tabindex="0" aria-label="Protokoll öffnen: ${esc(e.title || "")}">${dateCol(e.date)}<div style="min-width:0">${kopf.replace('</div>', '<span class="prot-go" aria-hidden="true">›</span></div>')}
+        <div class="foot"><span class="k muted">Protokoll</span>${person(e.author || "", "Unbekannt")}${editBtn(e)}<button class="link" data-docx="${esc(e._id)}">Als Word herunterladen</button></div></div></article>`;
+      return `<article class="entry prot-full">${dateCol(e.date)}<div style="min-width:0"><div class="meeting">
+        <span class="muted" style="font-size:13px">${items.length} Traktanden · ${dec} Entscheide · ${pendenzenOf(e._id).length} Pendenzen · ${(e.present || []).length} anwesend</span>
         <div class="att"><span class="k muted">Anwesend</span><span class="avs">${(e.present || []).map((p) => person(p)).join("") || "–"}</span>${absent.length && (e.kind || "LaLei") === "LaLei" ? `<span class="muted">Abwesend: ${esc(absent.filter((p) => peopleBy("LaLei").includes(p)).join(", ") || "–")}</span>` : ""}${e.guests ? `<span class="muted">Gäste: ${esc(e.guests)}</span>` : ""}</div>
         <ol class="trakt">${items.map((it, i) => { const pend = pendenzenOf(e._id, i); return `<li><div style="min-width:0"><b>${esc(it.title || "Ohne Titel")}</b>${it.notes ? `<div class="rich">${rich(it.notes)}</div>` : ""}${it.decision ? `<div class="decision"><span class="eyebrow">Entscheid</span><div class="rich">${rich(it.decision)}</div></div>` : ""}
           ${(it.links || []).length ? `<div style="margin-top:6px">${linksView(it.links)}</div>` : ""}
           <div class="pend">${pend.map((t) => `<div class="row"><span class="tag ${t.status === "Erledigt" ? "ok" : isLate(t) ? "late" : ""}">${esc(t.status)}</span><button class="link" data-open="${esc(t._id)}">${esc(t.title)}</button><span class="muted">${t.owner ? "· " + esc(t.owner) : ""}${t.deadline ? " · bis " + fmt(t.deadline) : ""}</span></div>`).join("")}
           <div class="row"><button class="link" data-pend="${esc(e._id)}|${i}" style="font-size:12.5px">+ Pendenz als Aufgabe erfassen</button></div></div></div></li>`; }).join("")}</ol>
         ${e.next ? `<div class="kv" style="margin-top:14px"><span class="k">Nächster Höck</span><b>${fmtFull(e.next)}</b></div>` : ""}
-      </details><div class="foot"><span class="k muted">Protokoll</span>${person(e.author || "", "Unbekannt")}${editBtn(e)}<button class="link" data-docx="${esc(e._id)}">Als Word herunterladen</button></div></div></article>`;
+      </div><div class="foot"><span class="k muted">Protokoll</span>${person(e.author || "", "Unbekannt")}</div></div></article>`;
     }
     if (ty === "contact") return `<article class="entry">${dateCol(e.date)}<div style="min-width:0"><div class="entry-top">${nd}<span class="tag plain type-contact">Kontakt</span><h3>${esc(e.topic || "Kontakt")}</h3>${e.status === "Nachfassen" ? `<span class="tag late">Nachfassen</span>` : ""}</div>
       <div class="kv"><span><span class="k">Mit</span> <b>${esc(e.contactName || "–")}</b>${e.role ? ` (${esc(e.role)})` : ""}</span><span><span class="k">via</span> ${esc(e.channel || "–")}</span><span class="who"><span class="k">durch</span> ${person(e.by || "", "–")}</span></div>
@@ -2878,7 +2890,7 @@ window.LaleiStore = (() => {
         return;
       }
       const list = sortEntries(tab === "all" ? all : all.filter((e) => typeOf(e) === tab)); const firstMeeting = list.find((e) => typeOf(e) === "meeting");
-      body.innerHTML = list.length ? list.map((e) => entryCard(e, { open: e === firstMeeting })).join("") : `<div class="empty"><b>Noch keine Einträge</b>${tab === "all" ? "Erstelle eine Traktandenliste, trage Traktanden ein oder erfasse ein Höck-Protokoll, eine Notiz oder einen externen Kontakt." : J_TYPES[tab].empty}</div>`;
+      body.innerHTML = list.length ? list.map((e) => entryCard(e)).join("") : `<div class="empty"><b>Noch keine Einträge</b>${tab === "all" ? "Erstelle eine Traktandenliste, trage Traktanden ein oder erfasse ein Höck-Protokoll, eine Notiz oder einen externen Kontakt." : J_TYPES[tab].empty}</div>`;
     },
   };
 
@@ -7246,14 +7258,14 @@ window.LaleiStore = (() => {
     // Leiste unten: kein Pfeil. Tagesseite: zu den Tagen. Alles andere: zur Startseite.
     const wurzel = [...document.querySelectorAll("#bnav [data-view]")].map((b) => b.dataset.view);
     const home = isLaLei() ? "start" : "home";
-    const ziel = state.view === "day" ? "days" : "mehr";
+    const ziel = state.view === "day" ? "days" : state.view === "prot" ? "journal" : "mehr";
     const zurueck = !wurzel.includes(state.view) && state.view !== home; const bb = $("#ab-back"); bb.hidden = !zurueck; bb.dataset.ziel = ziel;
     const nl = (z) => { const b = $(`#tabs button[data-view="${z}"]`); return b ? [...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim() : ""; };
     $("#ab-back-l").textContent = ziel === "mehr" ? "Mehr" : nl(ziel) || "Zurück"; bb.setAttribute("aria-label", "Zurück zu " + $("#ab-back-l").textContent);
     const n = bellItems().filter((x) => x.unread).length; const c = $("#ab-bell-n"); c.hidden = !n; c.textContent = n > 9 ? "9+" : n;
     document.body.classList.toggle("app-zurueck", zurueck);
-    const more = $("#bnav [data-more]"); if (more) more.setAttribute("aria-selected", String(!wurzel.includes(state.view)));
-    document.querySelectorAll("#bnav [data-view]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === (state.view === "day" ? "days" : state.view))));
+    const more = $("#bnav [data-more]"); if (more) more.setAttribute("aria-selected", String(!wurzel.includes(state.view) && !["day", "prot"].includes(state.view)));
+    document.querySelectorAll("#bnav [data-view]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === ({ day: "days", prot: "journal" }[state.view] || state.view))));
   }
   const renderSideOrig5 = renderSide;
   renderSide = function () { renderSideOrig5(); appbarPaint(); };
@@ -7407,6 +7419,32 @@ window.LaleiStore = (() => {
       warOffen = offen;
     };
     vv.addEventListener("resize", passe); vv.addEventListener("scroll", passe); passe();  }
+
+  // =====================================================================
+  // Ein Höck-Protokoll als eigene Seite (aus der Protokoll-Liste geöffnet)
+  // =====================================================================
+  views.prot = {
+    shell: () => {
+      const e = state.journal.find((x) => x._id === state.protId);
+      if (!e) return `${pageHead("Protokoll", "")}<section class="card"><div class="empty"><b>Protokoll nicht gefunden</b>Vielleicht wurde es gelöscht. <button class="link" data-goto="journal">Zur Protokoll-Liste</button></div></section>`;
+      const kann = isLaLei() && !isReadOnly() && !isClosed() && !state.asTeam;
+      return `<button class="link back-link prot-back" data-goto="journal">← Alle Protokolle</button>${pageHead(esc(e.title || HK[e.kind || "LaLei"].label), `${HK[e.kind || "LaLei"].label} · ${fmt(e.date)} ${e.date ? parse(e.date).getFullYear() : ""}`,
+        `<div class="btn-group">${kann ? `<button class="btn primary" data-open-entry="${esc(e._id)}">Bearbeiten</button>` : ""}<button class="btn" data-docx="${esc(e._id)}">Als Word</button></div>`)}<section class="card prot-card" id="prot-body"></section>`;
+    },
+    update() {
+      const e = state.journal.find((x) => x._id === state.protId); const b = $("#prot-body"); if (!e || !b) return;
+      b.innerHTML = entryCard(e, { full: true });
+    },
+  };
+  view.addEventListener("click", (ev) => {
+    if (ev.target.closest("button, a, input, select, textarea")) return;
+    const k = ev.target.closest("[data-prot]"); if (!k) return; state.protId = k.dataset.prot; setView("prot");
+  });
+  view.addEventListener("keydown", (ev) => { const k = ev.target.closest && ev.target.closest("[data-prot]"); if (k && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); state.protId = k.dataset.prot; setView("prot"); } });
+  // gemerkt, damit die Seite nach dem Neuladen wieder da ist
+  const setViewOrigProt = setView;
+  setView = function (v) { if (v === "prot") store.set("lalei-prot", state.protId || ""); return setViewOrigProt(v); };
+  if (!state.protId) state.protId = store.get("lalei-prot") || null;
 
   // ---------- boot ----------
   state.jTab = store.get("lalei-jtab") || "all";
