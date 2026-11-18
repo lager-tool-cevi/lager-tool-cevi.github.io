@@ -20,27 +20,30 @@
   function ressNotizHinzu(rid, text) { const r = (cfg().ressorts || {})[rid]; if (!r) return; const list = [...ressNotizen(r), { id: uid(), t: text, by: me(), at: nowStamp() }]; return ressNotizenSave(rid, list); }
   const ressUpdateOrigN = views.ress.update;
   views.ress.update = function () {
-    ressUpdateOrigN(); const ta = $("#rp-notes"); const r = ressorts().find((x) => x.id === state.ressId); if (!ta || !r) return;
-    const body = ta.closest(".card-body"); const fa = document.activeElement;
+    // Anker: beim ersten Zeichnen das alte Notizfeld, danach die eigene Notizliste (sonst würde nie mehr neu gezeichnet)
+    ressUpdateOrigN(); const ta = $("#rp-notes") || $("#view .rn-list"); const r = ressorts().find((x) => x.id === state.ressId); if (!ta || !r) return;
+    const body = ta.closest(".card-body"); if (!body) return; const fa = document.activeElement;
     if (body.contains(fa) && fa.id === "rn-text" && fa.value) return; // nicht stören beim Tippen
     body.innerHTML = notizenHtml(r);
   };
   view.addEventListener("submit", async (e) => {
     const f = e.target; if (!f.matches("[data-rn-add]")) return; e.preventDefault();
     const t = $("#rn-text", f); const v = t.value.trim(); if (!v) return t.focus(); t.value = "";
-    await ressNotizHinzu(state.ressId, v); toast("Notiz gespeichert"); views.ress.update();
+    // sofort zeigen (lokal ist es schon gespeichert), der Server bekommt es im Hintergrund
+    const p = ressNotizHinzu(state.ressId, v); views.ress.update(); toast("Notiz gespeichert");
+    const neu = $("#rn-text"); if (neu) neu.focus(); await p;
   });
   view.addEventListener("keydown", (e) => { if (e.target.id === "rn-text" && e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); e.target.form.requestSubmit(); } });
   view.addEventListener("click", async (e) => {
     const r = (cfg().ressorts || {})[state.ressId]; if (!r) return;
-    const rm = e.target.closest("[data-rn-rm]"); if (rm) { if (!confirm("Diese Notiz löschen?")) return; const alt = ressNotizen(r); await ressNotizenSave(state.ressId, alt.filter((n) => n.id !== rm.dataset.rnRm)); toastAction("Notiz gelöscht", "Rückgängig", () => ressNotizenSave(state.ressId, alt)); return; }
+    const rm = e.target.closest("[data-rn-rm]"); if (rm) { if (!confirm("Diese Notiz löschen?")) return; const alt = ressNotizen(r); const p = ressNotizenSave(state.ressId, alt.filter((n) => n.id !== rm.dataset.rnRm)); views.ress.update(); toastAction("Notiz gelöscht", "Rückgängig", () => ressNotizenSave(state.ressId, alt).then(() => views.ress.update())); await p; return; }
     const ed2 = e.target.closest("[data-rn-edit]"); if (ed2) {
       const item = ed2.closest(".rn-item"); const n = ressNotizen(r).find((x) => x.id === ed2.dataset.rnEdit); if (!n) return;
       item.innerHTML = `<textarea class="rn-edit" rows="3" data-mention>${esc(n.t)}</textarea><div class="rn-meta"><span></span><span class="rn-acts"><button class="link" data-rn-cancel>Abbrechen</button><button class="btn small primary" data-rn-save="${esc(n.id)}">Speichern</button></span></div>`;
       $("textarea", item).focus(); return;
     }
     if (e.target.closest("[data-rn-cancel]")) return views.ress.update();
-    const sv = e.target.closest("[data-rn-save]"); if (sv) { const v = $("textarea", sv.closest(".rn-item")).value.trim(); if (!v) return; await ressNotizenSave(state.ressId, ressNotizen(r).map((n) => (n.id === sv.dataset.rnSave ? { ...n, t: v, id: n.id === "alt" ? uid() : n.id } : n))); toast("Gespeichert"); views.ress.update(); }
+    const sv = e.target.closest("[data-rn-save]"); if (sv) { const v = $("textarea", sv.closest(".rn-item")).value.trim(); if (!v) return; const p = ressNotizenSave(state.ressId, ressNotizen(r).map((n) => (n.id === sv.dataset.rnSave ? { ...n, t: v, id: n.id === "alt" ? uid() : n.id } : n))); document.activeElement && document.activeElement.blur(); views.ress.update(); toast("Gespeichert"); await p; }
   });
 
   // ---------- Karten zuklappen (Ressortseite): nur der Titel bleibt ----------
