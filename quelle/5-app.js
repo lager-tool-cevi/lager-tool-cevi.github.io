@@ -2453,8 +2453,8 @@
 
   // ---------- mobile Leiste unten ----------
   function renderBnav() {
-    const keys = isLaLei() ? ["overview", "tasks", "days", "journal"] : ["home", "myatt", "plan", "infos"];
-    const label = { overview: "Übersicht", tasks: "Aufgaben", days: "Tage", journal: "Protokoll", home: "Mein Bereich", myatt: "Anwesenheit", plan: "Schichtplan", infos: "Infos" };
+    const keys = isLaLei() ? ["start", "tasks", "journal", "days"] : ["home", "myatt", "plan", "infos"];
+    const label = { start: "Start", overview: "Übersicht", tasks: "Aufgaben", days: "Tage", journal: "Protokoll", home: "Mein Bereich", myatt: "Anwesenheit", plan: "Schichtplan", infos: "Infos" };
     const html = keys.map((k) => { const src = $(`#tabs button[data-view="${k}"] svg`); return `<button data-view="${k}" aria-selected="${state.view === k}">${src ? src.outerHTML : ""}<span>${label[k]}</span></button>`; }).join("") + `<button data-more><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>Mehr</span></button>`;
     const el = $("#bnav"); if (el.dataset.k !== role() + state.view) { el.innerHTML = html; el.dataset.k = role() + state.view; }
   }

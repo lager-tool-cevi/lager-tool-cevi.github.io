@@ -1,0 +1,48 @@
+/* ===== Startseite ===== */
+.start-home { display: flex; flex-direction: column; gap: 12px; max-width: 760px; }
+.st-hero { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 65%, #000)); color: #fff; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+.st-hero .title-img { margin: -16px -16px 0; border-radius: 0; height: 120px; }
+.st-zeit { display: flex; flex-direction: column; } .st-zeit b { font-size: 26px; line-height: 1.15; } .st-zeit span { opacity: 0.85; font-size: 14px; }
+.st-stand { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.st-stand button { border: 0; border-radius: 12px; background: rgb(255 255 255 / 0.16); color: #fff; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; font: inherit; cursor: pointer; }
+.st-stand b { font-size: 20px; } .st-stand span { font-size: 12px; opacity: 0.9; }
+.st-stand button.warn { background: rgb(255 80 80 / 0.35); }
+.st-akt { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.st-akt button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 14px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; font: inherit; font-size: 12.5px; cursor: pointer; min-height: 64px; }
+.st-akt button span { font-size: 20px; line-height: 1; color: var(--accent); }
+.st-akt button:active { transform: scale(0.97); }
+.st-list { display: flex; flex-direction: column; }
+.st-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 0; border-top: 1px solid var(--line); background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; min-height: 52px; }
+.st-row:first-child { border-top: 0; }
+.st-row:active, .st-row:hover { background: var(--hover); }
+.st-t { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 15px; line-height: 1.3; }
+.st-t small { font-size: 12.5px; color: var(--muted); }
+.st-row.late small { color: var(--late); }
+.st-dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--line-strong); }
+.st-dot[data-s="Läuft"] { background: var(--run); } .st-dot[data-s="Wartet"] { background: var(--wait); } .st-dot[data-s="Nächster Höck"] { background: var(--accent); }
+.st-row.late .st-dot { background: var(--late); }
+.st-ico { flex: none; width: 22px; text-align: center; }
+.st-go { flex: none; color: var(--muted); font-size: 20px; }
+.st-hk { display: flex; flex-direction: column; gap: 4px; } .st-hk b { font-size: 16px; } .st-hk span { color: var(--muted); font-size: 14px; }
+.st-hk-b { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.st-links { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.st-links button { display: flex; justify-content: space-between; align-items: center; padding: 13px 14px; border: 0; border-top: 1px solid var(--line); background: none; color: var(--ink); font: inherit; font-size: 15px; cursor: pointer; }
+.st-links button:first-child { border-top: 0; } .st-links button span { color: var(--muted); font-size: 20px; }
+.st-card .card-head { padding-bottom: 8px; }
+
+/* ===== Tastatur am Handy ===== */
+@media (max-width: 760px) {
+  .ab-back { width: auto; padding: 0 8px 0 2px; border-radius: 999px; display: inline-flex; align-items: center; gap: 0; }
+  .ab-back span { font-size: 15px; color: var(--accent); max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body.app-zurueck .ab-title { padding-left: 2px; }
+  /* Beim Tippen: Leiste unten und Plus-Knopf weg, damit nichts das Eingabefeld verdeckt */
+  body.tippt .bnav, body.tippt .fab, body.kb-offen .bnav, body.kb-offen .fab { display: none !important; }
+  body.tippt .page { padding-bottom: 24px !important; }
+  /* Fenster bleiben über der Tastatur */
+  body.kb-offen .overlay { height: var(--vvh, 100%); bottom: auto; }
+  body.kb-offen .overlay:not(.center) .drawer { height: calc(var(--vvh, 94vh) - 8px); animation: none !important; }
+  body.kb-offen .overlay.center .modal { max-height: calc(var(--vvh, 92vh) - 8px) !important; animation: none !important; }
+  body.kb-offen .drawer-foot { padding-bottom: 8px; }
+  body.kb-offen .hoeck-mode { height: var(--vvh, 100%); }
+  body.kb-offen .toast { bottom: calc(var(--kb, 0px) + 12px) !important; }
+}

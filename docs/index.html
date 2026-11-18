@@ -1190,7 +1190,8 @@ tr.task.selected td { background: color-mix(in srgb, var(--accent) 7%, transpare
 .min-badge { display: inline-block; font-size: 11px; font-weight: 600; color: var(--wait); border: 1px solid currentColor; border-radius: 999px; padding: 0 6px; line-height: 17px; }
 .min-in { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); flex: none; }
 .list-edit .r .min-in input { flex: 0 0 52px; width: 52px; }
-@media (max-width: 700px) { .svc-row-edit { flex-wrap: wrap; } .svc-row-edit [data-svc], .svc-row-edit .svc-desc-in { flex: 1 1 100%; } }
+@media (max-width: 700px) { .list-edit .r.svc-row-edit { flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid var(--line); } .list-edit .r.svc-row-edit input[data-svc] { flex: 1 1 calc(100% - 140px); font-weight: 600; } .list-edit .r.svc-row-edit input.svc-desc-in { flex: 1 1 100%; order: 5; } }
+@media (pointer: coarse) { .drag-people { display: none; } }
 
 /* Pausen und Notfall-Liste */
 .pz-list, .nf-list { display: flex; flex-direction: column; gap: 6px; }
@@ -1537,6 +1538,55 @@ html:has(.overlay), html:has(.cmdk), html:has(.hoeck-mode), body:has(.overlay), 
 /* Als App installiert: kein Browser-Rahmen, Statusleiste beachten */
 @media (display-mode: standalone) and (max-width: 760px) { .appbar { padding-top: max(env(safe-area-inset-top, 0px), 6px); } }
 
+/* ===== Startseite ===== */
+.start-home { display: flex; flex-direction: column; gap: 12px; max-width: 760px; }
+.st-hero { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 65%, #000)); color: #fff; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+.st-hero .title-img { margin: -16px -16px 0; border-radius: 0; height: 120px; }
+.st-zeit { display: flex; flex-direction: column; } .st-zeit b { font-size: 26px; line-height: 1.15; } .st-zeit span { opacity: 0.85; font-size: 14px; }
+.st-stand { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.st-stand button { border: 0; border-radius: 12px; background: rgb(255 255 255 / 0.16); color: #fff; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; font: inherit; cursor: pointer; }
+.st-stand b { font-size: 20px; } .st-stand span { font-size: 12px; opacity: 0.9; }
+.st-stand button.warn { background: rgb(255 80 80 / 0.35); }
+.st-akt { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.st-akt button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 14px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; font: inherit; font-size: 12.5px; cursor: pointer; min-height: 64px; }
+.st-akt button span { font-size: 20px; line-height: 1; color: var(--accent); }
+.st-akt button:active { transform: scale(0.97); }
+.st-list { display: flex; flex-direction: column; }
+.st-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 0; border-top: 1px solid var(--line); background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; min-height: 52px; }
+.st-row:first-child { border-top: 0; }
+.st-row:active, .st-row:hover { background: var(--hover); }
+.st-t { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 15px; line-height: 1.3; }
+.st-t small { font-size: 12.5px; color: var(--muted); }
+.st-row.late small { color: var(--late); }
+.st-dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--line-strong); }
+.st-dot[data-s="Läuft"] { background: var(--run); } .st-dot[data-s="Wartet"] { background: var(--wait); } .st-dot[data-s="Nächster Höck"] { background: var(--accent); }
+.st-row.late .st-dot { background: var(--late); }
+.st-ico { flex: none; width: 22px; text-align: center; }
+.st-go { flex: none; color: var(--muted); font-size: 20px; }
+.st-hk { display: flex; flex-direction: column; gap: 4px; } .st-hk b { font-size: 16px; } .st-hk span { color: var(--muted); font-size: 14px; }
+.st-hk-b { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.st-links { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.st-links button { display: flex; justify-content: space-between; align-items: center; padding: 13px 14px; border: 0; border-top: 1px solid var(--line); background: none; color: var(--ink); font: inherit; font-size: 15px; cursor: pointer; }
+.st-links button:first-child { border-top: 0; } .st-links button span { color: var(--muted); font-size: 20px; }
+.st-card .card-head { padding-bottom: 8px; }
+
+/* ===== Tastatur am Handy ===== */
+@media (max-width: 760px) {
+  .ab-back { width: auto; padding: 0 8px 0 2px; border-radius: 999px; display: inline-flex; align-items: center; gap: 0; }
+  .ab-back span { font-size: 15px; color: var(--accent); max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body.app-zurueck .ab-title { padding-left: 2px; }
+  /* Beim Tippen: Leiste unten und Plus-Knopf weg, damit nichts das Eingabefeld verdeckt */
+  body.tippt .bnav, body.tippt .fab, body.kb-offen .bnav, body.kb-offen .fab { display: none !important; }
+  body.tippt .page { padding-bottom: 24px !important; }
+  /* Fenster bleiben über der Tastatur */
+  body.kb-offen .overlay { height: var(--vvh, 100%); bottom: auto; }
+  body.kb-offen .overlay:not(.center) .drawer { height: calc(var(--vvh, 94vh) - 8px); animation: none !important; }
+  body.kb-offen .overlay.center .modal { max-height: calc(var(--vvh, 92vh) - 8px) !important; animation: none !important; }
+  body.kb-offen .drawer-foot { padding-bottom: 8px; }
+  body.kb-offen .hoeck-mode { height: var(--vvh, 100%); }
+  body.kb-offen .toast { bottom: calc(var(--kb, 0px) + 12px) !important; }
+}
+
 
 /* =====================================================================
    Gestaltungsregeln (Grundgerüst): Abstände 4/8/16/24/32, wenige Schriftgrössen,
@@ -1674,7 +1724,7 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px var(--accent-s
   <nav class="bnav" id="bnav" aria-label="Schnellnavigation"></nav>
   <button class="fab" id="qnote" type="button" aria-label="Schnell-Notiz" title="Schnell-Notiz" hidden>+</button>
 </div>
-<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 13:08","test":false};</script>
+<script>window.LAGER_CONFIG = {"api":"https://script.google.com/macros/s/AKfycbztavmVVwvmGQskYgnRlPqQbkP1G4mnmnE5Bjfo07xcTQcVfgFsQpwWQ8IR9FwRRH9s3w/exec","version":"2026-11-18 13:20","test":false};</script>
 <script>
 // Datenanbindung. Bei Google (google.script.run vorhanden) läuft alles über api() in Code.gs,
 // sonst (Vorschau) über einen nachgebauten Server im Browser mit denselben Regeln:
@@ -4555,8 +4605,8 @@ window.LaleiStore = (() => {
 
   // ---------- mobile Leiste unten ----------
   function renderBnav() {
-    const keys = isLaLei() ? ["overview", "tasks", "days", "journal"] : ["home", "myatt", "plan", "infos"];
-    const label = { overview: "Übersicht", tasks: "Aufgaben", days: "Tage", journal: "Protokoll", home: "Mein Bereich", myatt: "Anwesenheit", plan: "Schichtplan", infos: "Infos" };
+    const keys = isLaLei() ? ["start", "tasks", "journal", "days"] : ["home", "myatt", "plan", "infos"];
+    const label = { start: "Start", overview: "Übersicht", tasks: "Aufgaben", days: "Tage", journal: "Protokoll", home: "Mein Bereich", myatt: "Anwesenheit", plan: "Schichtplan", infos: "Infos" };
     const html = keys.map((k) => { const src = $(`#tabs button[data-view="${k}"] svg`); return `<button data-view="${k}" aria-selected="${state.view === k}">${src ? src.outerHTML : ""}<span>${label[k]}</span></button>`; }).join("") + `<button data-more><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>Mehr</span></button>`;
     const el = $("#bnav"); if (el.dataset.k !== role() + state.view) { el.innerHTML = html; el.dataset.k = role() + state.view; }
   }
@@ -7160,7 +7210,7 @@ window.LaleiStore = (() => {
   (() => {
     const app = $("#app"); if (!app || $("#appbar")) return;
     app.insertAdjacentHTML("afterbegin", `<header class="appbar" id="appbar">
-      <button class="ab-btn ab-back" id="ab-back" type="button" aria-label="Zurück" hidden>${ICO.back}</button>
+      <button class="ab-btn ab-back" id="ab-back" type="button" aria-label="Zurück" hidden>${ICO.back}<span id="ab-back-l">Zurück</span></button>
       <div class="ab-title"><b id="ab-title">Lager-Tool</b><span id="ab-sub"></span></div>
       <button class="ab-btn" id="ab-search" type="button" aria-label="Suchen">${ICO.search}</button>
       <button class="ab-btn" id="ab-bell" type="button" aria-label="Mitteilungen">${ICO.bell}<span class="count" id="ab-bell-n" hidden></span></button>
@@ -7174,10 +7224,17 @@ window.LaleiStore = (() => {
     t.textContent = titel || (nav ? nav.textContent.trim() : "") || lagerDoc().title || "Lager-Tool";
     const sub = $("#ab-sub"); const r = isCampNow() ? (() => { const c = campRange(); return `Tag ${daysBetween(parse(c.from), today()) + 1} von ${daysBetween(parse(c.from), parse(c.to)) + 1}`; })() : "";
     const lt = lagerDoc().title || ""; sub.textContent = [t.textContent === lt ? (isLaLei() ? "Übersicht" : "") : lt, r].filter(Boolean).join(" · ");
+    // Leiste unten: kein Pfeil. Tagesseite: zu den Tagen. Alles andere: zur Startseite.
     const wurzel = [...document.querySelectorAll("#bnav [data-view]")].map((b) => b.dataset.view);
-    const zurueck = typeof navDepth === "number" && navDepth > 0 && !wurzel.includes(state.view); $("#ab-back").hidden = !zurueck;
+    const home = isLaLei() ? "start" : "home";
+    const ziel = state.view === "day" ? "days" : home;
+    const zurueck = !wurzel.includes(state.view) && state.view !== home; const bb = $("#ab-back"); bb.hidden = !zurueck; bb.dataset.ziel = ziel;
+    const nl = (z) => { const b = $(`#tabs button[data-view="${z}"]`); return b ? [...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim() : ""; };
+    $("#ab-back-l").textContent = nl(ziel) || "Start"; bb.setAttribute("aria-label", "Zurück zu " + $("#ab-back-l").textContent);
     const n = bellItems().filter((x) => x.unread).length; const c = $("#ab-bell-n"); c.hidden = !n; c.textContent = n > 9 ? "9+" : n;
     document.body.classList.toggle("app-zurueck", zurueck);
+    const more = $("#bnav [data-more]"); if (more) more.setAttribute("aria-selected", String(!wurzel.includes(state.view)));
+    document.querySelectorAll("#bnav [data-view]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === (state.view === "day" ? "days" : state.view))));
   }
   const renderSideOrig5 = renderSide;
   renderSide = function () { renderSideOrig5(); appbarPaint(); };
@@ -7185,7 +7242,7 @@ window.LaleiStore = (() => {
   render = function () { renderOrig5(); appbarPaint(); };
   document.addEventListener("click", (e) => {
     const b = e.target.closest && e.target.closest(".appbar .ab-btn"); if (!b) return;
-    if (b.id === "ab-back") return history.back();
+    if (b.id === "ab-back") return setView(b.dataset.ziel || (isLaLei() ? "start" : "home"));
     if (b.id === "ab-search") return cmdk();
     if (b.id === "ab-bell") return bellOpen();
     if (b.id === "ab-sos") return showSos();
@@ -7259,6 +7316,67 @@ window.LaleiStore = (() => {
     more.setAttribute("aria-selected", String(!unten.includes(state.view)));
   };
   window.addEventListener("resize", () => { if (state.lagerId) appbarPaint(); });
+
+  // =====================================================================
+  // Startseite der Lagerleitung: das Wichtigste für mich auf einen Blick.
+  // Dazu: Tastatur am Handy (Leisten ausblenden, Fenster über der Tastatur)
+  // =====================================================================
+  HELP.start = "Deine Startseite: was für dich ansteht, der nächste Höck, Neues und schnelle Aktionen. Der Pfeil oben führt von überall hierher zurück.";
+  views.start = {
+    shell: () => `${pageHead(`Hallo ${esc(me() || "")}`, esc(lagerDoc().title || ""))}<div id="start-body" class="start-home"></div>`,
+    update() {
+      const n = me(); const t0 = iso(today()); const kann = !isReadOnly() && !isClosed() && !state.asTeam;
+      const camp = isCampNow(); const r = campRange(); const d = cfg().dates || {}; const ziel = d.prep || d.start;
+      const bis = ziel && ziel > t0 ? daysBetween(today(), parse(ziel)) : null;
+      const zeit = camp ? `<b>Tag ${daysBetween(parse(r.from), today()) + 1} von ${daysBetween(parse(r.from), parse(r.to)) + 1}</b><span>im Lager</span>` : bis != null ? `<b>${bis} ${bis === 1 ? "Tag" : "Tage"}</b><span>bis zur Leitervorbereitung</span>` : `<b>${esc(lagerDoc().title || "")}</b><span>${r.to && r.to < t0 ? "Lager vorbei" : ""}</span>`;
+      const meine = allTasks().filter((t) => t.status !== "Erledigt" && (t.owner === n || t.support === n));
+      const ueber = meine.filter(isLate); const woche = meine.filter((t) => !isLate(t) && t.deadline && t.deadline <= addDays(t0, 7));
+      const fokus = [...ueber, ...woche].slice(0, 6);
+      const hk = state.hoecks.filter((h) => h.date >= t0).sort((a, b) => (a.date + (a.time || "")).localeCompare(b.date + (b.time || "")))[0];
+      const neu = bellItems().filter((x) => x.unread && !x.due).slice(0, 4);
+      const alle = allTasks(); const erl = alle.filter((t) => t.status === "Erledigt").length; const spaet = alle.filter(isLate).length;
+      const plan = planDoc(); const heute = days().find((x) => x.date === t0);
+      const dienste = heute ? plan.services.filter((s) => ((plan.cells || {})[heute.id + "|" + s.id] || []).includes(n)).map((s) => s.name) : [];
+      const zl = typeof zuletztOk === "function" ? zuletztOk().slice(0, 5) : [];
+      const zeile = (t) => `<button class="st-row ${isLate(t) ? "late" : ""}" data-open="${esc(t._id)}"><span class="st-dot" data-s="${esc(t.status)}"></span><span class="st-t">${esc(t.title)}<small>${esc(t.ressort)}${t.deadline ? " · " + (isLate(t) ? "überfällig, " : "") + relDay(t.deadline) : ""}</small></span><span class="st-go" aria-hidden="true">›</span></button>`;
+      $("#start-body").innerHTML = `
+        <section class="st-hero">${titelBild()}<div class="st-zeit">${zeit}</div>
+          <div class="st-stand"><button data-goto="overview"><b>${pct(erl, alle.length)}%</b><span>erledigt</span></button><button data-go-tab="tasks|late" class="${spaet ? "warn" : ""}"><b>${spaet}</b><span>überfällig</span></button><button data-go-tab="mine|tasks"><b>${meine.length}</b><span>meine offen</span></button></div></section>
+        ${kann ? `<div class="st-akt"><button data-st="task"><span>＋</span>Aufgabe</button><button data-st="note"><span>✎</span>Notiz</button><button data-st="meeting"><span>📝</span>Protokoll</button><button data-st="board"><span>📌</span>Mitteilung</button></div>` : ""}
+        ${camp && heute ? `<section class="card st-card"><div class="card-head"><h2>Heute im Lager</h2><button class="link" data-st-day="${esc(heute.id)}">Tagesseite</button></div><div class="card-body">${dienste.length ? `Dein Dienst: <b>${esc(dienste.join(", "))}</b>` : '<span class="muted">Heute hast du keinen Dienst.</span>'}</div></section>` : ""}
+        <section class="card st-card"><div class="card-head"><h2>Für dich</h2><button class="link" data-goto="mine">Alle meine Aufgaben</button></div>
+          ${fokus.length ? `<div class="st-list">${fokus.map(zeile).join("")}</div>` : `<div class="card-body muted">Nichts überfällig und diese Woche nichts fällig. 👍</div>`}</section>
+        ${hk ? `<section class="card st-card"><div class="card-head"><h2>Nächster Höck</h2><span class="muted">${relDay(hk.date)}</span></div><div class="card-body st-hk"><b>${esc(hk.title || HK[hk.kind || "LaLei"].label)}</b><span>${fmt(hk.date)}${hk.time ? ", " + esc(hk.time) : ""}${hk.place ? " · " + esc(hk.place) : ""}</span>
+          <div class="st-hk-b"><button class="btn small" data-open-hoeck="${esc(hk._id)}">Ansehen</button>${isLaLei() && kann ? `<button class="btn small" data-agenda>Traktandenliste</button>` : ""}</div></div></section>` : ""}
+        ${neu.length ? `<section class="card st-card"><div class="card-head"><h2>Neu für dich</h2><button class="link" data-st-bell>Alle</button></div><div class="st-list">${neu.map((x) => `<button class="st-row" ${x.attr}><span class="st-ico">${x.ico}</span><span class="st-t">${x.text}</span><span class="st-go" aria-hidden="true">›</span></button>`).join("")}</div></section>` : ""}
+        ${zl.length ? `<section class="card st-card"><div class="card-head"><h2>Zuletzt angesehen</h2></div><div class="card-body recent">${zl.map((x) => `<button class="pchip-s" ${zuletztAttr(x)}>${x.k === "t" ? "☑" : x.k === "h" ? "👥" : "📝"} ${esc(x.titel)}</button>`).join("")}</div></section>` : ""}
+        <section class="st-links">${[["overview", "Übersicht"], ["woche", "Meine Woche"], ["timeline", "Zeitplan"], ["board", "Pinnwand"], ["infos", "Infos & Links"], ["docs", "Dokumente"]].map(([v, l]) => `<button data-goto="${v}">${l}<span aria-hidden="true">›</span></button>`).join("")}</section>`;
+    },
+  };
+  view.addEventListener("click", (e) => {
+    const a = e.target.closest("[data-st]"); if (a) { const k = a.dataset.st; if (k === "task") return openTask("_new"); if (k === "board") return openBoardEditor(); return openEntry(k); }
+    if (e.target.closest("[data-st-bell]")) return bellOpen();
+    const dd = e.target.closest("[data-st-day]"); if (dd) { state.dayId = dd.dataset.stDay; return setView("day"); }
+  });
+  // Navigation: «Start» zuoberst bei der Lagerleitung
+  (() => { const ov = $('#tabs button[data-view="overview"]'); if (ov) ov.insertAdjacentHTML("beforebegin", `<button role="tab" data-view="start" data-roles="lalei"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>Start</button>`); })();
+  // Am Handy startet die Lagerleitung auf der Startseite
+  const openLagerOrig6 = openLager;
+  openLager = async function (id) { const r = await openLagerOrig6(id); if (state.lagerId === id && istHandy() && isLaLei() && state.view === "overview") setView("start"); return r; };
+
+  // ---------- Tastatur am Handy ----------
+  const tippFeld = (el) => el && (el.tagName === "TEXTAREA" || el.isContentEditable || (el.tagName === "INPUT" && !["checkbox", "radio", "button", "submit", "file", "range", "color"].includes(el.type)) || el.tagName === "SELECT");
+  document.addEventListener("focusin", (e) => { if (istHandy() && tippFeld(e.target)) document.body.classList.add("tippt"); });
+  document.addEventListener("focusout", () => setTimeout(() => { if (!tippFeld(document.activeElement)) document.body.classList.remove("tippt"); }, 120));
+  if (window.visualViewport) {
+    const vv = window.visualViewport;
+    const passe = () => {
+      const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop); const r = document.documentElement.style;
+      r.setProperty("--vvh", vv.height + "px"); r.setProperty("--kb", kb + "px"); document.body.classList.toggle("kb-offen", kb > 80);
+      const a = document.activeElement; if (kb > 80 && a && tippFeld(a) && a.closest(".overlay, .hoeck-mode")) setTimeout(() => a.scrollIntoView({ block: "center", behavior: "smooth" }), 60);
+    };
+    vv.addEventListener("resize", passe); vv.addEventListener("scroll", passe); passe();
+  }
 
   // ---------- boot ----------
   state.jTab = store.get("lalei-jtab") || "all";

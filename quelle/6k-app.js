@@ -12,7 +12,7 @@
   (() => {
     const app = $("#app"); if (!app || $("#appbar")) return;
     app.insertAdjacentHTML("afterbegin", `<header class="appbar" id="appbar">
-      <button class="ab-btn ab-back" id="ab-back" type="button" aria-label="Zurück" hidden>${ICO.back}</button>
+      <button class="ab-btn ab-back" id="ab-back" type="button" aria-label="Zurück" hidden>${ICO.back}<span id="ab-back-l">Zurück</span></button>
       <div class="ab-title"><b id="ab-title">Lager-Tool</b><span id="ab-sub"></span></div>
       <button class="ab-btn" id="ab-search" type="button" aria-label="Suchen">${ICO.search}</button>
       <button class="ab-btn" id="ab-bell" type="button" aria-label="Mitteilungen">${ICO.bell}<span class="count" id="ab-bell-n" hidden></span></button>
@@ -26,10 +26,17 @@
     t.textContent = titel || (nav ? nav.textContent.trim() : "") || lagerDoc().title || "Lager-Tool";
     const sub = $("#ab-sub"); const r = isCampNow() ? (() => { const c = campRange(); return `Tag ${daysBetween(parse(c.from), today()) + 1} von ${daysBetween(parse(c.from), parse(c.to)) + 1}`; })() : "";
     const lt = lagerDoc().title || ""; sub.textContent = [t.textContent === lt ? (isLaLei() ? "Übersicht" : "") : lt, r].filter(Boolean).join(" · ");
+    // Leiste unten: kein Pfeil. Tagesseite: zu den Tagen. Alles andere: zur Startseite.
     const wurzel = [...document.querySelectorAll("#bnav [data-view]")].map((b) => b.dataset.view);
-    const zurueck = typeof navDepth === "number" && navDepth > 0 && !wurzel.includes(state.view); $("#ab-back").hidden = !zurueck;
+    const home = isLaLei() ? "start" : "home";
+    const ziel = state.view === "day" ? "days" : home;
+    const zurueck = !wurzel.includes(state.view) && state.view !== home; const bb = $("#ab-back"); bb.hidden = !zurueck; bb.dataset.ziel = ziel;
+    const nl = (z) => { const b = $(`#tabs button[data-view="${z}"]`); return b ? [...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim() : ""; };
+    $("#ab-back-l").textContent = nl(ziel) || "Start"; bb.setAttribute("aria-label", "Zurück zu " + $("#ab-back-l").textContent);
     const n = bellItems().filter((x) => x.unread).length; const c = $("#ab-bell-n"); c.hidden = !n; c.textContent = n > 9 ? "9+" : n;
     document.body.classList.toggle("app-zurueck", zurueck);
+    const more = $("#bnav [data-more]"); if (more) more.setAttribute("aria-selected", String(!wurzel.includes(state.view)));
+    document.querySelectorAll("#bnav [data-view]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === (state.view === "day" ? "days" : state.view))));
   }
   const renderSideOrig5 = renderSide;
   renderSide = function () { renderSideOrig5(); appbarPaint(); };
@@ -37,7 +44,7 @@
   render = function () { renderOrig5(); appbarPaint(); };
   document.addEventListener("click", (e) => {
     const b = e.target.closest && e.target.closest(".appbar .ab-btn"); if (!b) return;
-    if (b.id === "ab-back") return history.back();
+    if (b.id === "ab-back") return setView(b.dataset.ziel || (isLaLei() ? "start" : "home"));
     if (b.id === "ab-search") return cmdk();
     if (b.id === "ab-bell") return bellOpen();
     if (b.id === "ab-sos") return showSos();
