@@ -56,6 +56,15 @@
     const navs = [...document.querySelectorAll("#tabs button[data-view]")].filter((b) => !b.hidden);
     const kacheln = navs.filter((b) => !["help", "prefs", "trash"].includes(b.dataset.view));
     const extra = navs.filter((b) => ["prefs", "help", "trash"].includes(b.dataset.view));
+    // Gruppen wie in der Seitenleiste am PC (Planung, Lager, Allgemein bzw. Mein Lager)
+    const kachel = (b) => { const cnt = b.querySelector(".count:not([hidden])"); return `<button type="button" class="mehr-k ${b.dataset.view === state.view ? "on" : ""}" data-mehr-view="${esc(b.dataset.view)}" data-such="${esc(txt(b).toLowerCase())}">${svgOf(b)}<span>${esc(txt(b))}</span>${cnt ? `<i>${esc(cnt.textContent)}</i>` : ""}</button>`; };
+    const gruppen = []; let grp = "Seiten";
+    for (const el of $("#tabs").children) {
+      if (el.classList.contains("nav-label")) { if (!el.hidden) grp = el.textContent.trim(); continue; }
+      if (el.classList.contains("nav-sep")) { grp = "Allgemein"; continue; }
+      if (!el.dataset || !el.dataset.view || el.hidden || !kacheln.includes(el)) continue;
+      let g = gruppen.find(([n]) => n === grp); if (!g) { g = [grp, []]; gruppen.push(g); } g[1].push(el);
+    }
     const svgOf = (b) => (b.querySelector("svg") ? b.querySelector("svg").outerHTML : "");
     const SV = {
       fb: '<svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/><path d="M8 9h8M8 12h5"/></svg>',
@@ -75,11 +84,10 @@
         <button type="button" data-mehr="logout">${SV.logout}<span>Abmelden</span></button>
       </div>
       <input type="search" class="mehr-q" placeholder="Seite suchen, z.B. Packliste" aria-label="Seite suchen" autocomplete="off">
-      <div class="mehr-label">Seiten</div>
-      <div class="mehr-grid">${kacheln.map((b) => { const cnt = b.querySelector(".count:not([hidden])");
-        return `<button type="button" class="mehr-k ${b.dataset.view === state.view ? "on" : ""}" data-mehr-view="${esc(b.dataset.view)}" data-such="${esc(txt(b).toLowerCase())}">${svgOf(b)}<span>${esc(txt(b))}</span>${cnt ? `<i>${esc(cnt.textContent)}</i>` : ""}</button>`; }).join("")}</div>
+      ${gruppen.filter(([g]) => g !== "Allgemein").map(([g, l]) => `<div class="mehr-label">${esc(g)}</div><div class="mehr-grid">${l.map(kachel).join("")}</div>`).join("")}
       <div class="mehr-label">Allgemein</div>
       <div class="mehr-grid">
+        ${((gruppen.find(([g]) => g === "Allgemein") || [])[1] || []).map(kachel).join("")}
         ${extra.map((b) => { const cnt = b.querySelector(".count:not([hidden])"); return `<button type="button" class="mehr-k ${b.dataset.view === state.view ? "on" : ""}" data-mehr-view="${esc(b.dataset.view)}" data-such="${esc(txt(b).toLowerCase())}">${svgOf(b)}<span>${esc(txt(b))}</span>${cnt ? `<i>${esc(cnt.textContent)}</i>` : ""}</button>`; }).join("")}
         ${isLaLei() && !state.asTeam ? `<button type="button" class="mehr-k" data-mehr="team" data-such="als team ansehen">${SV.team}<span>Als Team ansehen</span></button>` : ""}
         ${state.asTeam ? `<button type="button" class="mehr-k" data-mehr="lalei" data-such="zurück zur lagerleitung">${SV.team}<span>Zurück zur Lagerleitung</span></button>` : ""}
@@ -89,7 +97,7 @@
       <div class="mehr-leer muted" hidden>Nichts gefunden.</div>
       <div class="mehr-sync muted">${esc(($("#sync-state") || {}).textContent || "")}${STORE.version ? " · Version " + esc(STORE.version) : ""}</div>`, "mehr-blatt");
     const q = $(".mehr-q", o);
-    q.oninput = () => { const s = q.value.trim().toLowerCase(); let n = 0; o.querySelectorAll("[data-such]").forEach((b) => { const ok = !s || b.dataset.such.includes(s); b.hidden = !ok; if (ok) n++; }); $(".mehr-leer", o).hidden = n > 0; };
+    q.oninput = () => { const s = q.value.trim().toLowerCase(); let n = 0; o.querySelectorAll("[data-such]").forEach((b) => { const ok = !s || b.dataset.such.includes(s); b.hidden = !ok; if (ok) n++; }); $(".mehr-leer", o).hidden = n > 0; o.querySelectorAll(".mehr-grid").forEach((g) => { const leer = ![...g.children].some((x) => !x.hidden); g.hidden = leer; const lb = g.previousElementSibling; if (lb && lb.classList.contains("mehr-label")) lb.hidden = leer; }); };
     q.onkeydown = (e) => { if (e.key === "Enter") { const b = o.querySelector("[data-such]:not([hidden])"); if (b) b.click(); } };
     o.onclick = (e) => {
       if (e.target === o || e.target.closest("[data-mehr-zu]")) return closeDrawer();
