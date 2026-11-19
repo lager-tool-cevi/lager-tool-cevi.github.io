@@ -243,7 +243,7 @@ html.nd4 .setup-step:hover { border-color: var(--line-strong); }
 
 /* ---------- Start: Streifen, Bausteine, Kacheln ---------- */
 html.nd4 #view[data-v="start"] > .page-head { display: none; }
-html.nd4 .start-home { display: grid !important; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+html.nd4 .start-home { display: grid !important; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); grid-auto-flow: row dense; gap: 14px; align-items: start; }
 html.nd4 .start-home > * { grid-column: 1 / -1; margin: 0 !important; }
 html.nd4 .start-home > .st-hero { grid-row: 1; background: var(--tint) !important; color: var(--ink) !important; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px 22px; box-shadow: none; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
 html.nd4 .start-home > .st-hero::before, html.nd4 .start-home > .st-hero::after { display: none !important; }
